@@ -30,19 +30,20 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            /* Shifts the entire wallpaper up by roughly 1 inch */
+            object-position: center -40px; 
             z-index: 1;
         }
         .content-overlay {
             position: relative;
             z-index: 2;
             text-align: center;
-            /* Pushed down an extra half-inch */
-            margin-top: 260px; 
+            /* Shifts the interactive text area up proportionally */
+            margin-top: 180px; 
         }
         .enter-link {
             color: #fff;
             text-decoration: none;
-            /* Scaled text size down by 20% for a cleaner look */
             font-size: 0.88rem;
             letter-spacing: 4px;
             text-transform: uppercase;
