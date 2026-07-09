@@ -17,7 +17,6 @@
             overflow: hidden;
             font-family: sans-serif;
         }
-        /* Forces the landing page wrapper to take up the exact screen space */
         .landing-page {
             position: relative;
             width: 100%;
@@ -26,20 +25,19 @@
             justify-content: center;
             align-items: center;
         }
-        /* Fixes phone screen sizing to fill the display perfectly */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Crops cleanly on mobile screens with no borders */
+            object-fit: cover;
             z-index: 1;
         }
-        /* Centers the link layout directly over the image emblem */
         .content-overlay {
             position: relative;
             z-index: 2;
             text-align: center;
-            margin-top: 15px; /* Tiny adjustment to align perfectly in the middle */
+            /* Pushes the link vertically down so it sits below the text graphic */
+            margin-top: 140px; 
         }
         .enter-link {
             color: #fff;
@@ -65,10 +63,8 @@
 <body>
 
     <div class="landing-page">
-        <!-- Expanded full screen background layout -->
         <img src="reflexiunbackground.png" alt="Reflexiun Background" class="wallpaper-bg">
         
-        <!-- Interactive text positioned dead center -->
         <div class="content-overlay">
             <a href="#content" class="enter-link">drop in</a>
         </div>
