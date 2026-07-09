@@ -16,30 +16,35 @@
             height: 100%;
             overflow: hidden;
             font-family: sans-serif;
-        }
-        .landing-page {
-            position: relative;
-            width: 100%;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
+        /* Rigid centering container box */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        /* Forces the background image emblem to sit perfectly dead center */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Pushes the image composition much higher towards the top */
-            object-position: center 10%; 
+            object-position: center center;
             z-index: 1;
         }
+        /* Centers your interactive link layer cleanly below the logo text */
         .content-overlay {
             position: relative;
             z-index: 2;
             text-align: center;
-            /* Adjusts the text layout upward to match the new image placement */
-            margin-top: -10px; 
+            margin-top: 135px; 
         }
         .enter-link {
             color: #fff;
@@ -64,7 +69,7 @@
 </head>
 <body>
 
-    <div class="landing-page">
+    <div class="app-container">
         <img src="reflexiunbackground.png" alt="Reflexiun Background" class="wallpaper-bg">
         
         <div class="content-overlay">
