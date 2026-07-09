@@ -10,57 +10,69 @@
             padding: 0;
             box-sizing: border-box;
         }
-        body {
+        body, html {
             background-color: #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             font-family: sans-serif;
         }
-        .container {
-            text-align: center;
+        /* Forces the landing page wrapper to take up the exact screen space */
+        .landing-page {
+            position: relative;
+            width: 100%;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 20px;
         }
-        .logo-img {
-            max-width: 320px;
-            height: auto;
-            display: block;
+        /* Fixes phone screen sizing to fill the display perfectly */
+        .wallpaper-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Crops cleanly on mobile screens with no borders */
+            z-index: 1;
+        }
+        /* Centers the link layout directly over the image emblem */
+        .content-overlay {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-top: 15px; /* Tiny adjustment to align perfectly in the middle */
         }
         .enter-link {
             color: #fff;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             letter-spacing: 4px;
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer;
-            font-weight: 300;
+            font-weight: 400;
         }
         @keyframes randomGlow {
-            0%, 100’% { opacity: 0.2; text-shadow: 0 0 2px rgba(255,255,255,0.2); }
-            15% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,1), 0 0 18px rgba(255,255,255,0.7); }
+            0%, 100% { opacity: 0.2; text-shadow: 0 0 2px rgba(255,255,255,0.2); }
+            15% { opacity: 1; text-shadow: 0 0 12px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8); }
             22% { opacity: 0.3; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
-            45% { opacity: 0.85; text-shadow: 0 0 12px rgba(255,255,255,0.9); }
+            45% { opacity: 0.85; text-shadow: 0 0 14px rgba(255,255,255,0.9); }
             50% { opacity: 0.15; text-shadow: none; }
             70% { opacity: 0.75; text-shadow: 0 0 8px rgba(255,255,255,0.6); }
-            85% { opacity: 1; text-shadow: 0 0 12px rgba(255,255,255,1); }
+            85% { opacity: 1; text-shadow: 0 0 14px rgba(255,255,255,1); }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Connecting to your updated repository image asset -->
-        <img src="reflexiunbackground.png" alt="Reflexiun Background" class="logo-img">
-        <a href="#content" class="enter-link">drop in</a>
+    <div class="landing-page">
+        <!-- Expanded full screen background layout -->
+        <img src="reflexiunbackground.png" alt="Reflexiun Background" class="wallpaper-bg">
+        
+        <!-- Interactive text positioned dead center -->
+        <div class="content-overlay">
+            <a href="#content" class="enter-link">drop in</a>
+        </div>
     </div>
 
 </body>
 </html>
-
