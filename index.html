@@ -25,21 +25,35 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
         }
-        .logo-img {
-            max-width: 300px;
-            height: auto;
-            display: block;
+        /* Pure code glowing logo graphic */
+        .logo-graphic {
+            width: 120px;
+            height: 120px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-inner {
+            width: 40px;
+            height: 40px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
         }
         .enter-link {
             color: #fff;
             text-decoration: none;
             font-size: 1rem;
-            letter-spacing: 2px;
+            letter-spacing: 4px;
             text-transform: uppercase;
             animation: randomGlow 4s infinite ease-in-out;
             cursor: pointer;
+            margin-top: 10px;
         }
         @keyframes randomGlow {
             0%, 100% { opacity: 0.3; text-shadow: 0 0 2px rgba(255,255,255,0.2); }
@@ -55,8 +69,10 @@
 <body>
 
     <div class="container">
-        <!-- Using a reliable, external placeholder image to guarantee it loads inside GitHub -->
-        <img src="https://picsum.photos" alt="Reflexiun Logo" class="logo-img">
+        <!-- Logo built directly out of code elements -->
+        <div class="logo-graphic">
+            <div class="logo-inner"></div>
+        </div>
         <a href="#content" class="enter-link">drop in</a>
     </div>
 
