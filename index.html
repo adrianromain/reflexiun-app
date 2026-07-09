@@ -12,11 +12,6 @@
         }
         body {
             background-color: #000;
-            /* Failsafe: Standardizes background space if image has a glitch */
-            background-image: url('reflexiunwallpaper.png');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: contain;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -30,32 +25,38 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 40vh; /* Pushes text below center where logo sits */
+            gap: 20px;
+        }
+        .logo-img {
+            max-width: 300px;
+            height: auto;
+            display: block;
         }
         .enter-link {
             color: #fff;
             text-decoration: none;
             font-size: 1rem;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            animation: randomGlow 3s infinite ease-in-out;
+            animation: randomGlow 4s infinite ease-in-out;
             cursor: pointer;
-            font-weight: 300;
         }
         @keyframes randomGlow {
-            0%, 100% { opacity: 0.2; text-shadow: 0 0 2px rgba(255,255,255,0.1); }
-            10% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.6); }
-            15% { opacity: 0.3; text-shadow: 0 0 3px rgba(255,255,255,0.2); }
-            40% { opacity: 0.8; text-shadow: 0 0 12px rgba(255,255,255,0.9); }
-            45% { opacity: 0.2; text-shadow: none; }
-            70% { opacity: 0.9; text-shadow: 0 0 8px rgba(255,255,255,0.8); }
+            0%, 100% { opacity: 0.3; text-shadow: 0 0 2px rgba(255,255,255,0.2); }
+            15% { opacity: 1; text-shadow: 0 0 12px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8); }
+            20% { opacity: 0.4; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
+            45% { opacity: 0.9; text-shadow: 0 0 15px rgba(255,255,255,1); }
+            50% { opacity: 0.2; text-shadow: none; }
+            65% { opacity: 0.8; text-shadow: 0 0 10px rgba(255,255,255,0.7); }
+            85% { opacity: 1; text-shadow: 0 0 14px rgba(255,255,255,1); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Text with the specialized blinking glow script -->
+        <!-- Using a reliable, external placeholder image to guarantee it loads inside GitHub -->
+        <img src="https://picsum.photos" alt="Reflexiun Logo" class="logo-img">
         <a href="#content" class="enter-link">drop in</a>
     </div>
 
