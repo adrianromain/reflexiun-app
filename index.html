@@ -17,7 +17,6 @@
             overflow: hidden;
             font-family: sans-serif;
         }
-        /* Root container that keeps the whole app aligned */
         .app-container {
             width: 100%;
             height: 100vh;
@@ -26,16 +25,15 @@
             align-items: center;
             position: relative;
         }
-        /* Layer 1: Background is locked in place and will never shift */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center center;
+            /* Keeps the exact width scale but shifts the entire image UP by 1 inch (96px) */
+            object-position: center -96px; 
             z-index: 1;
         }
-        /* Layer 2: A rigid vertical stack for all current and future navigation links */
         .nav-menu-stack {
             position: relative;
             z-index: 2;
@@ -46,9 +44,9 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            /* Pushes the starting point of the menu area safely below the logo emblem */
-            padding-top: 360px; 
-            gap: 20px; /* This sets the exact, permanent spacing between future links */
+            /* Shifted up to stay perfectly aligned relative to your lifted logo text */
+            padding-top: 260px; 
+            gap: 20px; 
         }
         .enter-link {
             color: #fff;
@@ -62,10 +60,9 @@
             display: inline-block;
         }
 
-        /* Adjusts the menu starting position proportionally for desktop computer layouts */
         @media (min-width: 1024px) {
             .nav-menu-stack {
-                padding-top: 440px;
+                padding-top: 340px;
             }
         }
 
@@ -83,13 +80,10 @@
 <body>
 
     <div class="app-container">
-        <!-- Background Layer -->
         <img src="reflexiunbackground.png" alt="Reflexiun Background" class="wallpaper-bg">
         
-        <!-- Navigation Menu Layer (Ready for expanding deep functionality) -->
         <div class="nav-menu-stack">
             <a href="#content" class="enter-link">drop in</a>
-            <!-- New paths and navigation routes will slide directly under here safely -->
         </div>
     </div>
 
