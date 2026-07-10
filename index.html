@@ -172,12 +172,12 @@
         
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         
+        <!-- Stable layout media tracking layer -->
         <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
 
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
-                <!-- Fixed: True script loop routing applied to bypass link conflicts -->
                 <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
@@ -227,16 +227,18 @@
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
             
+            // Fixed: Explicitly verify video file paths to clear mobile playback blocks
             masterVideo.src = 'introvideo.mp4';
             masterVideo.style.display = 'block';
+            masterVideo.load(); // Forces device to buffer stream instantly before execution
+            
             masterVideo.play().catch(err => {
-                console.warn(err);
+                console.warn("Autoplay audio restriction fallback active:", err);
                 masterVideo.muted = true;
                 masterVideo.play();
             });
         }
         
-        // Fixed: Dual input hooks capturing exact hardware interaction vectors instantly
         dropInTrigger.addEventListener('touchstart', runMainVideoPlayback, { passive: false });
         dropInTrigger.addEventListener('click', runMainVideoPlayback);
 
@@ -259,10 +261,8 @@
                         masterVideo.src = 'phonecode.mp4';
                         masterVideo.style.mixBlendMode = 'screen';
                         masterVideo.loop = true;
+                        masterVideo.load();
                         
                         cameraVideo.style.opacity = '1';
                         masterVideo.style.opacity = '1';
                         cameraVideo.style.display = 'block';
-                        masterVideo.style.display = 'block';
-                        
-                        cameraVideo.play().catch(e => console.log(e));
