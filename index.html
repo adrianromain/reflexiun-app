@@ -1,4 +1,4 @@
-html<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -32,7 +32,7 @@ html<!DOCTYPE html>
             animation: none !important;
         }
         
-        /* Layer 1: Background Graphic */
+        /* Layer -100: Locked at the absolute bottom floor, completely unable to block clicks */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -40,8 +40,8 @@ html<!DOCTYPE html>
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
             background-position: center -144px;
-            z-index: 1;
-            pointer-events: none; 
+            z-index: -100 !important; 
+            pointer-events: none !important; 
             user-select: none;
             -webkit-user-drag: none;
             transition: opacity 0.5s ease;
@@ -50,7 +50,7 @@ html<!DOCTYPE html>
             opacity: 0;
         }
         
-        /* Layer 2: Master Native Video Layers */
+        /* Layer 10: Master Native Video Layers */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -84,10 +84,10 @@ html<!DOCTYPE html>
             transition: opacity 2s linear;
         }
         
-        /* Layer 3: Interactive Menu Overlays */
+        /* Layer 999999: Floating on the highest possible plane with zero graphics in its way */
         .nav-menu-stack {
             position: relative;
-            z-index: 9999; 
+            z-index: 999999 !important; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -97,7 +97,7 @@ html<!DOCTYPE html>
             max-width: 400px;
             padding-top: 210px; 
             gap: 32px; 
-            pointer-events: auto; 
+            pointer-events: auto !important; 
             transition: opacity 0.5s ease;
         }
         .nav-menu-stack.fade-out {
@@ -139,6 +139,9 @@ html<!DOCTYPE html>
             background: none;
             border: none;
             outline: none;
+            position: relative;
+            z-index: 1000000 !important; /* Ultimate layer separation priority */
+            pointer-events: auto !important;
         }
 
         /* --- THE DUAL MIRROR SETUP --- */
@@ -147,6 +150,8 @@ html<!DOCTYPE html>
             flex-direction: column;
             align-items: center;
             position: relative;
+            z-index: 999999 !important;
+            pointer-events: auto !important;
         }
         .mirror-reflection {
             transform: scaleY(-1);
@@ -154,7 +159,7 @@ html<!DOCTYPE html>
             margin-top: -25px; 
             filter: blur(3px); 
             user-select: none;
-            pointer-events: none;
+            pointer-events: none !important;
         }
 
         @keyframes screenGlitchShake {
@@ -183,9 +188,9 @@ html<!DOCTYPE html>
         <div class="wallpaper-bg" id="wallpaperBg"></div>
 
         <!-- Stable hardware video channels -->
-        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto"></video>
+        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto" muted></video>
         <video id="matrixFilterNode" class="movie-track-node" src="phonecode.mp4" playsinline webkit-playsinline preload="auto" loop muted></video>
-        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto"></video>
+        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto" muted></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
         
         <div class="nav-menu-stack" id="navMenuStack">
@@ -224,41 +229,33 @@ html<!DOCTYPE html>
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
 
-        function runMainVideoPlayback() {
+        function triggerCinematicPipeline(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation(); // Forces phone to ignore other hidden layers
+            }
+            
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
             
             introVideo.style.display = 'block';
-            introVideo.play().catch(err => {
-                console.warn("Muted fallback activated for auto-play compliance:", err);
-                introVideo.muted = true;
-                introVideo.play();
+            introVideo.play().then(() => {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "user" }, audio: false
+                    }).then(stream => {
+                        localCameraStream = stream;
+                        cameraVideo.srcObject = localCameraStream;
+                    }).catch(err => {
+                        console.warn("Camera fallback route active:", err);
+                        localCameraStream = null;
+                    });
+                }
+            }).catch(err => {
+                console.warn(err);
             });
         }
-
-        // Audited: Isolate permission triggers to clear device restrictions completely
-        dropInTrigger.addEventListener('click', (event) => {
-            if (event) event.preventDefault(); 
-
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                // Launch the camera permission window first *before* hitting the video player channels
-                navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user" }, audio: false
-                }).then(stream => {
-                    localCameraStream = stream;
-                    cameraVideo.srcObject = localCameraStream;
-                    // Success Handshake: Stream primed safely, proceed to movie launch immediately
-                    runMainVideoPlayback();
-                }).catch(err => {
-                    console.warn("Camera explicitly denied or unavailable. Running clean fallback path.", err);
-                    localCameraStream = null;
-                    // Fallback Handshake: Stream rejected safely, proceed to movie launch immediately
-                    runMainVideoPlayback();
-                });
-            } else {
-                runMainVideoPlayback();
-            }
-        });
-
-        introVideo.addEventListener('ended', () => {
+        
+        // Multi-bind to intercept physical touch gestures instantly on mobile screens
+        dropInTrigger.addEventListener('touchstart', triggerCinematicPipeline, { passive: false });
