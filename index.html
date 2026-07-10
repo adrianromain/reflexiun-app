@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -32,7 +32,7 @@
             animation: none !important;
         }
         
-        /* Layer 1: Background graphic layer safely fixed at the absolute bottom */
+        /* Layer 1: Background Graphic */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -50,7 +50,7 @@
             opacity: 0;
         }
         
-        /* Layer 2: Master video tracks sitting safely above the wallpaper background */
+        /* Layer 2: Master Native Video Layers */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -84,7 +84,7 @@
             transition: opacity 2s linear;
         }
         
-        /* Layer 3: Interactive menus completely unblocked floating on the top plane */
+        /* Layer 3: Interactive Menu Overlays */
         .nav-menu-stack {
             position: relative;
             z-index: 9999; 
@@ -96,7 +96,7 @@
             width: 100%;
             max-width: 400px;
             padding-top: 210px; 
-            gap: 24px;
+            gap: 32px; 
             pointer-events: auto; 
             transition: opacity 0.5s ease;
         }
@@ -124,6 +124,7 @@
                 padding-top: 380px; 
             }
         }
+
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -139,6 +140,8 @@
             border: none;
             outline: none;
         }
+
+        /* --- THE DUAL MIRROR SETUP --- */
         .mirror-block {
             display: flex;
             flex-direction: column;
@@ -147,12 +150,13 @@
         }
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.07; 
-            margin-top: -18px; 
-            filter: blur(2px); 
+            opacity: 0.02; 
+            margin-top: -25px; 
+            filter: blur(3px); 
             user-select: none;
             pointer-events: none;
         }
+
         @keyframes screenGlitchShake {
             0%, 92%, 100% { transform: translate(0, 0); }
             93% { transform: translate(-3px, 2px); }
@@ -161,6 +165,7 @@
             96% { transform: translate(3px, -1px); }
             97% { transform: translate(0, 0); }
         }
+
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
@@ -173,24 +178,29 @@
     </style>
 </head>
 <body>
+
     <div class="app-container" id="appContainer">
-        <!-- Background element layer structured first -->
         <div class="wallpaper-bg" id="wallpaperBg"></div>
 
-        <!-- Video elements compiled natively with strict iOS play parameters -->
-        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto" muted></video>
+        <!-- Stable hardware video channels -->
+        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto"></video>
         <video id="matrixFilterNode" class="movie-track-node" src="phonecode.mp4" playsinline webkit-playsinline preload="auto" loop muted></video>
-        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto" muted></video>
+        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
         
         <div class="nav-menu-stack" id="navMenuStack">
-            <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
+            <div class="mirror-block">
+                <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
+                <span class="enter-link mirror-reflection">drop in</span>
+            </div>
+            
             <div class="mirror-block">
                 <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
     </div>
+
     <script>
         function configureAdaptiveDownload() {
             const downloadLink = document.getElementById('dynamicDownload');
@@ -214,43 +224,41 @@
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
 
-        function triggerCinematicPipeline(event) {
-            if (event) event.preventDefault(); 
+        function runMainVideoPlayback() {
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
             
-            // Execute video track instantly to clear OS gesture loops
             introVideo.style.display = 'block';
             introVideo.play().catch(err => {
-                console.warn("Autoplay block active. Executing fallback routing.", err);
+                console.warn("Muted fallback activated for auto-play compliance:", err);
+                introVideo.muted = true;
+                introVideo.play();
             });
         }
-        
-        dropInTrigger.addEventListener('pointerdown', triggerCinematicPipeline);
-        dropInTrigger.addEventListener('click', triggerCinematicPipeline);
 
-        introVideo.addEventListener('ended', () => {
-            introVideo.style.display = 'none';
-            
-            // Staggered launch: Request device camera authorization ONLY when the intro finishes
+        // Audited: Isolate permission triggers to clear device restrictions completely
+        dropInTrigger.addEventListener('click', (event) => {
+            if (event) event.preventDefault(); 
+
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Launch the camera permission window first *before* hitting the video player channels
                 navigator.mediaDevices.getUserMedia({
                     video: { facingMode: "user" }, audio: false
                 }).then(stream => {
                     localCameraStream = stream;
                     cameraVideo.srcObject = localCameraStream;
-                    executeMirrorPhase();
+                    // Success Handshake: Stream primed safely, proceed to movie launch immediately
+                    runMainVideoPlayback();
                 }).catch(err => {
-                    console.warn("Camera channels rejected, jumping to next sequence route.", err);
+                    console.warn("Camera explicitly denied or unavailable. Running clean fallback path.", err);
                     localCameraStream = null;
-                    launchFinalDropInSegment();
+                    // Fallback Handshake: Stream rejected safely, proceed to movie launch immediately
+                    runMainVideoPlayback();
                 });
             } else {
-                launchFinalDropInSegment();
+                runMainVideoPlayback();
             }
         });
 
-        function executeMirrorPhase() {
-            matrixFilter.src = 'phonecode.mp4';
-            matrixFilter.load();
+        introVideo.addEventListener('ended', () => {
