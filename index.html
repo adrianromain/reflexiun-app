@@ -45,6 +45,13 @@
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
         }
+
+        /* Mobile specific adjustment to shift the wallpaper focus up */
+        @media (max-width: 599px) {
+            .wallpaper-bg {
+                background-position: center 35%;
+            }
+        }
         
         .movie-track-node {
             position: absolute;
