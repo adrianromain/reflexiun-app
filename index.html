@@ -51,18 +51,20 @@
             opacity: 0;
         }
 
-        /* --- HARDWARE VIDEO TRACK LAYERS --- */
-        .video-player-layer {
+        /* --- STABLE NATIVE LAYOUT EMBED TRACKS --- */
+        .movie-track-node {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 4; 
             background-color: #000;
             display: none;
         }
+        
+        #introVideoNode { z-index: 40; }
+        #dropInVideoNode { z-index: 50; }
 
         /* --- HARDWARE LIVE CAMERA MIRROR LAYER --- */
         .camera-feed-stream {
@@ -72,21 +74,14 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 2;
+            z-index: 20;
             transform: scaleX(-1);
             background-color: #000;
             display: none;
             transition: opacity 2s linear;
         }
-        .matrix-filter-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 3;
-            display: none;
+        #matrixFilterNode {
+            z-index: 30;
             mix-blend-mode: screen; 
             pointer-events: none;
             transition: opacity 2s linear;
@@ -191,9 +186,13 @@
 <body>
 
     <div class="app-container" id="appContainer">
+        <!-- Pre-loaded layout nodes -->
+        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto"></video>
+        <video id="matrixFilterNode" class="movie-track-node" src="phonecode.mp4" playsinline webkit-playsinline preload="auto" loop muted></video>
+        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto"></video>
+
+        <!-- Live device video layer -->
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
-        <video id="matrixFilter" class="matrix-filter-layer" autoplay playsinline muted loop></video>
-        <video id="transitionVideo" class="video-player-layer" playsinline webkit-playsinline></video>
         
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         
@@ -228,60 +227,51 @@
         window.addEventListener('resize', configureAdaptiveDownload);
 
         const dropInTrigger = document.getElementById('dropInTrigger');
-        const transitionVideo = document.getElementById('transitionVideo');
+        const introVideo = document.getElementById('introVideoNode');
+        const matrixFilter = document.getElementById('matrixFilterNode');
+        const dropInVideo = document.getElementById('dropInVideoNode');
         const cameraVideo = document.getElementById('cameraStream');
-        const matrixFilter = document.getElementById('matrixFilter');
         const wallpaperBg = document.getElementById('wallpaperBg');
-        const navMenuStack = document.getElementById('navMenuStack');
+        constnavMenuStack = document.getElementById('navMenuStack');
         const appContainer = document.getElementById('appContainer');
         
         let localCameraStream = null;
 
-        dropInTrigger.addEventListener('click', (event) => {
-            if (event) event.preventDefault(); 
-
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user" },
-                    audio: false
-                }).then(stream => {
-                    localCameraStream = stream;
-                    cameraVideo.srcObject = localCameraStream;
-                }).catch(cameraErr => {
-                    console.warn("Camera pipeline bypass warning:", cameraErr);
-                });
-            }
-
-            transitionVideo.src = 'introvideo.mp4';
-            
+        function triggerCinematicPipeline() {
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
 
-            transitionVideo.style.display = 'block';
-            transitionVideo.play().catch(err => {
-                transitionVideo.muted = true;
-                transitionVideo.play();
+            introVideo.style.display = 'block';
+            introVideo.play().then(() => {
+                // Request camera permission after intro video successfully boots up
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "user" },
+                        audio: false
+                    }).then(stream => {
+                        localCameraStream = stream;
+                        cameraVideo.srcObject = localCameraStream;
+                    }).catch(err => {
+                        // Continuation Fallback: Captures the 'Deny' action or missing camera state cleanly
+                        console.warn("Camera access denied or device missing webcam. Activating regular play fallback path.", err);
+                        localCameraStream = null;
+                    });
+                }
+            }).catch(err => {
+                introVideo.muted = true;
+                introVideo.play();
             });
+        }
+
+        dropInTrigger.addEventListener('click', (event) => {
+            if (event) event.preventDefault(); 
+            triggerCinematicPipeline();
         });
 
-        transitionVideo.addEventListener('ended', () => {
-            if (transitionVideo.src.includes('introvideo.mp4')) {
-                transitionVideo.style.display = 'none';
-                transitionVideo.src = ""; 
+        introVideo.addEventListener('ended', () => {
+            introVideo.style.display = 'none';
 
-                if (localCameraStream) {
-                    matrixFilter.src = 'phonecode.mp4';
-                    matrixFilter.load();
-
-                    cameraVideo.style.opacity = '1';
-                    matrixFilter.style.opacity = '1';
-                    
-                    cameraVideo.style.display = 'block';
-                    matrixFilter.style.display = 'block';
-                    
-                    cameraVideo.play().catch(e => console.log(e));
-                    matrixFilter.play().catch(e => console.log(e));
-
-                    setTimeout(() => {
-                        cameraVideo.style.opacity = '0';
+            if (localCameraStream) {
+                // Regular path: Camera was allowed
+                cameraVideo.style.opacity = '1';
