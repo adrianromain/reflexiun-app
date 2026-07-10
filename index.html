@@ -31,6 +31,8 @@
         .app-container.video-playing {
             animation: none !important;
         }
+        
+        /* Layer 1: Background graphic layer safely fixed at the absolute bottom */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -47,6 +49,8 @@
         .wallpaper-bg.fade-out {
             opacity: 0;
         }
+        
+        /* Layer 2: Master video tracks sitting safely above the wallpaper background */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -59,6 +63,7 @@
         }
         #introVideoNode { z-index: 40; }
         #dropInVideoNode { z-index: 50; }
+        
         .camera-feed-stream {
             position: absolute;
             top: 0;
@@ -78,6 +83,8 @@
             pointer-events: none;
             transition: opacity 2s linear;
         }
+        
+        /* Layer 3: Interactive menus completely unblocked floating on the top plane */
         .nav-menu-stack {
             position: relative;
             z-index: 9999; 
@@ -167,11 +174,15 @@
 </head>
 <body>
     <div class="app-container" id="appContainer">
-        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto"></video>
-        <video id="matrixFilterNode" class="movie-track-node" src="phonecode.mp4" playsinline webkit-playsinline preload="auto" loop muted></video>
-        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto"></video>
-        <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+        <!-- Background element layer structured first -->
         <div class="wallpaper-bg" id="wallpaperBg"></div>
+
+        <!-- Video elements compiled natively with strict iOS play parameters -->
+        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto" muted></video>
+        <video id="matrixFilterNode" class="movie-track-node" src="phonecode.mp4" playsinline webkit-playsinline preload="auto" loop muted></video>
+        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto" muted></video>
+        <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+        
         <div class="nav-menu-stack" id="navMenuStack">
             <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
             <div class="mirror-block">
@@ -208,44 +219,38 @@
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
+            
+            // Execute video track instantly to clear OS gesture loops
             introVideo.style.display = 'block';
-            introVideo.play().then(() => {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: "user" }, audio: false
-                    }).then(stream => {
-                        localCameraStream = stream;
-                        cameraVideo.srcObject = localCameraStream;
-                    }).catch(err => {
-                        console.warn(err);
-                        localCameraStream = null;
-                    });
-                }
-            }).catch(err => {
-                introVideo.muted = true; introVideo.play();
+            introVideo.play().catch(err => {
+                console.warn("Autoplay block active. Executing fallback routing.", err);
             });
         }
+        
         dropInTrigger.addEventListener('pointerdown', triggerCinematicPipeline);
         dropInTrigger.addEventListener('click', triggerCinematicPipeline);
 
         introVideo.addEventListener('ended', () => {
             introVideo.style.display = 'none';
-            if (localCameraStream) {
-                cameraVideo.style.opacity = '1';
-                matrixFilter.style.opacity = '1';
-                cameraVideo.style.display = 'block';
-                matrixFilter.style.display = 'block';
-                cameraVideo.play().catch(e => console.log(e));
-                matrixFilter.play().catch(e => console.log(e));
-                setTimeout(() => {
-                    cameraVideo.style.opacity = '0';
-                    matrixFilter.style.opacity = '0';
-                }, 2000);
-                setTimeout(() => {
-                    cameraVideo.style.display = 'none';
-                    matrixFilter.style.display = 'none';
-                    cameraVideo.pause(); matrixFilter.pause();
-                    localCameraStream.getTracks().forEach(track => track.stop());
-                    localCameraStream = null; cameraVideo.srcObject = null;
+            
+            // Staggered launch: Request device camera authorization ONLY when the intro finishes
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" }, audio: false
+                }).then(stream => {
+                    localCameraStream = stream;
+                    cameraVideo.srcObject = localCameraStream;
+                    executeMirrorPhase();
+                }).catch(err => {
+                    console.warn("Camera channels rejected, jumping to next sequence route.", err);
+                    localCameraStream = null;
                     launchFinalDropInSegment();
-                }, 4000);
+                });
+            } else {
+                launchFinalDropInSegment();
+            }
+        });
+
+        function executeMirrorPhase() {
+            matrixFilter.src = 'phonecode.mp4';
+            matrixFilter.load();
