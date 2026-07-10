@@ -40,16 +40,17 @@
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center center;
+            /* Default position for mobile/tablet: shifts visual focus upward */
+            background-position: center 65% !important;
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
         }
 
-        /* Adjusted mobile/tablet override to push the visual framing upward */
-        @media (max-width: 1023px) {
+        /* Desktop specific override: keeps it perfectly centered on large displays */
+        @media (min-width: 1024px) {
             .wallpaper-bg {
-                background-position: center 65% !important;
+                background-position: center center !important;
             }
         }
         
