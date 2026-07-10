@@ -3,95 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed Clickable Layout</title>
+    <title>Reflexiun</title>
     <style>
-        /* BASE PAGE STYLES */
-        body {
+        /* BASE SETUP FOR THE ENTIRE MOBILE SCREEN */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            height: 100vh;
+        }
+        
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* 1. THE FIXED BACKGROUND LAYER */
-        /* This layer stays behind and lets all clicks pass through it */
-        .background-container {
-            position: absolute;
+        /* 1. THE CRACKED GLASS BACKGROUND LAYER */
+        /* This keeps your beautiful visual look identical, but makes it invisible to finger touches */
+        .glass-background {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #34495e;
-            opacity: 0.1; /* Light overlay for visualization */
+            /* Keep your exact background image path below */
+            background: url('background.jpg') no-repeat center center;
+            background-size: cover;
             
-            /* CRITICAL FIXES FOR BACKGROUND */
-            z-index: 1 !important;         /* Keeps it on a low layer */
-            pointer-events: none !important; /* Clicks pass right through this */
+            /* INVISIBLE FUNCTIONAL FIXES */
+            z-index: 1 !important;          
+            pointer-events: none !important;  /* Touches pass directly through the glass graphic */
         }
 
-        /* 2. THE FIXED CONTENT CONTAINER */
-        /* This holds your active page content on a higher layer */
-        .content-layer {
+        /* 2. THE MAIN CONTAINER FOR LOGO AND LINKS */
+        .main-content {
             position: relative;
+            z-index: 1000 !important;       
             width: 100%;
-            max-width: 600px;
-            margin: 50px auto;
+            max-width: 450px;
             padding: 20px;
             text-align: center;
-            
-            /* CRITICAL FIXES FOR CONTENT CONTAINER */
-            z-index: 1000 !important;      /* Lifts content above background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* 3. THE FIXED BUTTON STYLES */
-        /* These settings force the buttons to accept clicks on the top layer */
-        .clickable-btn, button, a {
-            display: inline-block;
-            padding: 12px 24px;
-            margin: 10px;
-            font-size: 16px;
-            font-weight: bold;
+        /* THE GLOWING EMBLEM / LOGO SHAPE */
+        .logo-shape {
+            width: 180px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* THE "REFLEXIUN" MAIN BRAND TITLE */
+        .brand-title {
             color: #ffffff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            
-            /* CRITICAL FIXES FOR BUTTONS */
-            position: relative !important; 
-            z-index: 9999 !important;      /* Puts buttons on the absolute top layer */
-            pointer-events: auto !important; /* Guarantees they register clicks */
-            cursor: pointer !important;      /* Forces the hand cursor to show */
+            font-size: 38px;
+            letter-spacing: 7px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 50px;
         }
 
-        /* Visual hover state to prove it is working */
-        .clickable-btn:hover, button:hover, a:hover {
-            background-color: #0056b3;
+        /* 3. THE NAVIGATION LINKS ("DROP IN", "LOOK IN THE MIRROR", "REFLECT") */
+        /* They stay exactly where they are visually, but are forced to the top touch layer */
+        .nav-link {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 30px 0;
+            padding: 10px;
+            font-weight: 300;
+            
+            /* INVISIBLE FUNCTIONAL FIXES */
+            position: relative !important;
+            z-index: 9999 !important;       /* Hard-locks the links above the glass image */
+            pointer-events: auto !important; /* Forces the screen to register your clicks */
         }
     </style>
 </head>
 <body>
 
-    <!-- BACKGROUND ELEMENT (Will not block anything) -->
-    <div class="background-container"></div>
+    <!-- 1. VISUAL BACKGROUND LAYER -->
+    <div class="glass-background"></div>
 
-    <!-- MAIN CONTENT LAYER (Contains your interactive elements) -->
-    <div class="content-layer">
-        <h1>Your Web Page Title</h1>
-        <p>The background can move or resize freely without blocking the items below.</p>
+    <!-- 2. FRONT WORKBENCH LAYER -->
+    <div class="main-content">
         
-        <!-- BUTTON EXAMPLES USING THE NEW FIXED LAYER CLASSES -->
-        <button onclick="testClick('Standard Button')">Standard Button</button>
-        <a href="javascript:void(0);" class="clickable-btn" onclick="testClick('Link Button')">Text Link Button</a>
-    </div>
+        <!-- THE GLOWING ICON (Represented by the SVG code matching your screenshot) -->
+        <svg class="logo-shape" viewBox="0 0 200 100" fill="none" xmlns="http://w3.org">
+            <path d="M10 50 L100 15 L190 50 L100 85 Z" stroke="white" stroke-width="4"/>
+            <path d="M40 50 Q100 100 160 50" stroke="white" stroke-width="4"/>
+            <path d="M60 50 Q100 20 140 50" stroke="white" stroke-width="2"/>
+        </svg>
 
-    <!-- JAVASCRIPT TEST ACTION -->
-    <script>
-        function testClick(buttonName) {
-            alert(buttonName + " is working perfectly!");
-        }
-    </script>
+        <h1 class="brand-title">Reflexiun</h1>
+        
+        <!-- 3. THE FULLY CLICKABLE NAVIGATION LINKS -->
+        <a href="#drop-in" class="nav-link">Drop In</a>
+        
+        <a href="#look" class="nav-link">Look In The Mirror</a>
+        
+        <a href="#reflect" class="nav-link">Reflect</a>
+        
+    </div>
 
 </body>
 </html>
