@@ -80,9 +80,8 @@
         @media (min-width: 600px) and (max-width: 1023px) {
             .nav-menu-stack { bottom: 14%; }
         }
-        
         @media (min-width: 1024px) {
-            .nav-menu-stack { bottom: 16%; }
+            .nav-menu-stack { bottom: 16%; } 
         }
 
         .enter-link, .download-btn {
@@ -178,21 +177,26 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
+        // Master Timeline Tracking State Variables
         let selectedPathwayRoute = "dropin";
 
+        // Hardcoded Native Folder File Directions
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
 
         function startStreamingVideo(targetVideoUrl, routeName) {
             selectedPathwayRoute = routeName;
+            
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
+            
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
             masterVideo.load();
+            
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
@@ -201,17 +205,21 @@
                 });
             }
         }
-
+        
+        // Active click hooks connecting both buttons safely to your local files
         dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
+            // Check if the initial intro video just completed
             if (masterVideo.src.includes(localIntroUrl)) {
+                // Route to the correct secondary file based on which button you clicked
                 if (selectedPathwayRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
+                
                 masterVideo.load();
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
@@ -221,6 +229,7 @@
                     });
                 }
             } else {
+                // Final video segment completed -> Clear video player and bring user home smoothly
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
