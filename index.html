@@ -178,17 +178,16 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        // Master state tracking variables
         let currentSelectedTrackRoute = "none"; 
         let activeVideoSegmentStep = 1; 
 
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "lookinthemirror.mp4";
+        const localMirrorUrl = "mirrorvid.mp4"; // FIXED TARGET: Re-routed straight to the cleared filename track
 
         function startStreamingVideo(targetVideoUrl, routeName) {
             currentSelectedTrackRoute = routeName;
-            activeVideoSegmentStep = 1; // Explicitly lock segment phase to Intro Track
+            activeVideoSegmentStep = 1; 
             
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
@@ -213,12 +212,10 @@
         dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
-        // FIXED TIMELINE SYSTEM: Evaluates phase steps internally to bypass browser text-string errors permanently
         masterVideo.addEventListener('ended', () => {
             if (activeVideoSegmentStep === 1) {
-                activeVideoSegmentStep = 2; // Move sequence state directly forward to Main Track Phase
+                activeVideoSegmentStep = 2; 
                 
-                // Route cleanly based on the state locked at the instant of human touch gesture
                 if (currentSelectedTrackRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
@@ -236,7 +233,6 @@
                     });
                 }
             } else {
-                // Secondary track completed -> Safely clear canvas engine and reset home screen dashboard
                 activeVideoSegmentStep = 1;
                 currentSelectedTrackRoute = "none";
                 
