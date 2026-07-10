@@ -19,7 +19,7 @@
             font-family: sans-serif;
         }
         
-        /* THE MEDIA LAYER: Visual media objects locked deep underneath active navigation controls */
+        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
         .media-vault {
             position: fixed;
             top: 0;
@@ -139,13 +139,14 @@
             height: 48px; 
         }
         
+        /* CLEAN REFLECTION ARCHITECTURE FILTER CODE */
         .mirror-reflection {
             transform: scaleY(-1);
             opacity: 0.08; 
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
-            pointer-events: none !important;
+            pointer-events: none !important; /* FIXED: Smashes the invisible text layout shield permanently */
         }
 
         @keyframes randomGlow {
@@ -162,15 +163,14 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        <!-- Subterranean media layout vault pushes graphics underneath active controls -->
+        <!-- Subterranean media vault holds visual canvas layers -->
         <div class="media-vault">
             <div class="wallpaper-bg" id="wallpaperBg"></div>
-            <!-- FIXED: Direct inline structural touch bypass rules locked into the media node layout -->
             <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
             <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted style="pointer-events: none !important;"></video>
         </div>
 
-        <!-- Naked interface component stacking column -->
+        <!-- Naked interface stacking column floats completely unmasked on top -->
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
                 <button id="dropInTrigger" class="enter-link">drop in</button>
@@ -212,7 +212,6 @@
         let selectedPathwayRoute = "dropin";
         let localCameraStream = null;
 
-        // Clean local repository folder file mappings
         const localIntroUrl = "introvideo.mp4";
         const localMatrixUrl = "phonecode.mp4";
         const localDropInUrl = "dropinvid.mp4";
@@ -258,3 +257,4 @@
             if (masterVideo.src.includes(localIntroUrl)) {
                 masterVideo.style.display = 'none';
 
+                if (localCameraStream) {
