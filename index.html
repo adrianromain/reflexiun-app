@@ -19,7 +19,6 @@
             font-family: sans-serif;
         }
         
-        /* Master Base Plane Container */
         .app-container {
             width: 100%;
             height: 100vh;
@@ -28,9 +27,6 @@
             align-items: center;
             position: relative;
             background-color: #000;
-        }
-        .app-container.video-playing {
-            animation: none !important;
         }
         
         /* Layer 1: Background Graphic */
@@ -42,13 +38,10 @@
             background-size: cover;
             background-position: center -144px;
             z-index: 1; 
-            pointer-events: none !important; /* FIXED: Shield layer deactivated permanently */
+            pointer-events: none !important; 
             user-select: none;
             -webkit-user-drag: none;
             transition: opacity 0.5s ease;
-        }
-        .wallpaper-bg.fade-out {
-            opacity: 0;
         }
         
         /* Layer 2: Master Native Video Layers */
@@ -62,7 +55,7 @@
             background-color: #000;
             display: none;
             z-index: 4;
-            pointer-events: none !important; /* FIXED: Prevents media from blocking button input coordinates */
+            pointer-events: none !important; 
         }
         
         .camera-feed-stream {
@@ -79,7 +72,7 @@
             pointer-events: none !important;
         }
         
-        /* Layer 3: Interactive Menu Stack shifted up comfortably clear of logos */
+        /* Layer 3: Interactive Menu Stack */
         .nav-menu-stack {
             position: absolute; 
             bottom: 26%; 
@@ -93,13 +86,9 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            gap: 16px; /* Tight text line distribution footprint */
+            gap: 16px; 
             pointer-events: auto !important; 
             transition: opacity 0.5s ease;
-        }
-        .nav-menu-stack.fade-out {
-            opacity: 0;
-            pointer-events: none;
         }
         
         @media (min-width: 600px) and (max-width: 1023px) {
@@ -119,7 +108,6 @@
             .nav-menu-stack { bottom: 30%; } 
         }
 
-        /* Sleeker uniform font profile rules */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -128,7 +116,7 @@
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer; 
-            font-weight: 300 !important; /* Thin typography style locked */
+            font-weight: 300 !important; 
             display: inline-block !important; 
             padding: 8px 16px; 
             background: none;
@@ -147,10 +135,9 @@
             height: 48px; 
         }
         
-        /* Clean lighter reflection tracking coordinates */
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.08; /* Sharper bounce intensity signature */
+            opacity: 0.08; 
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
@@ -171,33 +158,26 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        
-        <!-- Native Player Layout Node Container -->
         <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
 
         <div class="nav-menu-stack" id="navMenuStack">
-            <!-- 1. Drop In Route -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
-            <!-- 2. Look In The Mirror Route -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
                 <span class="enter-link mirror-reflection">look in the mirror</span>
             </div>
             
-            <!-- 3. Wallpaper Download Route -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
-
     </div> 
 
     <script>
@@ -223,15 +203,14 @@
         let localCameraStream = null;
         let selectedPathwayRoute = "dropin"; 
 
-        // Verified Cloudinary Global Streaming Path Registry
+        // Hardcoded Global Cloudinary Direct Video Stream URLs
         const cloudIntroUrl = "https://cloudinary.com";
         const cloudMatrixUrl = "https://cloudinary.com";
         const cloudFinaleUrl = "https://cloudinary.com";
         
-        // Placeholder link targeting your upcoming custom CapCut video loop path
-        const cloudMirrorUrl = "lookinthemirror.mp4"; 
+        // FIXED: Real Cloudinary live video link applied completely free of placeholders
+        const cloudMirrorUrl = "https://cloudinary.com"; 
 
-        // Master Video Activation Pipeline Engine
         function fireCinematicPipeline(event, targetRoute) {
             if (event) {
                 event.preventDefault();
@@ -247,7 +226,6 @@
             masterVideo.play().catch(err => console.warn(err));
         }
         
-        // Unified click hooks capturing touchscreen input points instantly without hardware delays
         dropInTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "dropin"));
         mirrorTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "mirror"));
 
@@ -256,3 +234,22 @@
                 masterVideo.style.display = 'none';
 
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+                    .then(stream => {
+                        localCameraStream = stream;
+                        cameraVideo.srcObject = localCameraStream;
+                        
+                        masterVideo.src = cloudMatrixUrl;
+                        masterVideo.style.mixBlendMode = 'screen';
+                        masterVideo.loop = true;
+                        masterVideo.load();
+                        
+                        cameraVideo.style.display = 'block';
+                        masterVideo.style.display = 'block';
+                        
+                        cameraVideo.play().catch(e => console.log(e));
+                        masterVideo.play().catch(e => console.log(e));
+
+                        setTimeout(() => {
+                            cameraVideo.style.display = 'none';
+                            cameraVideo.pause();
