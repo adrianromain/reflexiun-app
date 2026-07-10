@@ -178,31 +178,24 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        let currentSelectedTrackRoute = "none"; 
-        let activeVideoSegmentStep = 1; 
+        let selectedPathwayRoute = "dropin";
 
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "mirrorvid.mp4"; // FIXED MATCH: Fully synced with your dashboard file rename
+        const localMirrorUrl = "mirrorvid.mp4";
 
         function startStreamingVideo(targetVideoUrl, routeName) {
-            currentSelectedTrackRoute = routeName;
-            activeVideoSegmentStep = 1; 
-            
+            selectedPathwayRoute = routeName;
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
-            
-            masterVideo.muted = false;
             masterVideo.load();
-            
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    console.warn("Browser fallback triggered: forcing muted loop to render video track frames", err);
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
@@ -213,18 +206,13 @@
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
-            if (activeVideoSegmentStep === 1) {
-                activeVideoSegmentStep = 2; 
-                
-                if (currentSelectedTrackRoute === "mirror") {
+            if (masterVideo.src.includes(localIntroUrl)) {
+                if (selectedPathwayRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
-                
-                masterVideo.muted = false;
                 masterVideo.load();
-                
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
@@ -233,9 +221,6 @@
                     });
                 }
             } else {
-                activeVideoSegmentStep = 1;
-                currentSelectedTrackRoute = "none";
-                
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
