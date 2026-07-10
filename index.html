@@ -19,7 +19,7 @@
             font-family: sans-serif;
         }
         
-        /* BACKGROUND WALLPAPER LAYER */
+        /* WALLPAPER BASE CONTAINER */
         .media-vault {
             position: fixed;
             top: 0;
@@ -32,6 +32,7 @@
             user-select: none;
         }
         
+        /* STATIC WALLPAPER FRAMES */
         .phone-bg, .tablet-bg, .desktop-bg {
             position: absolute;
             top: 0;
@@ -66,7 +67,7 @@
             .desktop-bg { display: block; background-image: url('reflexiunnewwallpaper.png'); background-position: center center; }
         }
         
-        /* DUAL VIDEO ENGINE STYLING */
+        /* CINEMATIC VIDEO BACKGROUND LAYER */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -80,7 +81,7 @@
             pointer-events: none !important; 
         }
 
-        /* LIVE CAMERA ENGINE LAYER */
+        /* LIVE FRONT-FACING MIRROR LENS RE-ROUTED BELOW THE FRAME OVERLAY */
         #cameraMirror {
             position: absolute;
             top: 0;
@@ -89,26 +90,25 @@
             height: 100%;
             object-fit: cover;
             display: none;
-            z-index: 10 !important;
-            transform: scaleX(-1); /* Flips the feed horizontally so it mirrors naturally */
+            z-index: 10 !important; /* Positioned directly underneath your framework overlay layer */
+            transform: scaleX(-1);   /* Keeps the natural mirror perspective intact */
             pointer-events: none !important;
         }
 
-        /* HARDWARE PHYSICAL FRAME OVERLAY OVER CAMERA FEED */
-        #phoneOverlayFrame {
+        /* ACTIVE MATRIX FILTER WRAPPER CONTAINER */
+        #phoneOverlayFilter {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center center;
+            background-color: rgba(0, 0, 0, 0.35); /* Soft industrial tint matrix overlay */
             display: none;
-            z-index: 20 !important; /* Locks directly on top of the live camera track */
+            z-index: 20 !important; /* Stays locked right on top of their live face view */
             pointer-events: none !important;
         }
         
-        /* MENU INTERACTION LAYER */
+        /* CONTROL INTERACTION STACK */
         .nav-menu-stack {
             position: fixed !important; 
             bottom: 12%; 
@@ -118,239 +118,4 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            gap: 16px; 
-            pointer-events: auto !important; 
-            transition: opacity 0.4s ease;
-        }
-        
-        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
-        @media (min-width: 1024px) { .nav-menu-stack { bottom: 16%; } }
-
-        .enter-link, .download-btn {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.1rem; 
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            animation: randomGlow 3.5s infinite ease-in-out;
-            cursor: pointer; 
-            font-weight: 300 !important; 
-            display: inline-block !important; 
-            padding: 8px 16px; 
-            background: none;
-            border: none;
-            outline: none;
-            pointer-events: auto !important;
-        }
-
-        .mirror-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            width: 100%; 
-            pointer-events: auto !important;
-            height: 48px; 
-        }
-        
-        .mirror-reflection {
-            transform: scaleY(-1);
-            opacity: 0.08; 
-            margin-top: -18px; 
-            filter: blur(3px); 
-            user-select: none;
-            pointer-events: none !important;
-        }
-
-        @keyframes randomGlow {
-            0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
-            15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
-            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
-            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
-            50% { opacity: 0.15; text-shadow: none; }
-            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
-            85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="media-vault">
-        <div class="phone-bg" id="phoneBg"></div>
-        <div class="tablet-bg" id="tabletBg"></div>
-        <div class="desktop-bg" id="desktopBg"></div>
-        
-        <video id="introPlayer" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto"></video>
-        <video id="loopPlayer" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto"></video>
-        
-        <video id="cameraMirror" autoplay playsinline muted></video>
-        
-        <div id="phoneOverlayFrame"></div>
-    </div>
-
-    <div class="nav-menu-stack" id="navMenuStack">
-        <div class="mirror-block">
-            <button id="dropInTrigger" class="enter-link">drop in</button>
-            <span class="enter-link mirror-reflection">drop in</span>
-        </div>
-        
-        <div class="mirror-block">
-            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
-            <span class="enter-link mirror-reflection">look in the mirror</span>
-        </div>
-        
-        <div class="mirror-block">
-            <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
-            <span class="download-btn mirror-reflection">reflect</span>
-        </div>
-    </div>
-
-    <script>
-        function configureAdaptiveDownload() {
-            const downloadLink = document.getElementById('dynamicDownload');
-            if (!downloadLink) return;
-            const width = window.innerWidth;
-            let targetFile = 'reflexiunnewwallpaper.png'; 
-            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
-            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
-            downloadLink.href = targetFile;
-        }
-        window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
-        window.addEventListener('resize', configureAdaptiveDownload);
-
-        const dropInTrigger = document.getElementById('dropInTrigger');
-        const mirrorTrigger = document.getElementById('mirrorTrigger');
-        
-        const introPlayer = document.getElementById('introPlayer');
-        const loopPlayer = document.getElementById('loopPlayer');
-        const cameraMirror = document.getElementById('cameraMirror');
-        const phoneOverlayFrame = document.getElementById('phoneOverlayFrame');
-        
-        const phoneBg = document.getElementById('phoneBg');
-        const tabletBg = document.getElementById('tabletBg');
-        const desktopBg = document.getElementById('desktopBg');
-        const navMenuStack = document.getElementById('navMenuStack');
-
-        const localIntroUrl = "introvideo.mp4";
-        const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "mirrorvid.mp4";
-
-        let selectedPathwayRoute = "dropin";
-        let activeCameraStream = null;
-        let cameraPermissionGranted = false;
-
-        function startInteractiveExperience(secondaryVideoUrl, routeName) {
-            selectedPathwayRoute = routeName;
-            
-            // Clear menu graphics immediately
-            navMenuStack.style.opacity = '0';
-            navMenuStack.style.pointerEvents = 'none';
-            if(phoneBg) phoneBg.style.opacity = '0';
-            if(tabletBg) tabletBg.style.opacity = '0';
-            if(desktopBg) desktopBg.style.opacity = '0';
-            
-            // Start the hardware intro file setup
-            introPlayer.style.zIndex = "9999999";
-            introPlayer.src = localIntroUrl;
-            introPlayer.style.display = 'block';
-            introPlayer.muted = false;
-            introPlayer.load();
-            introPlayer.play().catch(err => {
-                introPlayer.muted = true;
-                introPlayer.play().catch(e => console.error(e));
-            });
-
-            // REQUEST PERMISSION IMMEDIATELY DURING INTRO FRAME BACKDROP
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" }, /* Demands front-facing selfie camera precisely */
-                    audio: false 
-                })
-                .then(stream => {
-                    activeCameraStream = stream;
-                    cameraPermissionGranted = true;
-                    cameraMirror.srcObject = stream;
-                    cameraMirror.load();
-                })
-                .catch(error => {
-                    console.log("Camera access declined or unavailable. Failsafe enabled.");
-                    cameraPermissionGranted = false;
-                });
-            }
-        }
-        
-        dropInTrigger.addEventListener('click', function() { startInteractiveExperience(localDropInUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { startInteractiveExperience(localMirrorUrl, "mirror"); });
-
-        // EXECUTED IMMEDIATELY WHEN INTRO VIDEO TIMELINE TERMINATES
-        introPlayer.addEventListener('ended', () => {
-            introPlayer.style.display = 'none';
-            introPlayer.src = "";
-            
-            if (cameraPermissionGranted && activeCameraStream) {
-                // PHASE A: CAMERA PRESENTATION (Granted Access Flow)
-                cameraMirror.style.display = 'block';
-                
-                // Show the physical text overlay asset explicitly on top of your face matrix
-                phoneOverlayFrame.style.display = 'block';
-                cameraMirror.play().catch(e => console.error(e));
-                
-                // FORCE THE TIMED SYSTEM: Cut camera channel down completely after exactly 4 seconds
-                setTimeout(() => {
-                    // Turn off camera view elements safely
-                    cameraMirror.style.display = 'none';
-                    phoneOverlayFrame.style.display = 'none';
-                    cameraMirror.pause();
-                    
-                    // Kill active hardware capture lens pipeline smoothly to turn off device camera light
-                    if(activeCameraStream) {
-                        activeCameraStream.getTracks().forEach(track => track.stop());
-                    }
-                    
-                    // Transition smoothly to final narrative file
-                    playSecondaryLoop();
-                }, 4000);
-                
-            } else {
-                // FAILSAFE ROUTE: Jump straight to the secondary loop video without pausing if permission was denied
-                playSecondaryLoop();
-            }
-        });
-
-        function playSecondaryLoop() {
-            loopPlayer.style.zIndex = "9999999";
-            loopPlayer.style.display = 'block';
-            loopPlayer.src = (selectedPathwayRoute === "mirror") ? localMirrorUrl : localDropInUrl;
-            loopPlayer.muted = false;
-            loopPlayer.load();
-            loopPlayer.play().catch(err => {
-                loopPlayer.muted = true;
-                loopPlayer.play().catch(e => console.error(e));
-            });
-        }
-
-        // RETURN HOME ENGINE AUTOMATION LOGIC
-        loopPlayer.addEventListener('ended', () => {
-            // Drop core video display layouts completely out of view profiles
-            loopPlayer.style.zIndex = "3";
-            loopPlayer.style.display = 'none';
-            loopPlayer.src = "";
-            
-            // Clean up global tracker state metrics safely
-            activeCameraStream = null;
-            cameraPermissionGranted = false;
-            
-            // Bring the interface navigation directly back to home baseline setup smoothly
-            navMenuStack.style.opacity = '1';
-            navMenuStack.style.pointerEvents = 'auto';
-            if(phoneBg) phoneBg.style.opacity = '1';
-            if(tabletBg) tabletBg.style.opacity = '1';
-            if(desktopBg) desktopBg.style.opacity = '1';
-        });
-    </script>
-</body>
-</html>
+            justify
