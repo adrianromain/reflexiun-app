@@ -224,7 +224,9 @@
         const desktopBg = document.getElementById('desktopBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
+        // State Tracking Controls
         let selectedPathwayRoute = "dropin";
+        let introIsPlaying = false; // Bulletproof state tracker instead of reading text URLs
 
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
@@ -232,6 +234,8 @@
 
         function startStreamingVideo(targetVideoUrl, routeName) {
             selectedPathwayRoute = routeName;
+            introIsPlaying = true; // Mark that the initial phase has started
+            
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             
@@ -249,7 +253,7 @@
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    console.log("Audio bypass fallback active.");
+                    console.log("Audio exception handled.");
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
@@ -260,12 +264,12 @@
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
-            const currentVideoSrc = masterVideo.src.toLowerCase();
-            
-            if (currentVideoSrc.includes("introvideo.mp4")) {
-                // HARD RESET THE ENGINE: Force pause and clear current buffer before switching files
+            // If the phase state tracker confirms the intro video just completed
+            if (introIsPlaying) {
+                introIsPlaying = false; // Instantly turn off intro tracking state
                 masterVideo.pause();
                 
+                // Route directly based on internal state tracking variables
                 if (selectedPathwayRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
@@ -283,6 +287,7 @@
                     });
                 }
             } else {
+                // Secondary file phase completed -> Full structural view reset
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
