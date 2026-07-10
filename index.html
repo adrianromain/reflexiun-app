@@ -19,7 +19,7 @@
             font-family: sans-serif;
         }
         
-        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
+        /* BACKGROUND WALLPAPER LAYER */
         .media-vault {
             position: fixed;
             top: 0;
@@ -32,7 +32,6 @@
             user-select: none;
         }
         
-        /* Shared Baseline Rules for All Wallpaper Containers */
         .phone-bg, .tablet-bg, .desktop-bg {
             position: absolute;
             top: 0;
@@ -46,7 +45,6 @@
             display: none;
         }
 
-        /* 1. PHONE BACKGROUND BOX (Screens up to 599px wide) */
         @media (max-width: 599px) {
             .phone-bg {
                 display: block;
@@ -54,43 +52,21 @@
                 background-position: center center;
                 transform: scale(1.1) translateY(-40px);
             }
-            
-            .enter-link, .download-btn {
-                font-size: 0.55rem !important;
-                padding: 0px !important;
-            }
-
-            .mirror-block {
-                height: 24px !important;
-            }
-
-            .mirror-block .mirror-reflection {
-                margin-top: -6px !important;
-            }
-
-            .nav-menu-stack {
-                gap: 12px !important;
-            }
+            .enter-link, .download-btn { font-size: 0.55rem !important; padding: 0px !important; }
+            .mirror-block { height: 24px !important; }
+            .mirror-block .mirror-reflection { margin-top: -6px !important; }
+            .nav-menu-stack { gap: 12px !important; }
         }
 
-        /* 2. TABLET BACKGROUND BOX */
         @media (min-width: 600px) and (max-width: 1023px) {
-            .tablet-bg {
-                display: block;
-                background-image: url('reflexiunnewwallpaper.png');
-                background-position: center center;
-            }
+            .tablet-bg { display: block; background-image: url('reflexiunnewwallpaper.png'); background-position: center center; }
         }
 
-        /* 3. DESKTOP BACKGROUND BOX */
         @media (min-width: 1024px) {
-            .desktop-bg {
-                display: block;
-                background-image: url('reflexiunnewwallpaper.png');
-                background-position: center center;
-            }
+            .desktop-bg { display: block; background-image: url('reflexiunnewwallpaper.png'); background-position: center center; }
         }
         
+        /* DUAL VIDEO ENGINE STYLING */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -100,10 +76,39 @@
             object-fit: cover;
             background-color: #000;
             display: none;
-            z-index: 3 !important;
+            z-index: 5 !important;
             pointer-events: none !important; 
         }
+
+        /* LIVE CAMERA ENGINE LAYER */
+        #cameraMirror {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+            z-index: 10 !important;
+            transform: scaleX(-1); /* Flips the feed horizontally so it mirrors naturally */
+            pointer-events: none !important;
+        }
+
+        /* HARDWARE PHYSICAL FRAME OVERLAY OVER CAMERA FEED */
+        #phoneOverlayFrame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center center;
+            display: none;
+            z-index: 20 !important; /* Locks directly on top of the live camera track */
+            pointer-events: none !important;
+        }
         
+        /* MENU INTERACTION LAYER */
         .nav-menu-stack {
             position: fixed !important; 
             bottom: 12%; 
@@ -119,14 +124,11 @@
             max-width: 400px;
             gap: 16px; 
             pointer-events: auto !important; 
+            transition: opacity 0.4s ease;
         }
         
-        @media (min-width: 600px) and (max-width: 1023px) {
-            .nav-menu-stack { bottom: 14%; }
-        }
-        @media (min-width: 1024px) {
-            .nav-menu-stack { bottom: 16%; } 
-        }
+        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
+        @media (min-width: 1024px) { .nav-menu-stack { bottom: 16%; } }
 
         .enter-link, .download-btn {
             color: #fff;
@@ -182,7 +184,12 @@
         <div class="tablet-bg" id="tabletBg"></div>
         <div class="desktop-bg" id="desktopBg"></div>
         
-        <video id="masterVideoEngine" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
+        <video id="introPlayer" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto"></video>
+        <video id="loopPlayer" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto"></video>
+        
+        <video id="cameraMirror" autoplay playsinline muted></video>
+        
+        <div id="phoneOverlayFrame"></div>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
@@ -217,87 +224,132 @@
 
         const dropInTrigger = document.getElementById('dropInTrigger');
         const mirrorTrigger = document.getElementById('mirrorTrigger');
-        const masterVideo = document.getElementById('masterVideoEngine');
+        
+        const introPlayer = document.getElementById('introPlayer');
+        const loopPlayer = document.getElementById('loopPlayer');
+        const cameraMirror = document.getElementById('cameraMirror');
+        const phoneOverlayFrame = document.getElementById('phoneOverlayFrame');
         
         const phoneBg = document.getElementById('phoneBg');
         const tabletBg = document.getElementById('tabletBg');
         const desktopBg = document.getElementById('desktopBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        // State Tracking Controls
-        let selectedPathwayRoute = "dropin";
-        let introIsPlaying = false; // Bulletproof state tracker instead of reading text URLs
-
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "mirrorvid.mp4";
 
-        function startStreamingVideo(targetVideoUrl, routeName) {
+        let selectedPathwayRoute = "dropin";
+        let activeCameraStream = null;
+        let cameraPermissionGranted = false;
+
+        function startInteractiveExperience(secondaryVideoUrl, routeName) {
             selectedPathwayRoute = routeName;
-            introIsPlaying = true; // Mark that the initial phase has started
             
+            // Clear menu graphics immediately
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
-            
             if(phoneBg) phoneBg.style.opacity = '0';
             if(tabletBg) tabletBg.style.opacity = '0';
             if(desktopBg) desktopBg.style.opacity = '0';
             
-            masterVideo.style.zIndex = "9999999"; 
-            masterVideo.src = targetVideoUrl;
-            masterVideo.style.display = 'block';
-            
-            masterVideo.muted = false;
-            masterVideo.load();
-            
-            const playPromise = masterVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(err => {
-                    console.log("Audio exception handled.");
-                    masterVideo.muted = true;
-                    masterVideo.play().catch(e => console.error(e));
+            // Start the hardware intro file setup
+            introPlayer.style.zIndex = "9999999";
+            introPlayer.src = localIntroUrl;
+            introPlayer.style.display = 'block';
+            introPlayer.muted = false;
+            introPlayer.load();
+            introPlayer.play().catch(err => {
+                introPlayer.muted = true;
+                introPlayer.play().catch(e => console.error(e));
+            });
+
+            // REQUEST PERMISSION IMMEDIATELY DURING INTRO FRAME BACKDROP
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" }, /* Demands front-facing selfie camera precisely */
+                    audio: false 
+                })
+                .then(stream => {
+                    activeCameraStream = stream;
+                    cameraPermissionGranted = true;
+                    cameraMirror.srcObject = stream;
+                    cameraMirror.load();
+                })
+                .catch(error => {
+                    console.log("Camera access declined or unavailable. Failsafe enabled.");
+                    cameraPermissionGranted = false;
                 });
             }
         }
         
-        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
+        dropInTrigger.addEventListener('click', function() { startInteractiveExperience(localDropInUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { startInteractiveExperience(localMirrorUrl, "mirror"); });
 
-        masterVideo.addEventListener('ended', () => {
-            // If the phase state tracker confirms the intro video just completed
-            if (introIsPlaying) {
-                introIsPlaying = false; // Instantly turn off intro tracking state
-                masterVideo.pause();
+        // EXECUTED IMMEDIATELY WHEN INTRO VIDEO TIMELINE TERMINATES
+        introPlayer.addEventListener('ended', () => {
+            introPlayer.style.display = 'none';
+            introPlayer.src = "";
+            
+            if (cameraPermissionGranted && activeCameraStream) {
+                // PHASE A: CAMERA PRESENTATION (Granted Access Flow)
+                cameraMirror.style.display = 'block';
                 
-                // Route directly based on internal state tracking variables
-                if (selectedPathwayRoute === "mirror") {
-                    masterVideo.src = localMirrorUrl;
-                } else {
-                    masterVideo.src = localDropInUrl;
-                }
+                // Show the physical text overlay asset explicitly on top of your face matrix
+                phoneOverlayFrame.style.display = 'block';
+                cameraMirror.play().catch(e => console.error(e));
                 
-                masterVideo.muted = false;
-                masterVideo.load();
+                // FORCE THE TIMED SYSTEM: Cut camera channel down completely after exactly 4 seconds
+                setTimeout(() => {
+                    // Turn off camera view elements safely
+                    cameraMirror.style.display = 'none';
+                    phoneOverlayFrame.style.display = 'none';
+                    cameraMirror.pause();
+                    
+                    // Kill active hardware capture lens pipeline smoothly to turn off device camera light
+                    if(activeCameraStream) {
+                        activeCameraStream.getTracks().forEach(track => track.stop());
+                    }
+                    
+                    // Transition smoothly to final narrative file
+                    playSecondaryLoop();
+                }, 4000);
                 
-                const playPromise = masterVideo.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(err => {
-                        masterVideo.muted = true;
-                        masterVideo.play().catch(e => console.error(e));
-                    });
-                }
             } else {
-                // Secondary file phase completed -> Full structural view reset
-                masterVideo.style.zIndex = "3";
-                masterVideo.style.display = 'none';
-                masterVideo.src = "";
-                navMenuStack.style.opacity = '1';
-                navMenuStack.style.pointerEvents = 'auto';
-                
-                if(phoneBg) phoneBg.style.opacity = '1';
-                if(tabletBg) tabletBg.style.opacity = '1';
-                if(desktopBg) desktopBg.style.opacity = '1';
+                // FAILSAFE ROUTE: Jump straight to the secondary loop video without pausing if permission was denied
+                playSecondaryLoop();
             }
+        });
+
+        function playSecondaryLoop() {
+            loopPlayer.style.zIndex = "9999999";
+            loopPlayer.style.display = 'block';
+            loopPlayer.src = (selectedPathwayRoute === "mirror") ? localMirrorUrl : localDropInUrl;
+            loopPlayer.muted = false;
+            loopPlayer.load();
+            loopPlayer.play().catch(err => {
+                loopPlayer.muted = true;
+                loopPlayer.play().catch(e => console.error(e));
+            });
+        }
+
+        // RETURN HOME ENGINE AUTOMATION LOGIC
+        loopPlayer.addEventListener('ended', () => {
+            // Drop core video display layouts completely out of view profiles
+            loopPlayer.style.zIndex = "3";
+            loopPlayer.style.display = 'none';
+            loopPlayer.src = "";
+            
+            // Clean up global tracker state metrics safely
+            activeCameraStream = null;
+            cameraPermissionGranted = false;
+            
+            // Bring the interface navigation directly back to home baseline setup smoothly
+            navMenuStack.style.opacity = '1';
+            navMenuStack.style.pointerEvents = 'auto';
+            if(phoneBg) phoneBg.style.opacity = '1';
+            if(tabletBg) tabletBg.style.opacity = '1';
+            if(desktopBg) desktopBg.style.opacity = '1';
         });
     </script>
 </body>
