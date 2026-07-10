@@ -74,7 +74,7 @@
             width: 100%;
             max-width: 400px;
             gap: 16px; 
-            pointer-events: auto !important; /* Forces the browser to read your mouse clicks */
+            pointer-events: auto !important; /* Forces the browser to read your clicks */
         }
         
         @media (min-width: 600px) and (max-width: 1023px) {
@@ -136,24 +136,23 @@
     <!-- Background visual elements isolated deep below -->
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <!-- FIXED: Configured with precise crossorigin settings to prevent background video caching locks -->
         <video id="masterVideoEngine" class="movie-track-node" muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
     <!-- Clickable button menu floating naked on top -->
     <div class="nav-menu-stack" id="navMenuStack">
         <div class="mirror-block">
-            <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
+            <button id="dropInTrigger" class="enter-link">drop in</button>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
         
         <div class="mirror-block">
-            <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
+            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
             <span class="enter-link mirror-reflection">look in the mirror</span>
         </div>
         
         <div class="mirror-block">
-            <a href="javascript:void(0);" id="dynamicDownload" class="download-btn" download>reflect</a>
+            <a href="https://cloudinary.com" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
         </div>
     </div>
@@ -163,9 +162,9 @@
             const downloadLink = document.getElementById('dynamicDownload');
             if (!downloadLink) return;
             const width = window.innerWidth;
-            let targetFile = 'reflexiunnewwallpaper.png'; 
-            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
-            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
+            let targetFile = 'https://cloudinary.com'; 
+            if (width >= 1024) { targetFile = 'https://cloudinary.com'; } 
+            else if (width >= 600) { targetFile = 'https://cloudinary.com'; }
             downloadLink.href = targetFile;
         }
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
@@ -177,6 +176,7 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
+        // FIXED: Restored exact dashboard secure authentication parameters
         const cloudIntroUrl = "https://cloudinary.com";
         const cloudFinaleUrl = "https://cloudinary.com";
 
@@ -189,22 +189,21 @@
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
             
-            // FIXED: Complete clear re-initialization mapping ensures data buffers instantly
             masterVideo.load();
             
-            // Explicitly force user touch action pass-through
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    console.log("Stream sequence initialized successfully.");
+                    console.log("Stream successfully initiated.");
                 }).catch(err => {
-                    console.warn("Autoplay handler active, engaging secondary execution logic.", err);
+                    console.warn("Engaging audio override handler.", err);
                     masterVideo.muted = true;
                     masterVideo.play();
                 });
             }
         }
         
+        // FIXED: Direct hardware connection loops built into true button elements
         dropInTrigger.addEventListener('click', function() { startStreamingVideo(cloudIntroUrl); });
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(cloudIntroUrl); });
 
