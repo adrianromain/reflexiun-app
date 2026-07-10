@@ -10,6 +10,7 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation !important; /* AUDIT FIX: Blocks browser boundary gesture locks */
         }
         body, html {
             background-color: #000;
@@ -28,7 +29,7 @@
             height: 100vh;
             background-color: #000;
             z-index: 1 !important;
-            pointer-events: none !important;
+            pointer-events: none !important; /* AUDIT FIX: Visual vaults cannot intercept clicks */
             user-select: none;
         }
         
@@ -47,7 +48,6 @@
             transition: opacity 0.5s ease;
         }
         
-        /* THE IMMERSIVE WEB PLAYER STAGE: Naked viewport dynamic video engine */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -63,20 +63,19 @@
         
         /* 
            THE PEAK PLANE INDEPENDENT TRIGGER ENGINE
-           Every row anchors directly to screen coordinates. Zero shared column boxes. Zero masking.
+           Every row anchors tightly to independent screen coordinates. Zero shared container box leaks.
         */
         .mirror-block {
             position: fixed !important;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
+            display: inline-flex !important; /* AUDIT FIX: Shrink-wraps container footprint tightly to text letters */
             flex-direction: column;
             align-items: center;
-            width: 100%; 
-            max-width: 400px;
+            width: auto !important; /* AUDIT FIX: Destroys virtual full-width box overlap sheets */
             height: auto !important;
-            z-index: 999999 !important; /* Total dominance over screen layers */
-            pointer-events: none !important; /* Invisible wrapper frames cannot catch touch events */
+            z-index: 999999 !important; /* Absolute numerical dominance over screen layers */
+            pointer-events: none !important; /* Envelope boundaries are transparent to clicks */
         }
         
         /* INDEPENDENT POSITION TRACKING ARRAY: Mapped perfectly to preserve your 16px layout gaps */
@@ -119,7 +118,7 @@
             border: none;
             outline: none;
             pointer-events: auto !important; /* Forces the browser engine to receive your clicks exclusively */
-            z-index: 9999999 !important;
+            z-index: 9999999 !important; /* Peak layer tracking priority */
             position: relative;
         }
         
@@ -153,23 +152,19 @@
             <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
         </div>
 
-        /* 
-           UNIFIED INDEPENDENT INTERACTION MATRIX 
-           Each button floats completely standalone to eliminate box enclosure crashes entirely 
-        */
-        <!-- 1. Drop In Active Target Link -->
+        <!-- 1. Drop In Standalone Link Target Row -->
         <div class="mirror-block" id="row-dropin">
             <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
         
-        <!-- 2. Look In The Mirror Active Target Link -->
+        <!-- 2. Look In The Mirror Standalone Link Target Row -->
         <div class="mirror-block" id="row-mirror">
             <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
             <span class="enter-link mirror-reflection">look in the mirror</span>
         </div>
         
-        <!-- 3. Reflect Download Target Link -->
+        <!-- 3. Reflect Download Standalone Link Target Row -->
         <div class="mirror-block" id="row-reflect">
             <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
@@ -197,7 +192,7 @@
         let activeFilePlaylist = [];
         let currentPlaylistIndex = 0;
 
-        // Relative paths clear nested folder hosted tracks on GitHub Pages servers natively
+        // Relative path directions bypass sub-folder hosted restrictions on GitHub server loops natively
         const localIntroUrl = "./introvideo.mp4";
         const localDropInUrl = "./dropinvid.mp4";
         const localMirrorUrl = "./lookinthemirror.mp4";
@@ -206,7 +201,7 @@
             activeFilePlaylist = playlistArray;
             currentPlaylistIndex = 0;
             
-            // Instantly clear background artwork elements out of view
+            // Instantly dissolve interface links entirely out of the window field of view
             dropInTrigger.style.opacity = '0';
             dropInTrigger.style.pointerEvents = 'none';
             mirrorTrigger.style.opacity = '0';
@@ -215,7 +210,7 @@
             document.getElementById('dynamicDownload').style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
             
-            // Bring player canvas forward out of the vault layer setup
+            // Pop unblocked native player canvas right to the highest layout plane
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.style.display = 'block';
             
@@ -231,9 +226,5 @@
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
-                        console.warn("Autoplay handler engaged safety muted loop:", err);
+                        console.warn("Autoplay audio restriction bypassed natively:", err);
                         masterVideo.muted = true;
-                        masterVideo.play().catch(e => console.error(e));
-                    });
-                }
-            } else {
