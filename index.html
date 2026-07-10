@@ -19,32 +19,33 @@
             font-family: sans-serif;
         }
         
-        .app-container {
+        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
+        .media-vault {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
             background-color: #000;
+            z-index: 1 !important;
+            pointer-events: none !important;
+            user-select: none;
         }
         
-        /* Layer 1: Background Graphic */
         .wallpaper-bg {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center -144px;
-            z-index: 1; 
+            background-position: center center;
+            z-index: 2 !important; 
             pointer-events: none !important; 
-            user-select: none;
-            -webkit-user-drag: none;
             transition: opacity 0.5s ease;
         }
         
-        /* Layer 2: Master Native Video Layers */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -54,31 +55,17 @@
             object-fit: cover;
             background-color: #000;
             display: none;
-            z-index: 4;
+            z-index: 3 !important;
             pointer-events: none !important; 
         }
         
-        .camera-feed-stream {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 2;
-            transform: scaleX(-1);
-            background-color: #000;
-            display: none;
-            pointer-events: none !important;
-        }
-        
-        /* Layer 3: Interactive Menu Stack */
+        /* THE BUTTON LAYER: Put on the absolute highest level so nothing can cover them */
         .nav-menu-stack {
-            position: absolute; 
-            bottom: 26%; 
+            position: fixed !important; 
+            bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10; 
+            z-index: 999999 !important; /* Total dominance over the page screen */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -87,25 +74,14 @@
             width: 100%;
             max-width: 400px;
             gap: 16px; 
-            pointer-events: auto !important; 
-            transition: opacity 0.5s ease;
+            pointer-events: auto !important; /* Forces the browser to read your mouse clicks */
         }
         
         @media (min-width: 600px) and (max-width: 1023px) {
-            .wallpaper-bg {
-                background-image: url('reflexiuntablet.png'); 
-                background-size: contain;
-                background-position: center center;
-            }
-            .nav-menu-stack { bottom: 28%; }
+            .nav-menu-stack { bottom: 14%; }
         }
         @media (min-width: 1024px) {
-            .wallpaper-bg {
-                background-image: url('reflexiundesktop.png'); 
-                background-size: contain;
-                background-position: center center;
-            }
-            .nav-menu-stack { bottom: 30%; } 
+            .nav-menu-stack { bottom: 16%; } 
         }
 
         .enter-link, .download-btn {
@@ -157,28 +133,29 @@
 </head>
 <body>
 
-    <div class="app-container" id="appContainer">
+    <!-- Background visual elements isolated deep below -->
+    <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto"></video>
-        <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
+    </div>
 
-        <div class="nav-menu-stack" id="navMenuStack">
-            <div class="mirror-block">
-                <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
-                <span class="enter-link mirror-reflection">drop in</span>
-            </div>
-            
-            <div class="mirror-block">
-                <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
-                <span class="enter-link mirror-reflection">look in the mirror</span>
-            </div>
-            
-            <div class="mirror-block">
-                <a href="javascript:void(0);" id="dynamicDownload" class="download-btn" download>reflect</a>
-                <span class="download-btn mirror-reflection">reflect</span>
-            </div>
+    <!-- Clickable button menu floating naked on top -->
+    <div class="nav-menu-stack" id="navMenuStack">
+        <div class="mirror-block">
+            <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
+            <span class="enter-link mirror-reflection">drop in</span>
         </div>
-    </div> 
+        
+        <div class="mirror-block">
+            <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
+            <span class="enter-link mirror-reflection">look in the mirror</span>
+        </div>
+        
+        <div class="mirror-block">
+            <a href="javascript:void(0);" id="dynamicDownload" class="download-btn" download>reflect</a>
+            <span class="download-btn mirror-reflection">reflect</span>
+        </div>
+    </div>
 
     <script>
         function configureAdaptiveDownload() {
@@ -196,60 +173,44 @@
         const dropInTrigger = document.getElementById('dropInTrigger');
         const mirrorTrigger = document.getElementById('mirrorTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
-        const cameraVideo = document.getElementById('cameraStream');
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
-        const appContainer = document.getElementById('appContainer');
-        let localCameraStream = null;
-        let selectedPathwayRoute = "dropin"; 
 
-        // Hardcoded Global Cloudinary Direct Video Stream URLs
         const cloudIntroUrl = "https://cloudinary.com";
-        const cloudMatrixUrl = "https://cloudinary.com";
         const cloudFinaleUrl = "https://cloudinary.com";
-        
-        // FIXED: Real Cloudinary live video link applied completely free of placeholders
-        const cloudMirrorUrl = "https://cloudinary.com"; 
 
-        function fireCinematicPipeline(event, targetRoute) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            selectedPathwayRoute = targetRoute; 
+        function startStreamingVideo(targetVideoUrl) {
             navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
             
-            masterVideo.src = cloudIntroUrl;
+            masterVideo.style.zIndex = "9999999"; /* Pops video to the top ONLY after you successfully click */
+            masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
             masterVideo.load();
-            masterVideo.play().catch(err => console.warn(err));
+            masterVideo.play().catch(err => {
+                masterVideo.muted = true;
+                masterVideo.play();
+            });
         }
         
-        dropInTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "dropin"));
-        mirrorTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "mirror"));
+        dropInTrigger.addEventListener('click', function() { startStreamingVideo(cloudIntroUrl); });
+        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(cloudIntroUrl); });
 
         masterVideo.addEventListener('ended', () => {
             if (masterVideo.src === cloudIntroUrl) {
+                masterVideo.src = cloudFinaleUrl;
+                masterVideo.load();
+                masterVideo.play().catch(err => console.error(err));
+            } else {
+                masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
-
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-                    .then(stream => {
-                        localCameraStream = stream;
-                        cameraVideo.srcObject = localCameraStream;
-                        
-                        masterVideo.src = cloudMatrixUrl;
-                        masterVideo.style.mixBlendMode = 'screen';
-                        masterVideo.loop = true;
-                        masterVideo.load();
-                        
-                        cameraVideo.style.display = 'block';
-                        masterVideo.style.display = 'block';
-                        
-                        cameraVideo.play().catch(e => console.log(e));
-                        masterVideo.play().catch(e => console.log(e));
-
-                        setTimeout(() => {
-                            cameraVideo.style.display = 'none';
-                            cameraVideo.pause();
+                masterVideo.src = "";
+                navMenuStack.style.opacity = '1';
+                navMenuStack.style.pointerEvents = 'auto';
+                wallpaperBg.style.opacity = '1';
+            }
+        });
+    </script>
+</body>
+</html>
