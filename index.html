@@ -19,7 +19,7 @@
             font-family: sans-serif;
         }
         
-        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
+        /* THE MEDIA LAYER: Visual visual layers locked deep beneath active controls */
         .media-vault {
             position: fixed;
             top: 0;
@@ -47,13 +47,27 @@
             transition: opacity 0.5s ease;
         }
         
-        /* THE BUTTON LAYER: Isolated outside visual elements on the highest plane */
+        /* THE IMMERSIVE WEB PLAYER STAGE: Naked, full-viewport dynamic scaling layer */
+        .movie-track-node {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #000;
+            display: none;
+            z-index: 4 !important;
+            pointer-events: none !important; 
+        }
+        
+        /* THE BUTTON LAYER: Isolated completely outside visual elements on the absolute peak plane */
         .nav-menu-stack {
             position: fixed !important; 
-            bottom: 12%; /* LOCKED: Keeps buttons exactly down where you love them */
+            bottom: 12%; /* LOCKED: Text remains stationary down where you love it on your phone */
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; /* Total dominance to block any hidden glass overlays */
+            z-index: 999999 !important; /* Absolute numerical dominance over screen coordinates */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -72,16 +86,17 @@
             .nav-menu-stack { bottom: 14%; }
         }
         
+        /* DESKTOP MONITOR BALANCE PANEL STYLES */
         @media (min-width: 1024px) {
             .wallpaper-bg {
                 background-position: center center;
             }
             .nav-menu-stack { 
-                bottom: 8% !important; 
+                bottom: 8% !important; /* Lowers link grid on large monitor displays */
             } 
             .nav-menu-stack .enter-link, 
             .nav-menu-stack .download-btn {
-                font-size: 0.95rem !important; 
+                font-size: 0.95rem !important; /* Shrinks typography sleeker on monitors */
             }
         }
 
@@ -99,7 +114,9 @@
             background: none;
             border: none;
             outline: none;
-            pointer-events: auto !important; /* Forces the browser to read your clicks */
+            pointer-events: auto !important;
+            z-index: 9999999 !important;
+            position: relative;
         }
 
         .mirror-block {
@@ -108,18 +125,18 @@
             align-items: center;
             position: relative;
             width: 100%; 
-            height: auto !important;
-            pointer-events: none !important;
+            height: auto !important; /* Shrink-wraps links to delete container collisions */
+            pointer-events: none !important; /* Ghost rows ensure zero touch masking */
         }
         
-        /* CLEAN REFLECTION ARCHITECTURE FILTER CODE */
+        /* CLEAN REFLECTION GLOW LIGHT SIGNATURE CODE */
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.08; 
+            opacity: 0.08; /* Your exact reflection intensity signature match */
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
-            pointer-events: none !important; /* Smashes the invisible text layout shield permanently */
+            pointer-events: none !important; /* Completely transparent to finger and mouse clicks */
         }
 
         @keyframes randomGlow {
@@ -136,20 +153,22 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        <!-- Subterranean media vault holds background visuals completely out of touch way -->
+        <!-- Subterranean media vault holds visual layers completely out of the interface way -->
         <div class="media-vault">
             <div class="wallpaper-bg" id="wallpaperBg"></div>
+            <!-- Immersive container player tag stripped completely free of browser controls -->
+            <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
         </div>
 
-        <!-- FIXED: Direct HTML link framework routes video files with absolute 100% mechanical un-blockable precision -->
+        <!-- High-priority button grid floats completely unmasked on top of the world -->
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
-                <a href="introvideo.mp4" id="dropInTrigger" class="enter-link">drop in</a>
+                <button id="dropInTrigger" class="enter-link">drop in</button>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
             <div class="mirror-block">
-                <a href="lookinthemirror.mp4" id="mirrorTrigger" class="enter-link">look in the mirror</a>
+                <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
                 <span class="enter-link mirror-reflection">look in the mirror</span>
             </div>
             
@@ -172,6 +191,51 @@
         }
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
         window.addEventListener('resize', configureAdaptiveDownload);
-    </script>
-</body>
-</html>
+
+        const dropInTrigger = document.getElementById('dropInTrigger');
+        const mirrorTrigger = document.getElementById('mirrorTrigger');
+        const masterVideo = document.getElementById('masterVideoEngine');
+        const wallpaperBg = document.getElementById('wallpaperBg');
+        const navMenuStack = document.getElementById('navMenuStack');
+
+        let selectedPathwayRoute = "dropin";
+
+        // Pure folder directories containing your active local files
+        const localIntroUrl = "introvideo.mp4";
+        const localDropInUrl = "dropinvid.mp4";
+        const localMirrorUrl = "lookinthemirror.mp4";
+
+        function initializeImmersiveStream(targetVideoUrl, routeName) {
+            selectedPathwayRoute = routeName;
+            
+            // Step 1 Defense: Clear the text menu cleanly out of the field of view
+            navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
+            wallpaperBg.style.opacity = '0';
+            
+            // Step 2 Defense: Force the naked video player to pop cleanly to the top layer floor
+            masterVideo.style.zIndex = "9999999"; 
+            masterVideo.src = targetVideoUrl;
+            masterVideo.style.display = 'block';
+            
+            // Step 3 Defense: Command audio channels to unlock cleanly inside active human gesture context
+            masterVideo.muted = false; 
+            masterVideo.load();
+            
+            // Step 4 Defense: Promise tracking handles security policy audio locks automatically
+            const playPromise = masterVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.warn("Muted safety catch fallback engaged:", err);
+                    masterVideo.muted = true;
+                    masterVideo.play().catch(e => console.error(e));
+                });
+            }
+        }
+        
+        // Locked straightforward hardware click event receptors
+        dropInTrigger.addEventListener('click', function() { initializeImmersiveStream(localIntroUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { initializeImmersiveStream(localIntroUrl, "mirror"); });
+
+        // Step 5 Defense: Clear tracking strings using global '.includes' filters to destroy browser path crashes
+        masterVideo.addEventListener('ended', () => {
