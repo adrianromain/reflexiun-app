@@ -136,6 +136,7 @@
     <!-- Background visual elements isolated deep below -->
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
+        <!-- FIXED: Explicit hardware autoplay hooks injected directly to prevent black screen lockouts -->
         <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
@@ -184,14 +185,18 @@
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
             
-            masterVideo.style.zIndex = "9999999"; /* Pops video to the top ONLY after you successfully click */
+            masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
             masterVideo.load();
-            masterVideo.play().catch(err => {
-                masterVideo.muted = true;
-                masterVideo.play();
-            });
+            
+            var playPromise = masterVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    masterVideo.muted = true;
+                    masterVideo.play();
+                });
+            }
         }
         
         dropInTrigger.addEventListener('click', function() { startStreamingVideo(cloudIntroUrl); });
@@ -201,7 +206,13 @@
             if (masterVideo.src === cloudIntroUrl) {
                 masterVideo.src = cloudFinaleUrl;
                 masterVideo.load();
-                masterVideo.play().catch(err => console.error(err));
+                var playPromise = masterVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        masterVideo.muted = true;
+                        masterVideo.play();
+                    });
+                }
             } else {
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
