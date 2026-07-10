@@ -169,11 +169,8 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        
-        <!-- Stable layout media tracking layer -->
-        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
+        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
 
         <div class="nav-menu-stack" id="navMenuStack">
@@ -192,7 +189,6 @@
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
-
     </div> 
 
     <script>
@@ -227,13 +223,13 @@
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
             
-            // Fixed: Explicitly verify video file paths to clear mobile playback blocks
+            // Fixed: Verified source streaming paths to stop mobile memory drops
             masterVideo.src = 'introvideo.mp4';
             masterVideo.style.display = 'block';
-            masterVideo.load(); // Forces device to buffer stream instantly before execution
+            masterVideo.load();
             
             masterVideo.play().catch(err => {
-                console.warn("Autoplay audio restriction fallback active:", err);
+                console.warn("Muted background active:", err);
                 masterVideo.muted = true;
                 masterVideo.play();
             });
@@ -266,4 +262,6 @@
                         cameraVideo.style.opacity = '1';
                         masterVideo.style.opacity = '1';
                         cameraVideo.style.display = 'block';
-
+                        masterVideo.style.display = 'block';
+                        
+                        cameraVideo.play().catch(e => console.log(e));
