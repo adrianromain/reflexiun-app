@@ -2,120 +2,254 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reflexiun</title>
     <style>
-        /* BASE SETUP FOR THE ENTIRE MOBILE SCREEN */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
         body, html {
+            background-color: #000;
             width: 100%;
             height: 100%;
-            background-color: #000000;
-            font-family: 'Arial', sans-serif;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: sans-serif;
         }
-
-        /* 1. THE CRACKED GLASS BACKGROUND LAYER */
-        /* Keeps your beautiful visual look identical, but makes it invisible to finger touches */
-        .glass-background {
+        
+        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
+        .media-vault {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            /* Keep your exact background image file path or URL below */
-            background: url('background.jpg') no-repeat center center;
-            background-size: cover;
-            
-            /* INVISIBLE FUNCTIONAL FIXES */
-            z-index: 1 !important;          
-            pointer-events: none !important;  /* Touches pass directly through the glass graphic */
+            height: 100vh;
+            background-color: #000;
+            z-index: 1 !important;
+            pointer-events: none !important;
+            user-select: none;
         }
-
-        /* 2. THE MAIN CONTAINER FOR LOGO AND LINKS */
-        .main-content {
-            position: relative;
-            z-index: 1000 !important;       
+        
+        /* FIXED MOBILE BACKGROUND: Shifted up to center your logo on smartphone glass */
+        .wallpaper-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            text-align: center;
+            height: 100%;
+            background-image: url('reflexiunnewwallpaper.png');
+            background-size: cover;
+            background-position: center -220px; /* Pulls artwork up by a half-inch to center your logo */
+            z-index: 2 !important; 
+            pointer-events: none !important; 
+            transition: opacity 0.5s ease;
+        }
+        
+        .movie-track-node {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #000;
+            display: none;
+            z-index: 4 !important;
+            pointer-events: none !important; 
+        }
+        
+        .camera-feed-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 3 !important;
+            transform: scaleX(-1);
+            background-color: #000;
+            display: none;
+            pointer-events: none !important;
+        }
+        
+        /* THE BUTTON LAYER: Isolated outside visual elements on the highest plane */
+        .nav-menu-stack {
+            position: fixed !important; 
+            bottom: 12%; /* Mobile text placement left exactly where it belongs */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999999 !important; /* Total dominance to block any hidden glass overlays */
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            gap: 16px; 
+            pointer-events: auto !important; 
+        }
+        
+        @media (min-width: 600px) and (max-width: 1023px) {
+            .wallpaper-bg {
+                background-position: center center;
+            }
+            .nav-menu-stack { bottom: 14%; }
+        }
+        
+        /* DESKTOP MONITOR BALANCE: Shrinks font size scale and lowers text height positioning */
+        @media (min-width: 1024px) {
+            .wallpaper-bg {
+                background-position: center center;
+            }
+            .nav-menu-stack { 
+                bottom: 8% !important; /* Drops text lower on computer screens to clear logo */
+            } 
+            .nav-menu-stack .enter-link, 
+            .nav-menu-stack .download-btn {
+                font-size: 0.95rem !important; /* Makes typography sleeker on monitors */
+            }
         }
 
-        /* THE GLOWING EMBLEM / LOGO SHAPE */
-        .logo-shape {
-            width: 180px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
-        /* THE "REFLEXIUN" MAIN BRAND TITLE */
-        .brand-title {
-            color: #ffffff;
-            font-size: 38px;
-            letter-spacing: 7px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 50px;
-        }
-
-        /* 3. THE NAVIGATION LINKS ("DROP IN", "LOOK IN THE MIRROR", "REFLECT") */
-        /* They stay exactly where they are visually, but are forced to the top touch layer */
-        .nav-link {
-            display: block;
-            color: #ffffff;
+        .enter-link, .download-btn {
+            color: #fff;
             text-decoration: none;
-            font-size: 18px;
-            letter-spacing: 4px;
+            font-size: 1.1rem; 
+            letter-spacing: 5px;
             text-transform: uppercase;
-            margin: 30px 0;
-            padding: 10px;
-            font-weight: 300;
-            
-            /* INVISIBLE FUNCTIONAL FIXES */
-            position: relative !important;
-            z-index: 9999 !important;       /* Hard-locks the links above the glass image */
-            pointer-events: auto !important; /* Forces the screen to register your clicks */
+            animation: randomGlow 3.5s infinite ease-in-out;
+            cursor: pointer; 
+            font-weight: 300 !important; /* Locked premium thin typography styling */
+            display: inline-block !important; 
+            padding: 8px 16px; 
+            background: none;
+            border: none;
+            outline: none;
+            pointer-events: auto !important;
+        }
+
+        .mirror-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 100%; 
+            pointer-events: auto !important;
+            height: 48px; 
+        }
+        
+        .mirror-reflection {
+            transform: scaleY(-1);
+            opacity: 0.08; /* Locked reflection visibility glow signature */
+            margin-top: -18px; 
+            filter: blur(3px); 
+            user-select: none;
+            pointer-events: none !important;
+        }
+
+        @keyframes randomGlow {
+            0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
+            15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
+            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
+            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
+            50% { opacity: 0.15; text-shadow: none; }
+            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
+            85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. VISUAL BACKGROUND LAYER -->
-    <div class="glass-background"></div>
+    <div class="app-container" id="appContainer">
+        <!-- Subterranean media layout vault pushes graphics underneath active controls -->
+        <div class="media-vault">
+            <div class="wallpaper-bg" id="wallpaperBg"></div>
+            <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
+            <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+        </div>
 
-    <!-- 2. FRONT WORKBENCH LAYER -->
-    <div class="main-content">
-        
-        <!-- THE GLOWING ICON (Represented by the SVG code matching your screenshot) -->
-        <svg class="logo-shape" viewBox="0 0 200 100" fill="none" xmlns="http://w3.org">
-            <path d="M10 50 L100 15 L190 50 L100 85 Z" stroke="white" stroke-width="4"/>
-            <path d="M40 50 Q100 100 160 50" stroke="white" stroke-width="4"/>
-            <path d="M60 50 Q100 20 140 50" stroke="white" stroke-width="2"/>
-        </svg>
-
-        <h1 class="brand-title">Reflexiun</h1>
-        
-        <!-- 3. THE FULLY CLICKABLE NAVIGATION LINKS WITH DESTINATIONS -->
-        <!-- Replace the URLs inside href="" with your real destination web addresses -->
-        <a href="https://yourwebsite.com" class="nav-link">Drop In</a>
-        
-        <a href="https://yourwebsite.com" class="nav-link">Look In The Mirror</a>
-        
-        <a href="https://yourwebsite.com" class="nav-link">Reflect</a>
-        
+        <!-- Naked interface component stacking column -->
+        <div class="nav-menu-stack" id="navMenuStack">
+            <div class="mirror-block">
+                <button id="dropInTrigger" class="enter-link">drop in</button>
+                <span class="enter-link mirror-reflection">drop in</span>
+            </div>
+            
+            <div class="mirror-block">
+                <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
+                <span class="enter-link mirror-reflection">look in the mirror</span>
+            </div>
+            
+            <div class="mirror-block">
+                <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
+                <span class="download-btn mirror-reflection">reflect</span>
+            </div>
+        </div>
     </div>
 
-</body>
-</html>
+    <script>
+        function configureAdaptiveDownload() {
+            const downloadLink = document.getElementById('dynamicDownload');
+            if (!downloadLink) return;
+            const width = window.innerWidth;
+            let targetFile = 'reflexiunnewwallpaper.png'; 
+            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
+            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
+            downloadLink.href = targetFile;
+        }
+        window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
+        window.addEventListener('resize', configureAdaptiveDownload);
+
+        const dropInTrigger = document.getElementById('dropInTrigger');
+        const mirrorTrigger = document.getElementById('mirrorTrigger');
+        const masterVideo = document.getElementById('masterVideoEngine');
+        const cameraVideo = document.getElementById('cameraStream');
+        const wallpaperBg = document.getElementById('wallpaperBg');
+        const navMenuStack = document.getElementById('navMenuStack');
+
+        let selectedPathwayRoute = "dropin";
+        let localCameraStream = null;
+
+        // Clean local repository folder file mappings
+        const localIntroUrl = "introvideo.mp4";
+        const localMatrixUrl = "phonecode.mp4";
+        const localDropInUrl = "dropinvid.mp4";
+        const localMirrorUrl = "lookinthemirror.mp4";
+
+        function fireCinematicSystem(targetVideoUrl, routeName) {
+            selectedPathwayRoute = routeName;
+            
+            navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
+            wallpaperBg.style.opacity = '0';
+            
+            masterVideo.style.zIndex = "9999999"; 
+            masterVideo.src = targetVideoUrl;
+            masterVideo.style.display = 'block';
+            
+            // Turn on audio channels explicitly under manual touch context
+            masterVideo.muted = false; 
+            masterVideo.load();
+            
+            masterVideo.play().catch(err => {
+                console.warn("Browser audio fallback active:", err);
+                masterVideo.muted = true;
+                masterVideo.play().catch(e => console.error(e));
+            });
+
+            // Trigger the native hardware camera handshake immediately at button press
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+                .then(stream => {
+                    localCameraStream = stream;
+                    cameraVideo.srcObject = localCameraStream;
+                    cameraVideo.load();
+                }).catch(err => {
+                    console.warn("Camera request dropped or blocked by hardware preferences.", err);
+                    localCameraStream = null;
+                });
+            }
+        }
+        
