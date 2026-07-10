@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reflexiun</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body, html {
+            background-color: #000;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            animation: screenGlitchShake 8s infinite linear;
+            transition: animation 0.3s ease;
+        }
+        .app-container.video-playing {
+            animation: none !important;
+        }
+        .wallpaper-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('reflexiunnewwallpaper.png');
+            background-size: cover;
+            background-position: center -144px;
+            z-index: 1;
+            pointer-events: none; 
+            user-select: none;
+            -webkit-user-drag: none;
+            transition: opacity 0.5s ease;
+        }
+        .wallpaper-bg.fade-out {
+            opacity: 0;
+        }
+        .video-player-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 4; 
+            background-color: #000;
+            display: none;
+        }
+        .camera-feed-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2;
+            transform: scaleX(-1);
+            background-color: #000;
+            display: none;
+            transition: opacity 2s linear;
+        }
+        .matrix-filter-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 3;
+            display: none;
+            mix-blend-mode: screen; 
+            pointer-events: none;
+            transition: opacity 2s linear;
+        }
+        .nav-menu-stack {
+            position: relative;
+            z-index: 9999; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding-top: 210px; 
+            gap: 24px;
+            pointer-events: auto; 
+            transition: opacity 0.5s ease;
+        }
+        .nav-menu-stack.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @media (min-width: 600px) and (max-width: 1023px) {
+            .wallpaper-bg {
+                background-image: url('reflexiuntablet.png'); 
+                background-size: contain;
+                background-position: center center;
+            }
+            .nav-menu-stack {
+                padding-top: 250px; 
+            }
+        }
+        @media (min-width: 1024px) {
+            .wallpaper-bg {
+                background-image: url('reflexiundesktop.png'); 
+                background-size: contain;
+                background-position: center center;
+            }
+            .nav-menu-stack {
+                padding-top: 380px; 
+            }
+        }
+        .enter-link, .download-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            animation: randomGlow 3.5s infinite ease-in-out;
+            cursor: pointer; 
+            font-weight: 400;
+            display: inline-block;
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            outline: none;
+        }
+        .mirror-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .mirror-reflection {
+            transform: scaleY(-1);
+            opacity: 0.07; 
+            margin-top: -18px; 
+            filter: blur(2px); 
+            user-select: none;
+            pointer-events: none;
+        }
+        @keyframes screenGlitchShake {
+            0%, 92%, 100% { transform: translate(0, 0); }
+            93% { transform: translate(-3px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            95% { transform: translate(-2px, 3px); }
+            96% { transform: translate(3px, -1px); }
+            97% { transform: translate(0, 0); }
+        }
+        @keyframes randomGlow {
+            0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
+            15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
+            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
+            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
+            50% { opacity: 0.15; text-shadow: none; }
+            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
+            85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="appContainer">
+        <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+        <video id="matrixFilter" class="matrix-filter-layer" autoplay playsinline muted loop></video>
+        <video id="transitionVideo" class="video-player-layer" playsinline webkit-playsinline></video>
+        <div class="wallpaper-bg" id="wallpaperBg"></div>
+        <div class="nav-menu-stack" id="navMenuStack">
+            <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
+            <div class="mirror-block">
+                <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
+                <span class="download-btn mirror-reflection">reflect</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        function configureAdaptiveDownload() {
+            const downloadLink = document.getElementById('dynamicDownload');
+            if (!downloadLink) return;
+            const width = window.innerWidth;
+            let targetFile = 'reflexiunnewwallpaper.png'; 
+            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
+            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
+            downloadLink.href = targetFile;
+        }
+        window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
+        window.addEventListener('resize', configureAdaptiveDownload);
+
+        const dropInTrigger = document.getElementById('dropInTrigger');
+        const transitionVideo = document.getElementById('transitionVideo');
+        const cameraVideo = document.getElementById('cameraStream');
+        const matrixFilter = document.getElementById('matrixFilter');
+        const wallpaperBg = document.getElementById('wallpaperBg');
+        const navMenuStack = document.getElementById('navMenuStack');
+        const appContainer = document.getElementById('appContainer');
+        let localCameraStream = null;
+
+        dropInTrigger.addEventListener('click', (event) => {
+            if (event) event.preventDefault(); 
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" }, audio: false
+                }).then(stream => {
+                    localCameraStream = stream;
+                    cameraVideo.srcObject = localCameraStream;
+                }).catch(cameraErr => { console.warn(cameraErr); });
+            }
+            transitionVideo.src = 'introvideo.mp4';
+            navMenuStack.classList.add('fade-out');
+            wallpaperBg.classList.add('fade-out');
+            appContainer.classList.add('video-playing');
+            transitionVideo.style.display = 'block';
+            transitionVideo.play().catch(err => {
+                transitionVideo.muted = true; transitionVideo.play();
+            });
+        });
+
+        transitionVideo.addEventListener('ended', () => {
+            if (transitionVideo.src.includes('introvideo.mp4')) {
+                transitionVideo.style.display = 'none';
+                transitionVideo.src = ""; 
+                if (localCameraStream) {
+                    matrixFilter.src = 'phonecode.mp4';
+                    matrixFilter.load();
+                    cameraVideo.style.opacity = '1';
+                    matrixFilter.style.opacity = '1';
+                    cameraVideo.style.display = 'block';
+                    matrixFilter.style.display = 'block';
+                    cameraVideo.play().catch(e => console.log(e));
+                    matrixFilter.play().catch(e => console.log(e));
+                    setTimeout(() => {
+                        cameraVideo.style.opacity = '0';
+                        matrixFilter.style.opacity = '0';
+                    }, 2000);
+                    setTimeout(() => {
+                        cameraVideo.style.display = 'none';
+                        matrixFilter.style.display = 'none';
+                        cameraVideo.pause(); matrixFilter.pause(); matrixFilter.src = ""; 
+                        localCameraStream.getTracks().forEach(track => track.stop());
+                        localCameraStream = null; cameraVideo.srcObject = null;
+                        playDropInSegment();
+                    }, 4000);
+                } else { playDropInSegment(); }
