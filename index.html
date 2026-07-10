@@ -54,7 +54,7 @@
             width: 100%;
             max-width: 400px;
             padding-top: 210px;
-            gap: 24px; /* Structured gap separation between menu targets */
+            gap: 24px;
             pointer-events: auto;
         }
         
@@ -90,7 +90,6 @@
             }
         }
 
-        /* Standardized Action Buttons Style Rules */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -114,12 +113,12 @@
             align-items: center;
             position: relative;
         }
-        /* Generates a ghosted, inverted reflection beneath the download text link */
+        /* Audited: Pulled closer, faded lighter, and blurred for a perfect glass look */
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.15;
-            margin-top: -8px;
-            filter: blur(1px);
+            opacity: 0.07; 
+            margin-top: -18px; 
+            filter: blur(2px); 
             user-select: none;
             pointer-events: none;
         }
@@ -150,36 +149,32 @@
         <img class="wallpaper-bg" alt="Reflexiun Adaptive Framework">
         
         <div class="nav-menu-stack">
-            <!-- First Tier Route -->
             <a href="#content" class="enter-link">drop in</a>
             
-            <!-- Second Tier Route: Auto-detecting Mirror Block Container -->
             <div class="mirror-block">
-                <a href="#" id="dynamicDownload" class="download-btn" download>get asset</a>
-                <span class="download-btn mirror-reflection">get asset</span>
+                <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
+                <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
     </div>
 
-    <!-- Intelligent client-side adaptive engine layout script -->
     <script>
         function configureAdaptiveDownload() {
             const downloadLink = document.getElementById('dynamicDownload');
             if (!downloadLink) return;
 
             const width = window.innerWidth;
-            let targetFile = 'reflexiunnewwallpaper.png'; // Fallback Base Sizing Asset
+            let targetFile = 'reflexiunnewwallpaper.png'; 
 
             if (width >= 1024) {
-                targetFile = 'reflexiundesktop.png'; // Desktop computer assets
+                targetFile = 'reflexiundesktop.png'; 
             } else if (width >= 600) {
-                targetFile = 'reflexiuntablet.png'; // Intermediate tablet assets
+                targetFile = 'reflexiuntablet.png'; 
             }
 
             downloadLink.href = targetFile;
         }
 
-        // Run detection loops instantly upon viewport initialization routines
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
         window.addEventListener('resize', configureAdaptiveDownload);
     </script>
