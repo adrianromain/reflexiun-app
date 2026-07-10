@@ -65,7 +65,7 @@
             bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; /* Total dominance over the page screen */
+            z-index: 999999 !important; /* Absolute highest level on the screen */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -74,7 +74,7 @@
             width: 100%;
             max-width: 400px;
             gap: 16px; 
-            pointer-events: auto !important; /* Forces the browser to read your clicks */
+            pointer-events: auto !important; 
         }
         
         @media (min-width: 600px) and (max-width: 1023px) {
@@ -133,24 +133,25 @@
 </head>
 <body>
 
-    <!-- Background visual elements isolated deep below -->
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
-    <!-- Clickable button menu floating naked on top -->
     <div class="nav-menu-stack" id="navMenuStack">
+        <!-- 1. Drop In Pathway -->
         <div class="mirror-block">
             <button id="dropInTrigger" class="enter-link">drop in</button>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
         
+        <!-- 2. Look In The Mirror Pathway (Fully Restored) -->
         <div class="mirror-block">
             <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
             <span class="enter-link mirror-reflection">look in the mirror</span>
         </div>
         
+        <!-- 3. Reflect Asset Download -->
         <div class="mirror-block">
             <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
@@ -176,11 +177,17 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        // FIXED: Restored original native GitHub repository movie paths
-        const localIntroUrl = "introvideo.mp4";
-        const localFinaleUrl = "dropinvid.mp4";
+        // Master Timeline Tracking State Variables
+        let selectedPathwayRoute = "dropin";
 
-        function startStreamingVideo(targetVideoUrl) {
+        // Hardcoded Native Folder File Directions
+        const localIntroUrl = "introvideo.mp4";
+        const localDropInUrl = "dropinvid.mp4";
+        const localMirrorUrl = "lookinthemirror.mp4";
+
+        function startStreamingVideo(targetVideoUrl, routeName) {
+            selectedPathwayRoute = routeName;
+            
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
@@ -188,26 +195,31 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
-            
             masterVideo.load();
             
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("Local playback initialized successfully.");
-                }).catch(err => {
+                playPromise.catch(err => {
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
             }
         }
         
-        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl); });
-        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl); });
+        // Active click hooks connecting both buttons safely to your local files
+        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
+            // Check if the initial intro video just completed
             if (masterVideo.src.includes(localIntroUrl)) {
-                masterVideo.src = localFinaleUrl;
+                // Route to the correct secondary file based on which button you clicked
+                if (selectedPathwayRoute === "mirror") {
+                    masterVideo.src = localMirrorUrl;
+                } else {
+                    masterVideo.src = localDropInUrl;
+                }
+                
                 masterVideo.load();
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
@@ -217,6 +229,7 @@
                     });
                 }
             } else {
+                // Final video segment completed -> Clear video player and bring user home smoothly
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
