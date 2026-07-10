@@ -112,6 +112,7 @@
             }
         }
 
+        /* CORE LINK BUTTON ACTIONS: Hardcoded with total touch target dominance attributes */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -126,7 +127,9 @@
             background: none;
             border: none;
             outline: none;
-            pointer-events: auto !important;
+            pointer-events: auto !important; /* FIXED: Forces the browser to receive your touches exclusively */
+            z-index: 9999999 !important;
+            position: relative;
         }
 
         .mirror-block {
@@ -135,8 +138,8 @@
             align-items: center;
             position: relative;
             width: 100%; 
-            pointer-events: auto !important;
-            height: 48px; 
+            height: auto !important; /* FIXED: Destroys rigid bounding container overlaps */
+            pointer-events: none !important; /* FIXED: Prevents empty container boxes from blocking text behind them */
         }
         
         /* CLEAN REFLECTION ARCHITECTURE FILTER CODE */
@@ -250,11 +253,3 @@
             }
         }
         
-        dropInTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "mirror"); });
-
-        masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes(localIntroUrl)) {
-                masterVideo.style.display = 'none';
-
-                if (localCameraStream) {
