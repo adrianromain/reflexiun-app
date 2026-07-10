@@ -18,6 +18,7 @@
             overflow: hidden;
             font-family: sans-serif;
         }
+        
         .app-container {
             width: 100%;
             height: 100vh;
@@ -169,6 +170,7 @@
 </head>
 <body>
 
+    <!-- Fixed Structural Layout: The app container wraps every element completely -->
     <div class="app-container" id="appContainer">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
 
@@ -187,7 +189,7 @@
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
-    </div>
+    </div> <!-- Tag moved to the bottom floor so buttons are unblocked -->
 
     <script>
         function configureAdaptiveDownload() {
@@ -210,7 +212,6 @@
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
 
-        // Clean, prioritized click handler targeting ONLY the movie playback layer
         dropInTrigger.addEventListener('click', (event) => {
             if (event) event.preventDefault(); 
 
@@ -218,11 +219,10 @@
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
             
-            // Firing intro video cleanly to perfectly pass strict mobile autoplay filters
             masterVideo.src = 'introvideo.mp4';
             masterVideo.style.display = 'block';
             masterVideo.play().catch(err => {
-                console.warn("Autoplay audio restriction fallback activated.", err);
+                console.warn("Autoplay fallback bypass active:", err);
                 masterVideo.muted = true;
                 masterVideo.play();
             });
@@ -232,7 +232,6 @@
             if (masterVideo.src.includes('introvideo.mp4')) {
                 masterVideo.style.display = 'none';
 
-                // Intro ends cleanly -> Request hardware device camera authorization now
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     navigator.mediaDevices.getUserMedia({
                         video: { facingMode: "user" }, audio: false
@@ -240,7 +239,6 @@
                         localCameraStream = stream;
                         cameraVideo.srcObject = localCameraStream;
                         
-                        // Fire Matrix Mirror phase
                         masterVideo.src = 'phonecode.mp4';
                         masterVideo.style.mixBlendMode = 'screen';
                         masterVideo.loop = true;
@@ -253,11 +251,15 @@
                         cameraVideo.play().catch(e => console.log(e));
                         masterVideo.play().catch(e => console.log(e));
 
-                        // 2 Seconds down: Begin fading reflection elements out
                         setTimeout(() => {
                             cameraVideo.style.opacity = '0';
                             masterVideo.style.opacity = '0';
                         }, 2000);
 
-                        // 4 Seconds down: Hard kill streams and launch dropinvid.mp4
                         setTimeout(() => {
+                            cameraVideo.style.display = 'none';
+                            cameraVideo.pause();
+                            masterVideo.pause();
+                            masterVideo.loop = false;
+                            masterVideo.style.mixBlendMode = 'normal';
+                            
