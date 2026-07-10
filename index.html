@@ -46,10 +46,10 @@
             transition: opacity 0.5s ease;
         }
 
-        /* Mobile specific adjustment to shift the wallpaper focus up */
-        @media (max-width: 599px) {
+        /* Aggressive mobile/tablet override to shift the wallpaper focus upward */
+        @media (max-width: 1023px) {
             .wallpaper-bg {
-                background-position: center 35%;
+                background-position: center 30% !important;
             }
         }
         
@@ -146,19 +146,16 @@
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
-        <!-- 1. Drop In Pathway -->
         <div class="mirror-block">
             <button id="dropInTrigger" class="enter-link">drop in</button>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
         
-        <!-- 2. Look In The Mirror Pathway (Fully Restored) -->
         <div class="mirror-block">
             <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
             <span class="enter-link mirror-reflection">look in the mirror</span>
         </div>
         
-        <!-- 3. Reflect Asset Download -->
         <div class="mirror-block">
             <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
