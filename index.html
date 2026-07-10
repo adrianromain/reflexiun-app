@@ -173,22 +173,24 @@
         
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         
-        <!-- Fixed: Added direct play permissions to anchor video tracking loops internally -->
+        <!-- Native Player Layout Node Container -->
         <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
 
         <div class="nav-menu-stack" id="navMenuStack">
+            <!-- 1. Drop In Route Link -->
             <div class="mirror-block">
-                <!-- Fixed: Removed external Cloudinary window route link -->
                 <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
+            <!-- 2. Look In The Mirror Route Link -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
                 <span class="enter-link mirror-reflection">look in the mirror</span>
             </div>
             
+            <!-- 3. Asset Wallpaper Route Container -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
@@ -219,15 +221,26 @@
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
 
+        // Master Timeline Memory State Router Variable
+        let selectedPathwayRoute = "dropin"; 
+
+        // Cloudinary High-Speed Streaming Path Network Registry
         const cloudIntroUrl = "https://cloudinary.com";
         const cloudMatrixUrl = "https://cloudinary.com";
         const cloudFinaleUrl = "https://cloudinary.com";
+        
+        // Placeholder link targeting your upcoming custom CapCut video loop path
+        const cloudMirrorUrl = "lookinthemirror.mp4"; 
 
-        function runMainVideoPlayback(event) {
+        // Master Video Activation Pipeline Engine
+        function fireCinematicPipeline(event, targetRoute) {
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
+            
+            // Set track selection route into system memory state
+            selectedPathwayRoute = targetRoute; 
 
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
@@ -239,27 +252,14 @@
             masterVideo.play().catch(err => console.warn(err));
         }
         
-        dropInTrigger.addEventListener('touchstart', runMainVideoPlayback, { passive: false });
-        dropInTrigger.addEventListener('click', runMainVideoPlayback);
+        // Connect Touch Input Handshakes to Track Router Engine
+        dropInTrigger.addEventListener('touchstart', (e) => fireCinematicPipeline(e, "dropin"), { passive: false });
+        dropInTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "dropin"));
 
-        mirrorTrigger.addEventListener('click', (event) => {
-            if (event) event.preventDefault();
-            alert('"LOOK IN THE MIRROR" pathway initialized. Ready for script pipeline configuration.');
-        });
+        mirrorTrigger.addEventListener('touchstart', (e) => fireCinematicPipeline(e, "mirror"), { passive: false });
+        mirrorTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "mirror"));
 
         masterVideo.addEventListener('ended', () => {
             if (masterVideo.src === cloudIntroUrl) {
                 masterVideo.style.display = 'none';
 
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: "user" }, audio: false
-                    }).then(stream => {
-                        localCameraStream = stream;
-                        cameraVideo.srcObject = localCameraStream;
-                        
-                        masterVideo.src = cloudMatrixUrl;
-                        masterVideo.style.mixBlendMode = 'screen';
-                        masterVideo.loop = true;
-                        masterVideo.load();
-                        
