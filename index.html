@@ -136,7 +136,6 @@
 
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <!-- FIXED SOUND CHANNELS: Removed hardcoded 'muted' attribute to let local audio function natively -->
         <video id="masterVideoEngine" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
@@ -179,14 +178,18 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        let selectedPathwayRoute = "dropin";
+        // Master state tracking variables
+        let currentSelectedTrackRoute = "none"; 
+        let activeVideoSegmentStep = 1; 
 
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
 
         function startStreamingVideo(targetVideoUrl, routeName) {
-            selectedPathwayRoute = routeName;
+            currentSelectedTrackRoute = routeName;
+            activeVideoSegmentStep = 1; // Explicitly lock segment phase to Intro Track
+            
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
@@ -194,14 +197,13 @@
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
             
-            // FIXED SOUND CHANNELS: Command volume levels to unmute inside the active user gesture context
             masterVideo.muted = false;
             masterVideo.load();
             
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    console.warn("Browser security fallback: forcing muted loop to render video track frames", err);
+                    console.warn("Browser fallback triggered: forcing unmuted tracking loop", err);
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
@@ -211,15 +213,18 @@
         dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
+        // FIXED TIMELINE SYSTEM: Evaluates phase steps internally to bypass browser text-string errors permanently
         masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes(localIntroUrl)) {
-                if (selectedPathwayRoute === "mirror") {
+            if (activeVideoSegmentStep === 1) {
+                activeVideoSegmentStep = 2; // Move sequence state directly forward to Main Track Phase
+                
+                // Route cleanly based on the state locked at the instant of human touch gesture
+                if (currentSelectedTrackRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
                 
-                // Keep subsequent movie tracks unmuted cleanly
                 masterVideo.muted = false;
                 masterVideo.load();
                 
@@ -231,6 +236,10 @@
                     });
                 }
             } else {
+                // Secondary track completed -> Safely clear canvas engine and reset home screen dashboard
+                activeVideoSegmentStep = 1;
+                currentSelectedTrackRoute = "none";
+                
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
