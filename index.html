@@ -51,12 +51,19 @@
             .phone-bg {
                 display: block;
                 background-image: url('reflexiunnewwallpaper.png');
-                background-position: center 75%; /* Pushed up to lift framing up on phones */
+                background-position: center center;
+                /* Scale slightly and translate Y up to force the image asset to move upward */
+                transform: scale(1.1) translateY(-40px);
             }
             
             /* Shrink text sizing exactly by half for phone displays */
             .enter-link, .download-btn {
                 font-size: 0.55rem !important;
+            }
+
+            /* Tighten up spacing gap between stack items specifically on mobile */
+            .nav-menu-stack {
+                gap: 8px !important;
             }
         }
 
