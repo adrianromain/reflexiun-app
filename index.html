@@ -49,8 +49,9 @@
         .enter-link {
             color: #fff;
             text-decoration: none;
-            font-size: 1.25rem;
-            letter-spacing: 4px;
+            /* Scaled text size up for maximum screen readability */
+            font-size: 1.5rem;
+            letter-spacing: 5px;
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer;
@@ -65,13 +66,14 @@
         }
 
         @keyframes randomGlow {
-            0%, 100% { opacity: 0.2; text-shadow: 0 0 2px rgba(255,255,255,0.2); }
-            15% { opacity: 1; text-shadow: 0 0 12px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8); }
-            22% { opacity: 0.3; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
-            45% { opacity: 0.85; text-shadow: 0 0 14px rgba(255,255,255,0.9); }
+            /* Audited: Amplified the white neon bloom intensity across the timeline */
+            0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
+            15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
+            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
+            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
             50% { opacity: 0.15; text-shadow: none; }
-            70% { opacity: 0.75; text-shadow: 0 0 8px rgba(255,255,255,0.6); }
-            85% { opacity: 1; text-shadow: 0 0 14px rgba(255,255,255,1); }
+            70% { opacity: 0.8; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
+            85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
         }
     </style>
 </head>
@@ -87,3 +89,4 @@
 
 </body>
 </html>
+
