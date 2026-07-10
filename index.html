@@ -183,7 +183,7 @@
 
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "mirrorvid.mp4"; // FIXED TARGET: Re-routed straight to the cleared filename track
+        const localMirrorUrl = "mirrorvid.mp4"; // FIXED MATCH: Fully synced with your dashboard file rename
 
         function startStreamingVideo(targetVideoUrl, routeName) {
             currentSelectedTrackRoute = routeName;
@@ -202,7 +202,7 @@
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    console.warn("Browser fallback triggered: forcing unmuted tracking loop", err);
+                    console.warn("Browser fallback triggered: forcing muted loop to render video track frames", err);
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
