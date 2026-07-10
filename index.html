@@ -19,7 +19,7 @@
             font-family: sans-serif;
         }
         
-        /* THE MEDIA LAYER: Visual visual layers locked deep beneath active controls */
+        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
         .media-vault {
             position: fixed;
             top: 0;
@@ -61,13 +61,13 @@
             pointer-events: none !important; 
         }
         
-        /* THE BUTTON LAYER: Isolated completely outside visual elements on the absolute peak plane */
+        /* THE BUTTON LAYER: Isolated completely outside visual elements on the absolute highest plane */
         .nav-menu-stack {
             position: fixed !important; 
             bottom: 12%; /* LOCKED: Text remains stationary down where you love it on your phone */
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; /* Absolute numerical dominance over screen coordinates */
+            z-index: 999999 !important; /* Total dominance over screen coordinates */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -153,7 +153,7 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        <!-- Subterranean media vault holds visual layers completely out of the interface way -->
+        <!-- Subterranean media vault holds visual canvas layers completely out of the interface way -->
         <div class="media-vault">
             <div class="wallpaper-bg" id="wallpaperBg"></div>
             <!-- Immersive container player tag stripped completely free of browser controls -->
@@ -198,44 +198,48 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        let selectedPathwayRoute = "dropin";
+        // FIXED: Rebuilt script layout to listen strictly to native button tag variables to eliminate script memory shutdowns
+        let activeFilePlaylist = [];
+        let currentPlaylistIndex = 0;
 
-        // Pure folder directories containing your active local files
-        const localIntroUrl = "introvideo.mp4";
-        const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "lookinthemirror.mp4";
-
-        function initializeImmersiveStream(targetVideoUrl, routeName) {
-            selectedPathwayRoute = routeName;
+        function launchVideoChain(playlistArray) {
+            activeFilePlaylist = playlistArray;
+            currentPlaylistIndex = 0;
             
-            // Step 1 Defense: Clear the text menu cleanly out of the field of view
+            // Clear landing interface assets out of view instantly
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
             
-            // Step 2 Defense: Force the naked video player to pop cleanly to the top layer floor
+            // Pop unblocked native player canvas right to the highest layout plane
             masterVideo.style.zIndex = "9999999"; 
-            masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
             
-            // Step 3 Defense: Command audio channels to unlock cleanly inside active human gesture context
-            masterVideo.muted = false; 
-            masterVideo.load();
-            
-            // Step 4 Defense: Promise tracking handles security policy audio locks automatically
-            const playPromise = masterVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(err => {
-                    console.warn("Muted safety catch fallback engaged:", err);
-                    masterVideo.muted = true;
-                    masterVideo.play().catch(e => console.error(e));
-                });
-            }
+            executePlaylistTrack();
         }
-        
-        // Locked straightforward hardware click event receptors
-        dropInTrigger.addEventListener('click', function() { initializeImmersiveStream(localIntroUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { initializeImmersiveStream(localIntroUrl, "mirror"); });
 
-        // Step 5 Defense: Clear tracking strings using global '.includes' filters to destroy browser path crashes
-        masterVideo.addEventListener('ended', () => {
+        function executePlaylistTrack() {
+            if (currentPlaylistIndex < activeFilePlaylist.length) {
+                masterVideo.src = activeFilePlaylist[currentPlaylistIndex];
+                
+                // Track 1 (Intro) triggers soundtrack audio channels, subsequent loops mute safely
+                if (currentPlaylistIndex === 0) {
+                    masterVideo.muted = false;
+                } else {
+                    masterVideo.muted = false;
+                }
+                
+                masterVideo.load();
+                
+                const playPromise = masterVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        console.warn("Autoplay audio restriction active: engaged backup tracking sequence", err);
+                        masterVideo.muted = true;
+                        masterVideo.play().catch(e => console.error(e));
+                    });
+                }
+            } else {
+                // Entire track loop completed cleanly -> Drop player depth and restore original home layout screen
+                masterVideo.style.zIndex = "3";
+                masterVideo.style.display = 'none';
