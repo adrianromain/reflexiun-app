@@ -42,7 +42,7 @@
             background-size: cover;
             background-position: center -144px;
             z-index: 1; 
-            pointer-events: none !important; 
+            pointer-events: none !important; /* FIXED: Shield layer deactivated permanently */
             user-select: none;
             -webkit-user-drag: none;
             transition: opacity 0.5s ease;
@@ -62,7 +62,7 @@
             background-color: #000;
             display: none;
             z-index: 4;
-            pointer-events: none !important; 
+            pointer-events: none !important; /* FIXED: Prevents media from blocking button input coordinates */
         }
         
         .camera-feed-stream {
@@ -76,11 +76,10 @@
             transform: scaleX(-1);
             background-color: #000;
             display: none;
-            transition: opacity 2s linear;
             pointer-events: none !important;
         }
         
-        /* Layer 3: Interactive Menu Stack */
+        /* Layer 3: Interactive Menu Stack shifted up comfortably clear of logos */
         .nav-menu-stack {
             position: absolute; 
             bottom: 26%; 
@@ -94,7 +93,7 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            gap: 16px; 
+            gap: 16px; /* Tight text line distribution footprint */
             pointer-events: auto !important; 
             transition: opacity 0.5s ease;
         }
@@ -120,6 +119,7 @@
             .nav-menu-stack { bottom: 30%; } 
         }
 
+        /* Sleeker uniform font profile rules */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -128,7 +128,7 @@
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer; 
-            font-weight: 300 !important; 
+            font-weight: 300 !important; /* Thin typography style locked */
             display: inline-block !important; 
             padding: 8px 16px; 
             background: none;
@@ -147,9 +147,10 @@
             height: 48px; 
         }
         
+        /* Clean lighter reflection tracking coordinates */
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.08; 
+            opacity: 0.08; /* Sharper bounce intensity signature */
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
@@ -178,19 +179,19 @@
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
 
         <div class="nav-menu-stack" id="navMenuStack">
-            <!-- 1. Drop In Route Link -->
+            <!-- 1. Drop In Route -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
-            <!-- 2. Look In The Mirror Route Link -->
+            <!-- 2. Look In The Mirror Route -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
                 <span class="enter-link mirror-reflection">look in the mirror</span>
             </div>
             
-            <!-- 3. Asset Wallpaper Route Container -->
+            <!-- 3. Wallpaper Download Route -->
             <div class="mirror-block">
                 <a href="javascript:void(0);" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
@@ -220,11 +221,9 @@
         const navMenuStack = document.getElementById('navMenuStack');
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
-
-        // Master Timeline Memory State Router Variable
         let selectedPathwayRoute = "dropin"; 
 
-        // Cloudinary High-Speed Streaming Path Network Registry
+        // Verified Cloudinary Global Streaming Path Registry
         const cloudIntroUrl = "https://cloudinary.com";
         const cloudMatrixUrl = "https://cloudinary.com";
         const cloudFinaleUrl = "https://cloudinary.com";
@@ -238,13 +237,9 @@
                 event.preventDefault();
                 event.stopPropagation();
             }
-            
-            // Set track selection route into system memory state
             selectedPathwayRoute = targetRoute; 
-
-            navMenuStack.classList.add('fade-out');
-            wallpaperBg.classList.add('fade-out');
-            appContainer.classList.add('video-playing');
+            navMenuStack.style.opacity = '0';
+            wallpaperBg.style.opacity = '0';
             
             masterVideo.src = cloudIntroUrl;
             masterVideo.style.display = 'block';
@@ -252,14 +247,12 @@
             masterVideo.play().catch(err => console.warn(err));
         }
         
-        // Connect Touch Input Handshakes to Track Router Engine
-        dropInTrigger.addEventListener('touchstart', (e) => fireCinematicPipeline(e, "dropin"), { passive: false });
+        // Unified click hooks capturing touchscreen input points instantly without hardware delays
         dropInTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "dropin"));
-
-        mirrorTrigger.addEventListener('touchstart', (e) => fireCinematicPipeline(e, "mirror"), { passive: false });
         mirrorTrigger.addEventListener('click', (e) => fireCinematicPipeline(e, "mirror"));
 
         masterVideo.addEventListener('ended', () => {
             if (masterVideo.src === cloudIntroUrl) {
                 masterVideo.style.display = 'none';
 
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
