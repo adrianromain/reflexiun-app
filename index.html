@@ -82,7 +82,7 @@
         /* Layer 3: Interactive Menu Stack */
         .nav-menu-stack {
             position: absolute; 
-            bottom: 18%; 
+            bottom: 26%; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 10; 
@@ -108,7 +108,7 @@
                 background-size: contain;
                 background-position: center center;
             }
-            .nav-menu-stack { bottom: 20%; }
+            .nav-menu-stack { bottom: 28%; }
         }
         @media (min-width: 1024px) {
             .wallpaper-bg {
@@ -116,10 +116,9 @@
                 background-size: contain;
                 background-position: center center;
             }
-            .nav-menu-stack { bottom: 22%; } 
+            .nav-menu-stack { bottom: 30%; } 
         }
 
-        /* Audited: Set font-weight to 300 across all text entries for a thinner, lighter typography style */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -128,7 +127,7 @@
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer; 
-            font-weight: 300 !important; /* Forces a thinner, ultra-sleek character thickness */
+            font-weight: 300 !important; 
             display: inline-block !important; 
             padding: 8px 16px; 
             background: none;
@@ -178,17 +177,18 @@
 
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
-                <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
+                <!-- Fixed: True script loop routing applied to bypass link conflicts -->
+                <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
             <div class="mirror-block">
-                <a href="#" id="mirrorTrigger" class="enter-link">look in the mirror</a>
+                <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
                 <span class="enter-link mirror-reflection">look in the mirror</span>
             </div>
             
             <div class="mirror-block">
-                <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
+                <a href="javascript:void(0);" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
@@ -217,8 +217,11 @@
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
 
-        dropInTrigger.addEventListener('click', (event) => {
-            if (event) event.preventDefault(); 
+        function runMainVideoPlayback(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
 
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
@@ -231,7 +234,11 @@
                 masterVideo.muted = true;
                 masterVideo.play();
             });
-        });
+        }
+        
+        // Fixed: Dual input hooks capturing exact hardware interaction vectors instantly
+        dropInTrigger.addEventListener('touchstart', runMainVideoPlayback, { passive: false });
+        dropInTrigger.addEventListener('click', runMainVideoPlayback);
 
         mirrorTrigger.addEventListener('click', (event) => {
             if (event) event.preventDefault();
@@ -259,11 +266,3 @@
                         masterVideo.style.display = 'block';
                         
                         cameraVideo.play().catch(e => console.log(e));
-                        masterVideo.play().catch(e => console.log(e));
-
-                        setTimeout(() => {
-                            cameraVideo.style.opacity = '0';
-                            masterVideo.style.opacity = '0';
-                        }, 2000);
-
-                        setTimeout(() => {
