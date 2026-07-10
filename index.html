@@ -32,7 +32,6 @@
             user-select: none;
         }
         
-        /* UNIFIED BACKGROUND PANEL: Re-anchored to 78% to push the canvas artwork significantly higher */
         .wallpaper-bg {
             position: absolute;
             top: 0;
@@ -41,7 +40,7 @@
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center 78%; /* FIXED: Set to center 78% to dramatically elevate the logo */
+            background-position: center center;
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
@@ -137,7 +136,8 @@
 
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
+        <!-- FIXED SOUND CHANNELS: Removed hardcoded 'muted' attribute to let local audio function natively -->
+        <video id="masterVideoEngine" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
@@ -193,10 +193,15 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
+            
+            // FIXED SOUND CHANNELS: Command volume levels to unmute inside the active user gesture context
+            masterVideo.muted = false;
             masterVideo.load();
+            
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
+                    console.warn("Browser security fallback: forcing muted loop to render video track frames", err);
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
@@ -213,7 +218,11 @@
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
+                
+                // Keep subsequent movie tracks unmuted cleanly
+                masterVideo.muted = false;
                 masterVideo.load();
+                
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
