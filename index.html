@@ -40,7 +40,7 @@
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center center;
+            background-position: center -220px; 
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
@@ -55,17 +55,31 @@
             object-fit: cover;
             background-color: #000;
             display: none;
-            z-index: 3 !important;
+            z-index: 4 !important;
             pointer-events: none !important; 
         }
         
-        /* THE BUTTON LAYER: Put on the absolute highest level so nothing can cover them */
+        .camera-feed-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 3 !important;
+            transform: scaleX(-1);
+            background-color: #000;
+            display: none;
+            pointer-events: none !important;
+        }
+        
+        /* THE BUTTON LAYER: Isolated outside visual elements on the highest plane */
         .nav-menu-stack {
             position: fixed !important; 
             bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; /* Absolute highest level on the screen */
+            z-index: 999999 !important; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -78,10 +92,23 @@
         }
         
         @media (min-width: 600px) and (max-width: 1023px) {
+            .wallpaper-bg {
+                background-position: center center;
+            }
             .nav-menu-stack { bottom: 14%; }
         }
+        
         @media (min-width: 1024px) {
-            .nav-menu-stack { bottom: 16%; } 
+            .wallpaper-bg {
+                background-position: center center;
+            }
+            .nav-menu-stack { 
+                bottom: 8% !important; 
+            } 
+            .nav-menu-stack .enter-link, 
+            .nav-menu-stack .download-btn {
+                font-size: 0.95rem !important; 
+            }
         }
 
         .enter-link, .download-btn {
@@ -133,28 +160,28 @@
 </head>
 <body>
 
-    <div class="media-vault">
-        <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
-    </div>
+    <div class="app-container" id="appContainer">
+        <div class="media-vault">
+            <div class="wallpaper-bg" id="wallpaperBg"></div>
+            <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
+            <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+        </div>
 
-    <div class="nav-menu-stack" id="navMenuStack">
-        <!-- 1. Drop In Pathway -->
-        <div class="mirror-block">
-            <button id="dropInTrigger" class="enter-link">drop in</button>
-            <span class="enter-link mirror-reflection">drop in</span>
-        </div>
-        
-        <!-- 2. Look In The Mirror Pathway (Fully Restored) -->
-        <div class="mirror-block">
-            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
-            <span class="enter-link mirror-reflection">look in the mirror</span>
-        </div>
-        
-        <!-- 3. Reflect Asset Download -->
-        <div class="mirror-block">
-            <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
-            <span class="download-btn mirror-reflection">reflect</span>
+        <div class="nav-menu-stack" id="navMenuStack">
+            <div class="mirror-block">
+                <button id="dropInTrigger" class="enter-link">drop in</button>
+                <span class="enter-link mirror-reflection">drop in</span>
+            </div>
+            
+            <div class="mirror-block">
+                <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
+                <span class="enter-link mirror-reflection">look in the mirror</span>
+            </div>
+            
+            <div class="mirror-block">
+                <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
+                <span class="download-btn mirror-reflection">reflect</span>
+            </div>
         </div>
     </div>
 
@@ -174,18 +201,19 @@
         const dropInTrigger = document.getElementById('dropInTrigger');
         const mirrorTrigger = document.getElementById('mirrorTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
+        const cameraVideo = document.getElementById('cameraStream');
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        // Master Timeline Tracking State Variables
         let selectedPathwayRoute = "dropin";
+        let localCameraStream = null;
 
-        // Hardcoded Native Folder File Directions
         const localIntroUrl = "introvideo.mp4";
+        const localMatrixUrl = "phonecode.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
 
-        function startStreamingVideo(targetVideoUrl, routeName) {
+        function fireCinematicSystem(targetVideoUrl, routeName) {
             selectedPathwayRoute = routeName;
             
             navMenuStack.style.opacity = '0';
@@ -195,49 +223,44 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
+            masterVideo.muted = false; 
             masterVideo.load();
             
-            const playPromise = masterVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(err => {
-                    masterVideo.muted = true;
-                    masterVideo.play().catch(e => console.error(e));
+            masterVideo.play().catch(err => {
+                masterVideo.muted = true;
+                masterVideo.play().catch(e => console.error(e));
+            });
+
+            // Trigger the camera permission handshake right at the launch point
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+                .then(stream => {
+                    localCameraStream = stream;
+                    cameraVideo.srcObject = localCameraStream;
+                    cameraVideo.load();
+                }).catch(err => {
+                    console.warn("Camera request declined or blocked by system parameters.", err);
+                    localCameraStream = null;
                 });
             }
         }
         
-        // Active click hooks connecting both buttons safely to your local files
-        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
+        dropInTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
-            // Check if the initial intro video just completed
             if (masterVideo.src.includes(localIntroUrl)) {
-                // Route to the correct secondary file based on which button you clicked
-                if (selectedPathwayRoute === "mirror") {
-                    masterVideo.src = localMirrorUrl;
-                } else {
-                    masterVideo.src = localDropInUrl;
-                }
-                
-                masterVideo.load();
-                const playPromise = masterVideo.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(err => {
-                        masterVideo.muted = true;
-                        masterVideo.play().catch(e => console.error(e));
-                    });
-                }
-            } else {
-                // Final video segment completed -> Clear video player and bring user home smoothly
-                masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
-                masterVideo.src = "";
-                navMenuStack.style.opacity = '1';
-                navMenuStack.style.pointerEvents = 'auto';
-                wallpaperBg.style.opacity = '1';
-            }
-        });
-    </script>
-</body>
-</html>
+
+                if (localCameraStream) {
+                    masterVideo.src = localMatrixUrl;
+                    masterVideo.style.mixBlendMode = 'screen';
+                    masterVideo.loop = true;
+                    masterVideo.muted = true; 
+                    masterVideo.load();
+                    
+                    cameraVideo.style.opacity = '1';
+                    cameraVideo.style.display = 'block';
+                    masterVideo.style.display = 'block';
+                    
+                    cameraVideo.play().catch(e => console.log(e));
