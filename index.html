@@ -19,7 +19,6 @@
             font-family: sans-serif;
         }
         
-        /* Master Base Plane Container */
         .app-container {
             width: 100%;
             height: 100vh;
@@ -28,14 +27,12 @@
             align-items: center;
             position: relative;
             background-color: #000;
-            animation: screenGlitchShake 8s infinite linear;
-            transition: animation 0.3s ease;
         }
         .app-container.video-playing {
             animation: none !important;
         }
         
-        /* Layer 1: Background graphic sitting safely on the baseline floor */
+        /* Layer 1: Background Graphic */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -44,7 +41,7 @@
             background-size: cover;
             background-position: center -144px;
             z-index: 1; 
-            pointer-events: none !important; /* Fixed: Prevents artwork from stealing taps */
+            pointer-events: none !important; 
             user-select: none;
             -webkit-user-drag: none;
             transition: opacity 0.5s ease;
@@ -53,7 +50,7 @@
             opacity: 0;
         }
         
-        /* Layer 2: Master Native Video Streams sitting on top of the background */
+        /* Layer 2: Master Native Video Layers */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -64,7 +61,7 @@
             background-color: #000;
             display: none;
             z-index: 4;
-            pointer-events: none !important; /* Fixed: Prevents player frames from blocking links */
+            pointer-events: none !important; 
         }
         
         .camera-feed-stream {
@@ -82,13 +79,13 @@
             pointer-events: none !important;
         }
         
-        /* Layer 3: Interactive Menu Stack floating unblocked on the absolute top plane */
+        /* Layer 3: Interactive Menu Stack */
         .nav-menu-stack {
             position: absolute; 
-            bottom: 8%; /* Kept clean lower-third framing to clear logo graphics completely */
+            bottom: 18%; 
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10; /* Fixed: Correctly floats over baseline graphic layers inside the container */
+            z-index: 10; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -97,7 +94,7 @@
             width: 100%;
             max-width: 400px;
             gap: 16px; 
-            pointer-events: auto !important; /* Guarantees layout reads touch contact points */
+            pointer-events: auto !important; 
             transition: opacity 0.5s ease;
         }
         .nav-menu-stack.fade-out {
@@ -111,7 +108,7 @@
                 background-size: contain;
                 background-position: center center;
             }
-            .nav-menu-stack { bottom: 10%; }
+            .nav-menu-stack { bottom: 20%; }
         }
         @media (min-width: 1024px) {
             .wallpaper-bg {
@@ -119,9 +116,10 @@
                 background-size: contain;
                 background-position: center center;
             }
-            .nav-menu-stack { bottom: 12%; } 
+            .nav-menu-stack { bottom: 22%; } 
         }
 
+        /* Audited: Set font-weight to 300 across all text entries for a thinner, lighter typography style */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -130,7 +128,7 @@
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer; 
-            font-weight: 400;
+            font-weight: 300 !important; /* Forces a thinner, ultra-sleek character thickness */
             display: inline-block !important; 
             padding: 8px 16px; 
             background: none;
@@ -148,22 +146,14 @@
             pointer-events: auto !important;
             height: 48px; 
         }
+        
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.02; 
+            opacity: 0.08; 
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
             pointer-events: none !important;
-        }
-
-        @keyframes screenGlitchShake {
-            0%, 92%, 100% { transform: translate(0, 0); }
-            93% { transform: translate(-3px, 2px); }
-            94% { transform: translate(2px, -2px); }
-            95% { transform: translate(-2px, 3px); }
-            96% { transform: translate(3px, -1px); }
-            97% { transform: translate(0, 0); }
         }
 
         @keyframes randomGlow {
@@ -179,38 +169,31 @@
 </head>
 <body>
 
-    <!-- Main Parent Container wraps ALL components under a single unified tracking plane -->
     <div class="app-container" id="appContainer">
         
-        <!-- Baseline Wallpaper Graphic Layer -->
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         
-        <!-- Video Media Engines -->
         <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
 
-        <!-- Unblocked Interactive Button Grid Stack -->
         <div class="nav-menu-stack" id="navMenuStack">
-            <!-- 1. Master Sequence Touch Link Route -->
             <div class="mirror-block">
                 <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
-            <!-- 2. Standalone Experience Menu Link Route (Placeholder) -->
             <div class="mirror-block">
                 <a href="#" id="mirrorTrigger" class="enter-link">look in the mirror</a>
                 <span class="enter-link mirror-reflection">look in the mirror</span>
             </div>
             
-            <!-- 3. Wallpaper Download Route Container -->
             <div class="mirror-block">
                 <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
 
-    </div> <!-- Fixed Closing Container Box safely moved to the bottom floor -->
+    </div> 
 
     <script>
         function configureAdaptiveDownload() {
@@ -259,3 +242,28 @@
             if (masterVideo.src.includes('introvideo.mp4')) {
                 masterVideo.style.display = 'none';
 
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "user" }, audio: false
+                    }).then(stream => {
+                        localCameraStream = stream;
+                        cameraVideo.srcObject = localCameraStream;
+                        
+                        masterVideo.src = 'phonecode.mp4';
+                        masterVideo.style.mixBlendMode = 'screen';
+                        masterVideo.loop = true;
+                        
+                        cameraVideo.style.opacity = '1';
+                        masterVideo.style.opacity = '1';
+                        cameraVideo.style.display = 'block';
+                        masterVideo.style.display = 'block';
+                        
+                        cameraVideo.play().catch(e => console.log(e));
+                        masterVideo.play().catch(e => console.log(e));
+
+                        setTimeout(() => {
+                            cameraVideo.style.opacity = '0';
+                            masterVideo.style.opacity = '0';
+                        }, 2000);
+
+                        setTimeout(() => {
