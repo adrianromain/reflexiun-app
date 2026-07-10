@@ -18,7 +18,6 @@
             overflow: hidden;
             font-family: sans-serif;
         }
-        
         .app-container {
             width: 100%;
             height: 100vh;
@@ -32,8 +31,6 @@
         .app-container.video-playing {
             animation: none !important;
         }
-        
-        /* --- 1. MOBILE PHONE BACKGROUND (DEFAULT) --- */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -50,8 +47,6 @@
         .wallpaper-bg.fade-out {
             opacity: 0;
         }
-
-        /* --- STABLE NATIVE LAYOUT EMBED TRACKS --- */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -62,11 +57,8 @@
             background-color: #000;
             display: none;
         }
-        
         #introVideoNode { z-index: 40; }
         #dropInVideoNode { z-index: 50; }
-
-        /* --- HARDWARE LIVE CAMERA MIRROR LAYER --- */
         .camera-feed-stream {
             position: absolute;
             top: 0;
@@ -86,7 +78,6 @@
             pointer-events: none;
             transition: opacity 2s linear;
         }
-        
         .nav-menu-stack {
             position: relative;
             z-index: 9999; 
@@ -106,8 +97,6 @@
             opacity: 0;
             pointer-events: none;
         }
-        
-        /* --- 2. TABLET / IPAD OVERRIDES --- */
         @media (min-width: 600px) and (max-width: 1023px) {
             .wallpaper-bg {
                 background-image: url('reflexiuntablet.png'); 
@@ -118,8 +107,6 @@
                 padding-top: 250px; 
             }
         }
-        
-        /* --- 3. DESKTOP / LAPTOP MONITOR OVERRIDES --- */
         @media (min-width: 1024px) {
             .wallpaper-bg {
                 background-image: url('reflexiundesktop.png'); 
@@ -130,7 +117,6 @@
                 padding-top: 380px; 
             }
         }
-
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -146,8 +132,6 @@
             border: none;
             outline: none;
         }
-
-        /* --- THE MIRROR DESIGN EFFECT --- */
         .mirror-block {
             display: flex;
             flex-direction: column;
@@ -162,7 +146,6 @@
             user-select: none;
             pointer-events: none;
         }
-
         @keyframes screenGlitchShake {
             0%, 92%, 100% { transform: translate(0, 0); }
             93% { transform: translate(-3px, 2px); }
@@ -171,7 +154,6 @@
             96% { transform: translate(3px, -1px); }
             97% { transform: translate(0, 0); }
         }
-
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
@@ -184,45 +166,30 @@
     </style>
 </head>
 <body>
-
     <div class="app-container" id="appContainer">
-        <!-- Pre-loaded layout nodes -->
         <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto"></video>
         <video id="matrixFilterNode" class="movie-track-node" src="phonecode.mp4" playsinline webkit-playsinline preload="auto" loop muted></video>
         <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto"></video>
-
-        <!-- Live device video layer -->
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
-        
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        
         <div class="nav-menu-stack" id="navMenuStack">
             <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
-            
             <div class="mirror-block">
                 <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
     </div>
-
     <script>
         function configureAdaptiveDownload() {
             const downloadLink = document.getElementById('dynamicDownload');
             if (!downloadLink) return;
-
             const width = window.innerWidth;
             let targetFile = 'reflexiunnewwallpaper.png'; 
-
-            if (width >= 1024) {
-                targetFile = 'reflexiundesktop.png'; 
-            } else if (width >= 600) {
-                targetFile = 'reflexiuntablet.png'; 
-            }
-
+            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
+            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
             downloadLink.href = targetFile;
         }
-
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
         window.addEventListener('resize', configureAdaptiveDownload);
 
@@ -232,46 +199,53 @@
         const dropInVideo = document.getElementById('dropInVideoNode');
         const cameraVideo = document.getElementById('cameraStream');
         const wallpaperBg = document.getElementById('wallpaperBg');
-        constnavMenuStack = document.getElementById('navMenuStack');
+        const navMenuStack = document.getElementById('navMenuStack');
         const appContainer = document.getElementById('appContainer');
-        
         let localCameraStream = null;
 
-        function triggerCinematicPipeline() {
+        function triggerCinematicPipeline(event) {
+            if (event) event.preventDefault(); 
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
-
             introVideo.style.display = 'block';
             introVideo.play().then(() => {
-                // Request camera permission after intro video successfully boots up
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: "user" },
-                        audio: false
+                        video: { facingMode: "user" }, audio: false
                     }).then(stream => {
                         localCameraStream = stream;
                         cameraVideo.srcObject = localCameraStream;
                     }).catch(err => {
-                        // Continuation Fallback: Captures the 'Deny' action or missing camera state cleanly
-                        console.warn("Camera access denied or device missing webcam. Activating regular play fallback path.", err);
+                        console.warn(err);
                         localCameraStream = null;
                     });
                 }
             }).catch(err => {
-                introVideo.muted = true;
-                introVideo.play();
+                introVideo.muted = true; introVideo.play();
             });
         }
-
-        dropInTrigger.addEventListener('click', (event) => {
-            if (event) event.preventDefault(); 
-            triggerCinematicPipeline();
-        });
+        dropInTrigger.addEventListener('pointerdown', triggerCinematicPipeline);
+        dropInTrigger.addEventListener('click', triggerCinematicPipeline);
 
         introVideo.addEventListener('ended', () => {
             introVideo.style.display = 'none';
-
             if (localCameraStream) {
-                // Regular path: Camera was allowed
                 cameraVideo.style.opacity = '1';
+                matrixFilter.style.opacity = '1';
+                cameraVideo.style.display = 'block';
+                matrixFilter.style.display = 'block';
+                cameraVideo.play().catch(e => console.log(e));
+                matrixFilter.play().catch(e => console.log(e));
+                setTimeout(() => {
+                    cameraVideo.style.opacity = '0';
+                    matrixFilter.style.opacity = '0';
+                }, 2000);
+                setTimeout(() => {
+                    cameraVideo.style.display = 'none';
+                    matrixFilter.style.display = 'none';
+                    cameraVideo.pause(); matrixFilter.pause();
+                    localCameraStream.getTracks().forEach(track => track.stop());
+                    localCameraStream = null; cameraVideo.srcObject = null;
+                    launchFinalDropInSegment();
+                }, 4000);
