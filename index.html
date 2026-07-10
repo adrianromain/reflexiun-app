@@ -136,7 +136,7 @@
     <!-- Background visual elements isolated deep below -->
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
+        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
     <!-- Clickable button menu floating naked on top -->
@@ -152,7 +152,7 @@
         </div>
         
         <div class="mirror-block">
-            <a href="https://cloudinary.com" id="dynamicDownload" class="download-btn" download>reflect</a>
+            <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
         </div>
     </div>
@@ -162,9 +162,9 @@
             const downloadLink = document.getElementById('dynamicDownload');
             if (!downloadLink) return;
             const width = window.innerWidth;
-            let targetFile = 'https://cloudinary.com'; 
-            if (width >= 1024) { targetFile = 'https://cloudinary.com'; } 
-            else if (width >= 600) { targetFile = 'https://cloudinary.com'; }
+            let targetFile = 'reflexiunnewwallpaper.png'; 
+            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
+            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
             downloadLink.href = targetFile;
         }
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
@@ -176,9 +176,9 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        // FIXED: Restored exact dashboard secure authentication parameters
-        const cloudIntroUrl = "https://cloudinary.com";
-        const cloudFinaleUrl = "https://cloudinary.com";
+        // FIXED: Restored original native GitHub repository movie paths
+        const localIntroUrl = "introvideo.mp4";
+        const localFinaleUrl = "dropinvid.mp4";
 
         function startStreamingVideo(targetVideoUrl) {
             navMenuStack.style.opacity = '0';
@@ -194,28 +194,26 @@
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    console.log("Stream successfully initiated.");
+                    console.log("Local playback initialized successfully.");
                 }).catch(err => {
-                    console.warn("Engaging audio override handler.", err);
                     masterVideo.muted = true;
-                    masterVideo.play();
+                    masterVideo.play().catch(e => console.error(e));
                 });
             }
         }
         
-        // FIXED: Direct hardware connection loops built into true button elements
-        dropInTrigger.addEventListener('click', function() { startStreamingVideo(cloudIntroUrl); });
-        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(cloudIntroUrl); });
+        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl); });
+        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl); });
 
         masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src === cloudIntroUrl) {
-                masterVideo.src = cloudFinaleUrl;
+            if (masterVideo.src.includes(localIntroUrl)) {
+                masterVideo.src = localFinaleUrl;
                 masterVideo.load();
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
                         masterVideo.muted = true;
-                        masterVideo.play();
+                        masterVideo.play().catch(e => console.error(e));
                     });
                 }
             } else {
