@@ -43,7 +43,7 @@
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
-            display: none; /* Hidden by default; turned on precisely by screen size */
+            display: none;
         }
 
         /* 1. PHONE BACKGROUND BOX (Screens up to 599px wide) */
@@ -55,43 +55,39 @@
                 transform: scale(1.1) translateY(-40px);
             }
             
-            /* Shrink text sizing exactly by half for phone displays */
             .enter-link, .download-btn {
                 font-size: 0.55rem !important;
-                padding: 0px !important; /* Reset padding to keep calculation clean */
+                padding: 0px !important;
             }
 
-            /* Give the box a specific height to leave clean room for the shadow reflection */
             .mirror-block {
                 height: 24px !important;
             }
 
-            /* Push the mirror reflection down so it sits below the smaller text */
             .mirror-block .mirror-reflection {
                 margin-top: -6px !important;
             }
 
-            /* Set the gap between the blocks to hit a precise half-inch total distance */
             .nav-menu-stack {
                 gap: 12px !important;
             }
         }
 
-        /* 2. TABLET BACKGROUND BOX (Screens from 600px up to 1023px wide) */
+        /* 2. TABLET BACKGROUND BOX */
         @media (min-width: 600px) and (max-width: 1023px) {
             .tablet-bg {
                 display: block;
                 background-image: url('reflexiunnewwallpaper.png');
-                background-position: center center; /* Kept centered exactly as established */
+                background-position: center center;
             }
         }
 
-        /* 3. DESKTOP BACKGROUND BOX (Screens 1024px wide and up) */
+        /* 3. DESKTOP BACKGROUND BOX */
         @media (min-width: 1024px) {
             .desktop-bg {
                 display: block;
                 background-image: url('reflexiunnewwallpaper.png');
-                background-position: center center; /* Kept centered exactly as established */
+                background-position: center center;
             }
         }
         
@@ -108,13 +104,12 @@
             pointer-events: none !important; 
         }
         
-        /* THE BUTTON LAYER: Put on the absolute highest level so nothing can cover them */
         .nav-menu-stack {
             position: fixed !important; 
             bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; /* Absolute highest level on the screen */
+            z-index: 999999 !important;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -229,12 +224,12 @@
         const desktopBg = document.getElementById('desktopBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
+        // State Tracking Variable
         let selectedPathwayRoute = "dropin";
 
         // Hardcoded Native Folder File Directions
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
-        // FIXED: Updated target name here to precisely match your repository file tracking
         const localMirrorUrl = "mirrorvid.mp4";
 
         function startStreamingVideo(targetVideoUrl, routeName) {
@@ -264,12 +259,18 @@
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes(localIntroUrl)) {
+            // Convert current src string to lowercase to prevent server casing mismatch bugs
+            const currentVideoSrc = masterVideo.src.toLowerCase();
+            
+            // Check strictly for the core intro file text name anywhere in the URL
+            if (currentVideoSrc.includes("introvideo.mp4")) {
+                // Route directly to the precise secondary file path requested
                 if (selectedPathwayRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
+                
                 masterVideo.load();
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
@@ -279,6 +280,7 @@
                     });
                 }
             } else {
+                // Secondary file sequence completed -> Cleanly reset baseline display
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
