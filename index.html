@@ -18,7 +18,6 @@
             overflow: hidden;
             font-family: sans-serif;
         }
-        
         .app-container {
             width: 100%;
             height: 100vh;
@@ -52,7 +51,7 @@
             opacity: 0;
         }
         
-        /* Layer 2: Unified Master Video Media Engine */
+        /* Layer 2: Master Native Video Layers */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -79,7 +78,7 @@
             transition: opacity 2s linear;
         }
         
-        /* Layer 3: Interactive Menus */
+        /* Layer 3: Interactive Menu Stack */
         .nav-menu-stack {
             position: relative;
             z-index: 10; 
@@ -173,8 +172,8 @@
     <div class="app-container" id="appContainer">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
 
-        <!-- Single high-performance multi-swap media tracking layer -->
-        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto" muted></video>
+        <!-- Master Video Node Tracking Elements -->
+        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
         
         <div class="nav-menu-stack" id="navMenuStack">
@@ -211,62 +210,54 @@
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
 
-        function beginMasterSequence() {
+        // Clean, prioritized click handler targeting ONLY the movie playback layer
+        dropInTrigger.addEventListener('click', (event) => {
+            if (event) event.preventDefault(); 
+
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
             
+            // Firing intro video cleanly to perfectly pass strict mobile autoplay filters
             masterVideo.src = 'introvideo.mp4';
             masterVideo.style.display = 'block';
             masterVideo.play().catch(err => {
-                console.warn(err);
+                console.warn("Autoplay audio restriction fallback activated.", err);
                 masterVideo.muted = true;
                 masterVideo.play();
             });
-        }
-
-        dropInTrigger.addEventListener('click', (event) => {
-            if (event) event.preventDefault(); 
-
-            // Initialize camera instantly to bypass device privilege constraints
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user" }, audio: false
-                }).then(stream => {
-                    localCameraStream = stream;
-                    cameraVideo.srcObject = localCameraStream;
-                    beginMasterSequence();
-                }).catch(err => {
-                    console.warn("Camera denied, running movie loops natively.", err);
-                    localCameraStream = null;
-                    beginMasterSequence();
-                });
-            } else {
-                beginMasterSequence();
-            }
         });
 
         masterVideo.addEventListener('ended', () => {
             if (masterVideo.src.includes('introvideo.mp4')) {
-                // Intro ends -> Swap to Matrix Mirror phase
-                if (localCameraStream) {
-                    masterVideo.src = 'phonecode.mp4';
-                    masterVideo.style.mixBlendMode = 'screen';
-                    masterVideo.loop = true;
-                    
-                    cameraVideo.style.opacity = '1';
-                    masterVideo.style.opacity = '1';
-                    cameraVideo.style.display = 'block';
-                    
-                    cameraVideo.play().catch(e => console.log(e));
-                    masterVideo.play().catch(e => console.log(e));
+                masterVideo.style.display = 'none';
 
-                    setTimeout(() => {
-                        cameraVideo.style.opacity = '0';
-                        masterVideo.style.opacity = '0';
-                    }, 2000);
+                // Intro ends cleanly -> Request hardware device camera authorization now
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "user" }, audio: false
+                    }).then(stream => {
+                        localCameraStream = stream;
+                        cameraVideo.srcObject = localCameraStream;
+                        
+                        // Fire Matrix Mirror phase
+                        masterVideo.src = 'phonecode.mp4';
+                        masterVideo.style.mixBlendMode = 'screen';
+                        masterVideo.loop = true;
+                        
+                        cameraVideo.style.opacity = '1';
+                        masterVideo.style.opacity = '1';
+                        cameraVideo.style.display = 'block';
+                        masterVideo.style.display = 'block';
+                        
+                        cameraVideo.play().catch(e => console.log(e));
+                        masterVideo.play().catch(e => console.log(e));
 
-                    setTimeout(() => {
-                        cameraVideo.style.display = 'none';
-                        cameraVideo.pause();
-                        masterVideo.pause();
+                        // 2 Seconds down: Begin fading reflection elements out
+                        setTimeout(() => {
+                            cameraVideo.style.opacity = '0';
+                            masterVideo.style.opacity = '0';
+                        }, 2000);
+
+                        // 4 Seconds down: Hard kill streams and launch dropinvid.mp4
+                        setTimeout(() => {
