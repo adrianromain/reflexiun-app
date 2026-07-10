@@ -77,7 +77,7 @@
             transition: opacity 2s linear;
         }
         
-        /* Layer 999999: Completely independent master plane floating over everything */
+        /* Layer 999999: Floating Menu Stack */
         .nav-menu-stack {
             position: fixed; 
             top: 0;
@@ -92,7 +92,7 @@
             width: 100%;
             max-width: 400px;
             padding-top: 210px; 
-            gap: 32px; 
+            gap: 28px; /* Balanced spacing grid */
             pointer-events: auto !important; 
             transition: opacity 0.5s ease;
         }
@@ -115,7 +115,7 @@
                 background-size: contain;
                 background-position: center center;
             }
-            .nav-menu-stack { padding-top: 380px; }
+            .nav-menu-stack { padding-top: 350px; } 
         }
 
         .enter-link, .download-btn {
@@ -127,9 +127,8 @@
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer; 
             font-weight: 400;
-            display: block !important; 
-            width: 100% !important; 
-            padding: 12px 20px;
+            display: inline-block !important; /* Fixed: Clear box clutter locks */
+            padding: 8px 16px;
             background: none;
             border: none;
             outline: none;
@@ -143,11 +142,12 @@
             position: relative;
             width: 100%; 
             pointer-events: auto !important;
+            height: 60px; /* Locked explicit height prevents layer cross-bleeding */
         }
         .mirror-reflection {
             transform: scaleY(-1);
             opacity: 0.02; 
-            margin-top: -25px; 
+            margin-top: -22px; 
             filter: blur(3px); 
             user-select: none;
             pointer-events: none !important;
@@ -175,20 +175,26 @@
 </head>
 <body>
 
-    <!-- Isolated Graphic Box Grid -->
     <div class="app-container" id="appContainer">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
     </div> 
 
-    <!-- Isolated Menu Stacking Layer sitting completely separate and safe -->
     <div class="nav-menu-stack" id="navMenuStack">
+        <!-- 1. Master Sequence Touch Link Route -->
         <div class="mirror-block">
             <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
         
+        <!-- 2. Standalone Experience Menu Link Route (Placeholder) -->
+        <div class="mirror-block">
+            <a href="#" id="mirrorTrigger" class="enter-link">look in the mirror</a>
+            <span class="enter-link mirror-reflection">look in the mirror</span>
+        </div>
+        
+        <!-- 3. Lowered Asset Wallpaper Route Container -->
         <div class="mirror-block">
             <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
@@ -209,6 +215,7 @@
         window.addEventListener('resize', configureAdaptiveDownload);
 
         const dropInTrigger = document.getElementById('dropInTrigger');
+        const mirrorTrigger = document.getElementById('mirrorTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
         const cameraVideo = document.getElementById('cameraStream');
         const wallpaperBg = document.getElementById('wallpaperBg');
@@ -232,6 +239,11 @@
             });
         });
 
+        mirrorTrigger.addEventListener('click', (event) => {
+            if (event) event.preventDefault();
+            alert('"LOOK IN THE MIRROR" pathway initialized. Ready for script pipeline configuration.');
+        });
+
         masterVideo.addEventListener('ended', () => {
             if (masterVideo.src.includes('introvideo.mp4')) {
                 masterVideo.style.display = 'none';
@@ -253,17 +265,3 @@
                         masterVideo.style.display = 'block';
                         
                         cameraVideo.play().catch(e => console.log(e));
-                        masterVideo.play().catch(e => console.log(e));
-
-                        setTimeout(() => {
-                            cameraVideo.style.opacity = '0';
-                            masterVideo.style.opacity = '0';
-                        }, 2000);
-
-                        setTimeout(() => {
-                            cameraVideo.style.display = 'none';
-                            cameraVideo.pause();
-                            masterVideo.pause();
-                            masterVideo.loop = false;
-                            masterVideo.style.mixBlendMode = 'normal';
-                            
