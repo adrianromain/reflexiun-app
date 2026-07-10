@@ -32,7 +32,7 @@
             animation: none !important;
         }
         
-        /* Layer -100: Locked at the absolute bottom floor, completely unable to block clicks */
+        /* Layer -100: Set to the absolute bottom floor to prevent click interference */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -228,12 +228,17 @@
         const navMenuStack = document.getElementById('navMenuStack');
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
+        let flowExecuting = false; // Master shield variable to prevent double-strike overloading
 
         function triggerCinematicPipeline(event) {
             if (event) {
                 event.preventDefault();
-                event.stopPropagation(); // Forces phone to ignore other hidden layers
+                event.stopPropagation(); // Stops ghost event echoes instantly
             }
+            
+            // Abort instantly if processing is already running in current loop window
+            if (flowExecuting) return;
+            flowExecuting = true;
             
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
@@ -248,14 +253,8 @@
                         localCameraStream = stream;
                         cameraVideo.srcObject = localCameraStream;
                     }).catch(err => {
-                        console.warn("Camera fallback route active:", err);
+                        console.warn("Camera fallback step initialized.", err);
                         localCameraStream = null;
                     });
                 }
             }).catch(err => {
-                console.warn(err);
-            });
-        }
-        
-        // Multi-bind to intercept physical touch gestures instantly on mobile screens
-        dropInTrigger.addEventListener('touchstart', triggerCinematicPipeline, { passive: false });
