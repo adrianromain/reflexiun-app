@@ -136,6 +136,7 @@
 
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
+        <!-- FIXED AUDIO CHANNEL: Stripped native 'muted' tag to allow sound layers to broadcast natively -->
         <video id="masterVideoEngine" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
@@ -178,11 +179,13 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
+        // Master Timeline Tracking State Variables
         let selectedPathwayRoute = "dropin";
 
+        // Hardcoded Native Folder File Directions
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "mirrorvid.mp4";
+        const localMirrorUrl = "mirrorvid.mp4"; // FIXED DIRECTION: Remapped strictly to point to your live renamed repo file
 
         function startStreamingVideo(targetVideoUrl, routeName) {
             selectedPathwayRoute = routeName;
@@ -192,27 +195,38 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
+            
+            // Command volume levels to un-mute programmatically within user click gesture context
+            masterVideo.muted = false;
             masterVideo.load();
+            
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
+                    console.warn("Browser safety override active: forcing video frame render via muted channels", err);
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
             }
         }
 
+        // Active click hooks connecting both buttons safely to your local files
         dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
+            // Check if the initial intro video just completed
             if (masterVideo.src.includes(localIntroUrl)) {
+                // Route to the correct secondary file based on which button you clicked
                 if (selectedPathwayRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
+                
+                masterVideo.muted = false;
                 masterVideo.load();
+                
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
@@ -221,6 +235,7 @@
                     });
                 }
             } else {
+                // Final video segment completed -> Clear video player and bring user home smoothly
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
