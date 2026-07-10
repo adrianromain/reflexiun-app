@@ -18,6 +18,7 @@
             overflow: hidden;
             font-family: sans-serif;
         }
+        
         .app-container {
             width: 100%;
             height: 100vh;
@@ -37,13 +38,13 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            object-position: center -144px;
-            z-index: 5;
-            pointer-events: none; 
+            background-image: url('reflexiunnewwallpaper.png');
+            background-size: cover;
+            background-position: center -144px;
+            z-index: 1;
+            pointer-events: none; /* Keeps background image from stealing button clicks */
             user-select: none;
             -webkit-user-drag: none;
-            content: url('reflexiunnewwallpaper.png');
             transition: opacity 0.5s ease;
         }
         .wallpaper-bg.fade-out {
@@ -71,11 +72,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 1;
+            z-index: 2;
             transform: scaleX(-1);
             background-color: #000;
             display: none;
-            transition: opacity 2s linear; /* Smooth 2-second fade driver */
+            transition: opacity 2s linear;
         }
         .matrix-filter-layer {
             position: absolute;
@@ -84,16 +85,17 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 2;
+            z-index: 3;
             display: none;
-            mix-blend-mode: screen; /* Drops black background, blends matrix onto user's face */
+            mix-blend-mode: screen; 
             pointer-events: none;
-            transition: opacity 2s linear; /* Smooth 2-second fade driver */
+            transition: opacity 2s linear;
         }
         
+        /* Isolated, Safe Menu Layer Box */
         .nav-menu-stack {
             position: relative;
-            z-index: 10; 
+            z-index: 9999; /* Floats safely on top of all visual layout graphics */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -101,9 +103,9 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            padding-top: 210px;
+            padding-top: 210px; 
             gap: 24px;
-            pointer-events: auto;
+            pointer-events: auto; /* Explicitly commands all engines to read touch interactions */
             transition: opacity 0.5s ease;
         }
         .nav-menu-stack.fade-out {
@@ -111,15 +113,12 @@
             pointer-events: none;
         }
         
-        /* --- 2. TABLET / IPAD DEVICE OVERRIDES --- */
+        /* --- 2. TABLET / IPAD OVERRIDES --- */
         @media (min-width: 600px) and (max-width: 1023px) {
             .wallpaper-bg {
-                content: url('reflexiuntablet.png'); 
-                object-fit: contain;
-                width: 100%;
-                height: 100%;
-                object-position: center center;
-                margin-top: -30px; 
+                background-image: url('reflexiuntablet.png'); 
+                background-size: contain;
+                background-position: center center;
             }
             .nav-menu-stack {
                 padding-top: 250px; 
@@ -129,17 +128,12 @@
         /* --- 3. DESKTOP / LAPTOP MONITOR OVERRIDES --- */
         @media (min-width: 1024px) {
             .wallpaper-bg {
-                content: url('reflexiundesktop.png'); 
-                object-fit: contain;
-                width: 100%;
-                height: 100%;
-                max-width: 100vw;
-                max-height: 100vh;
-                object-position: center center;
-                margin-top: -40px; 
+                background-image: url('reflexiundesktop.png'); 
+                background-size: contain;
+                background-position: center center;
             }
             .nav-menu-stack {
-                padding-top: 310px; 
+                padding-top: 380px; 
             }
         }
 
@@ -150,7 +144,7 @@
             letter-spacing: 5px;
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
-            cursor: pointer;
+            cursor: pointer; 
             font-weight: 400;
             display: inline-block;
             padding: 10px 20px;
@@ -198,20 +192,15 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        <!-- Live Mirror Track -->
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
-
-        <!-- Matrix Matrix Code Overlay Filter -->
         <video id="matrixFilter" class="matrix-filter-layer" autoplay playsinline muted loop></video>
-
-        <!-- Production Master Movie Layer -->
         <video id="transitionVideo" class="video-player-layer" playsinline webkit-playsinline></video>
-
-        <!-- Static Artwork Layer -->
-        <img class="wallpaper-bg" id="wallpaperBg" alt="Reflexiun Adaptive Framework">
+        
+        <div class="wallpaper-bg" id="wallpaperBg"></div>
         
         <div class="nav-menu-stack" id="navMenuStack">
-            <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
+            <!-- Native HTML Pointer Setup: Absolute protection against phone click lockouts -->
+            <a href="#launchSequence" id="dropInTrigger" class="enter-link">drop in</a>
             
             <div class="mirror-block">
                 <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
@@ -221,7 +210,6 @@
     </div>
 
     <script>
-        // --- 1. DYNAMIC DEVICE DOWNLOAD ENGINE ---
         function configureAdaptiveDownload() {
             const downloadLink = document.getElementById('dynamicDownload');
             if (!downloadLink) return;
@@ -241,7 +229,6 @@
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
         window.addEventListener('resize', configureAdaptiveDownload);
 
-        // --- 2. MULTI-TIER AUTOMATED MOVIE SEQUENCER ---
         const dropInTrigger = document.getElementById('dropInTrigger');
         const transitionVideo = document.getElementById('transitionVideo');
         const cameraVideo = document.getElementById('cameraStream');
@@ -252,31 +239,43 @@
         
         let localCameraStream = null;
 
-        dropInTrigger.addEventListener('click', async () => {
-            // Stage matrix resource code loop cleanly ahead of track handoff
+        // Clean, standard event processing function block
+        function executeMoviePipeline(event) {
+            if (event) event.preventDefault(); 
+            
             matrixFilter.src = 'phonecode.mp4';
             matrixFilter.load();
 
-            // Pre-warm and authorize live hardware channels silently
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
-                    localCameraStream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: "user" },
-                        audio: false
-                    });
+                navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" },
+                    audio: false
+                }).then(stream => {
+                    localCameraStream = stream;
                     cameraVideo.srcObject = localCameraStream;
-                } catch (cameraErr) {
+                }).catch(cameraErr => {
                     console.warn("Camera streaming pipeline unavailable or denied:", cameraErr);
-                }
+                });
             }
 
-            // Set up original starting intro video track
             transitionVideo.src = 'introvideo.mp4';
-            
-            // Dissolve interface container structures
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
 
-            // Force visibility channels and execute master playback
             transitionVideo.style.display = 'block';
+            transitionVideo.play().catch(err => {
+                transitionVideo.muted = true;
+                transitionVideo.play();
+            });
+        }
+
+        // Clean unified action handling rule
+        dropInTrigger.addEventListener('click', executeMoviePipeline);
+
+        transitionVideo.addEventListener('ended', () => {
+            if (transitionVideo.src.includes('introvideo.mp4')) {
+                transitionVideo.style.display = 'none';
+                transitionVideo.src = ""; 
+
+                if (localCameraStream) {
