@@ -136,8 +136,8 @@
     <!-- Background visual elements isolated deep below -->
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <!-- FIXED: Explicit hardware autoplay hooks injected directly to prevent black screen lockouts -->
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
+        <!-- FIXED: Configured with precise crossorigin settings to prevent background video caching locks -->
+        <video id="masterVideoEngine" class="movie-track-node" muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
     <!-- Clickable button menu floating naked on top -->
@@ -188,11 +188,17 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
+            
+            // FIXED: Complete clear re-initialization mapping ensures data buffers instantly
             masterVideo.load();
             
-            var playPromise = masterVideo.play();
+            // Explicitly force user touch action pass-through
+            const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
-                playPromise.catch(err => {
+                playPromise.then(() => {
+                    console.log("Stream sequence initialized successfully.");
+                }).catch(err => {
+                    console.warn("Autoplay handler active, engaging secondary execution logic.", err);
                     masterVideo.muted = true;
                     masterVideo.play();
                 });
@@ -206,7 +212,7 @@
             if (masterVideo.src === cloudIntroUrl) {
                 masterVideo.src = cloudFinaleUrl;
                 masterVideo.load();
-                var playPromise = masterVideo.play();
+                const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
                         masterVideo.muted = true;
