@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation !important; /* AUDIT FIX: Blocks browser boundary gesture locks */
         }
         body, html {
             background-color: #000;
@@ -29,11 +28,10 @@
             height: 100vh;
             background-color: #000;
             z-index: 1 !important;
-            pointer-events: none !important; /* AUDIT FIX: Visual vaults cannot intercept clicks */
+            pointer-events: none !important;
             user-select: none;
         }
         
-        /* MOBILE VIEWPORT ARTWORK: Fixed to preserve your exact screenshot look */
         .wallpaper-bg {
             position: absolute;
             top: 0;
@@ -42,7 +40,7 @@
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center -220px; 
+            background-position: center center;
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
@@ -57,52 +55,35 @@
             object-fit: cover;
             background-color: #000;
             display: none;
-            z-index: 4 !important;
+            z-index: 3 !important;
             pointer-events: none !important; 
         }
         
-        /* 
-           THE PEAK PLANE INDEPENDENT TRIGGER ENGINE
-           Every row anchors tightly to independent screen coordinates. Zero shared container box leaks.
-        */
-        .mirror-block {
-            position: fixed !important;
+        /* THE BUTTON LAYER: Put on the absolute highest level so nothing can cover them */
+        .nav-menu-stack {
+            position: fixed !important; 
+            bottom: 12%; 
             left: 50%;
             transform: translateX(-50%);
-            display: inline-flex !important; /* AUDIT FIX: Shrink-wraps container footprint tightly to text letters */
+            z-index: 999999 !important; /* Absolute highest level on the screen */
+            display: flex;
             flex-direction: column;
             align-items: center;
-            width: auto !important; /* AUDIT FIX: Destroys virtual full-width box overlap sheets */
-            height: auto !important;
-            z-index: 999999 !important; /* Absolute numerical dominance over screen layers */
-            pointer-events: none !important; /* Envelope boundaries are transparent to clicks */
+            justify-content: flex-start;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            gap: 16px; 
+            pointer-events: auto !important; 
         }
-        
-        /* INDEPENDENT POSITION TRACKING ARRAY: Mapped perfectly to preserve your 16px layout gaps */
-        #row-dropin { bottom: 22%; }
-        #row-mirror { bottom: 17%; }
-        #row-reflect { bottom: 12%; } /* LOCKED: Drops down exactly where it sits in your phone screenshot */
         
         @media (min-width: 600px) and (max-width: 1023px) {
-            #row-dropin { bottom: 24%; }
-            #row-mirror { bottom: 19%; }
-            #row-reflect { bottom: 14%; }
+            .nav-menu-stack { bottom: 14%; }
         }
-        
-        /* DESKTOP MONITOR POSITION ADJUSTMENT OVERRIDES */
         @media (min-width: 1024px) {
-            .wallpaper-bg { background-position: center center; }
-            #row-dropin { bottom: 16% !important; }
-            #row-mirror { bottom: 12% !important; }
-            #row-reflect { bottom: 8% !important; } /* Lowers layout link rows on desktop monitors */
-            
-            .mirror-block .enter-link, 
-            .mirror-block .download-btn {
-                font-size: 0.95rem !important; /* Shrinks typography font scale sleeker on monitors */
-            }
+            .nav-menu-stack { bottom: 16%; } 
         }
 
-        /* CORE TEXT ACTIONS: Isolated absolute touch targets */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -117,19 +98,26 @@
             background: none;
             border: none;
             outline: none;
-            pointer-events: auto !important; /* Forces the browser engine to receive your clicks exclusively */
-            z-index: 9999999 !important; /* Peak layer tracking priority */
+            pointer-events: auto !important;
+        }
+
+        .mirror-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             position: relative;
+            width: 100%; 
+            pointer-events: auto !important;
+            height: 48px; 
         }
         
-        /* CLEAN REFLECTION SIGNATURE ARCHITECTURE */
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.08; /* Exact reflection intensity signature match */
+            opacity: 0.08; 
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
-            pointer-events: none !important; /* Mirror shadows are completely transparent to mouse trackpads */
+            pointer-events: none !important;
         }
 
         @keyframes randomGlow {
@@ -145,27 +133,26 @@
 </head>
 <body>
 
-    <div class="app-container" id="appContainer">
-        <!-- Subterranean media layout vault pushes graphic layers underneath active controls -->
-        <div class="media-vault">
-            <div class="wallpaper-bg" id="wallpaperBg"></div>
-            <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
-        </div>
+    <div class="media-vault">
+        <div class="wallpaper-bg" id="wallpaperBg"></div>
+        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
+    </div>
 
-        <!-- 1. Drop In Standalone Link Target Row -->
-        <div class="mirror-block" id="row-dropin">
-            <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
+    <div class="nav-menu-stack" id="navMenuStack">
+        <!-- 1. Drop In Pathway -->
+        <div class="mirror-block">
+            <button id="dropInTrigger" class="enter-link">drop in</button>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
         
-        <!-- 2. Look In The Mirror Standalone Link Target Row -->
-        <div class="mirror-block" id="row-mirror">
-            <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
+        <!-- 2. Look In The Mirror Pathway (Fully Restored) -->
+        <div class="mirror-block">
+            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
             <span class="enter-link mirror-reflection">look in the mirror</span>
         </div>
         
-        <!-- 3. Reflect Download Standalone Link Target Row -->
-        <div class="mirror-block" id="row-reflect">
+        <!-- 3. Reflect Asset Download -->
+        <div class="mirror-block">
             <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
         </div>
@@ -188,43 +175,69 @@
         const mirrorTrigger = document.getElementById('mirrorTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
         const wallpaperBg = document.getElementById('wallpaperBg');
+        const navMenuStack = document.getElementById('navMenuStack');
 
-        let activeFilePlaylist = [];
-        let currentPlaylistIndex = 0;
+        // Master Timeline Tracking State Variables
+        let selectedPathwayRoute = "dropin";
 
-        // Relative path directions bypass sub-folder hosted restrictions on GitHub server loops natively
-        const localIntroUrl = "./introvideo.mp4";
-        const localDropInUrl = "./dropinvid.mp4";
-        const localMirrorUrl = "./lookinthemirror.mp4";
+        // Hardcoded Native Folder File Directions
+        const localIntroUrl = "introvideo.mp4";
+        const localDropInUrl = "dropinvid.mp4";
+        const localMirrorUrl = "lookinthemirror.mp4";
 
-        function launchVideoChain(playlistArray) {
-            activeFilePlaylist = playlistArray;
-            currentPlaylistIndex = 0;
+        function startStreamingVideo(targetVideoUrl, routeName) {
+            selectedPathwayRoute = routeName;
             
-            // Instantly dissolve interface links entirely out of the window field of view
-            dropInTrigger.style.opacity = '0';
-            dropInTrigger.style.pointerEvents = 'none';
-            mirrorTrigger.style.opacity = '0';
-            mirrorTrigger.style.pointerEvents = 'none';
-            document.getElementById('dynamicDownload').style.opacity = '0';
-            document.getElementById('dynamicDownload').style.pointerEvents = 'none';
+            navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
             
-            // Pop unblocked native player canvas right to the highest layout plane
             masterVideo.style.zIndex = "9999999"; 
+            masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
+            masterVideo.load();
             
-            executePlaylistTrack();
+            const playPromise = masterVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    masterVideo.muted = true;
+                    masterVideo.play().catch(e => console.error(e));
+                });
+            }
         }
+        
+        // Active click hooks connecting both buttons safely to your local files
+        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
-        function executePlaylistTrack() {
-            if (currentPlaylistIndex < activeFilePlaylist.length) {
-                masterVideo.src = activeFilePlaylist[currentPlaylistIndex];
-                masterVideo.muted = false;
-                masterVideo.load();
+        masterVideo.addEventListener('ended', () => {
+            // Check if the initial intro video just completed
+            if (masterVideo.src.includes(localIntroUrl)) {
+                // Route to the correct secondary file based on which button you clicked
+                if (selectedPathwayRoute === "mirror") {
+                    masterVideo.src = localMirrorUrl;
+                } else {
+                    masterVideo.src = localDropInUrl;
+                }
                 
+                masterVideo.load();
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
-                        console.warn("Autoplay audio restriction bypassed natively:", err);
                         masterVideo.muted = true;
+                        masterVideo.play().catch(e => console.error(e));
+                    });
+                }
+            } else {
+                // Final video segment completed -> Clear video player and bring user home smoothly
+                masterVideo.style.zIndex = "3";
+                masterVideo.style.display = 'none';
+                masterVideo.src = "";
+                navMenuStack.style.opacity = '1';
+                navMenuStack.style.pointerEvents = 'auto';
+                wallpaperBg.style.opacity = '1';
+            }
+        });
+    </script>
+</body>
+</html>
