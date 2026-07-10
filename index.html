@@ -32,7 +32,7 @@
             user-select: none;
         }
         
-        /* UNIFIED MASTER BACKGROUND: Hardcoded shift pulls artwork up 1 inch across ALL devices identically */
+        /* FIXED MOBILE BACKGROUND: Hardcoded pixel shift pulls your logo up 1 inch on phone glass */
         .wallpaper-bg {
             position: absolute;
             top: 0;
@@ -41,7 +41,7 @@
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center -100px; /* FIXED: Shifted up from center center across all devices */
+            background-position: center -100px; /* FIXED: Shifted up from center center to elevate the logo */
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
