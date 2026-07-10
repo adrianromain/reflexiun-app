@@ -243,15 +243,13 @@
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
             
-            // CRITICAL AUDIO BYPASS: Force video to unmute right inside the user click block
             masterVideo.muted = false;
             masterVideo.load();
             
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    // Fallback to muted only if a rare device security setting strictly demands it
-                    console.log("Audio block encountered, forcing fallback stream.");
+                    console.log("Audio bypass fallback active.");
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
@@ -265,13 +263,15 @@
             const currentVideoSrc = masterVideo.src.toLowerCase();
             
             if (currentVideoSrc.includes("introvideo.mp4")) {
+                // HARD RESET THE ENGINE: Force pause and clear current buffer before switching files
+                masterVideo.pause();
+                
                 if (selectedPathwayRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
                 
-                // Maintain audio status across the dynamic handoff transition
                 masterVideo.muted = false;
                 masterVideo.load();
                 
