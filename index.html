@@ -19,6 +19,7 @@
             font-family: sans-serif;
         }
         
+        /* Master Base Plane Container */
         .app-container {
             width: 100%;
             height: 100vh;
@@ -172,14 +173,14 @@
         
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         
-        <!-- Unified Master Media Container -->
-        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto"></video>
+        <!-- Fixed: Added direct play permissions to anchor video tracking loops internally -->
+        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline crossorigin="anonymous" preload="auto"></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
 
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
-                <!-- Bulletproof Fallback: Directly embeds the finale video stream route as a fallback link -->
-                <a href="https://cloudinary.com" id="dropInTrigger" class="enter-link" target="_blank">drop in</a>
+                <!-- Fixed: Removed external Cloudinary window route link -->
+                <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
@@ -223,29 +224,19 @@
         const cloudFinaleUrl = "https://cloudinary.com";
 
         function runMainVideoPlayback(event) {
-            // Attempt standard layout code playback loop
-            try {
-                if (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-
-                navMenuStack.classList.add('fade-out');
-                wallpaperBg.classList.add('fade-out');
-                appContainer.classList.add('video-playing');
-                
-                masterVideo.src = cloudIntroUrl;
-                masterVideo.style.display = 'block';
-                masterVideo.load();
-                
-                masterVideo.play().catch(err => {
-                    // Fallback to direct window link if unmuted playback crashes script memory
-                    window.location.href = cloudFinaleUrl;
-                });
-            } catch(e) {
-                // Safe Catch: If any part of the sequence fails, immediately launch the direct cloud stream path
-                window.location.href = cloudFinaleUrl;
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
             }
+
+            navMenuStack.classList.add('fade-out');
+            wallpaperBg.classList.add('fade-out');
+            appContainer.classList.add('video-playing');
+            
+            masterVideo.src = cloudIntroUrl;
+            masterVideo.style.display = 'block';
+            masterVideo.load();
+            masterVideo.play().catch(err => console.warn(err));
         }
         
         dropInTrigger.addEventListener('touchstart', runMainVideoPlayback, { passive: false });
@@ -261,3 +252,14 @@
                 masterVideo.style.display = 'none';
 
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "user" }, audio: false
+                    }).then(stream => {
+                        localCameraStream = stream;
+                        cameraVideo.srcObject = localCameraStream;
+                        
+                        masterVideo.src = cloudMatrixUrl;
+                        masterVideo.style.mixBlendMode = 'screen';
+                        masterVideo.loop = true;
+                        masterVideo.load();
+                        
