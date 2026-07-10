@@ -2,265 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reflexiun</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Clickable Layout</title>
     <style>
-        * {
+        /* BASE PAGE STYLES */
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body, html {
-            background-color: #000;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
-        
-        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
-        .media-vault {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
             height: 100vh;
-            background-color: #000;
-            z-index: 1 !important;
-            pointer-events: none !important;
-            user-select: none;
-        }
-        
-        .wallpaper-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('reflexiunnewwallpaper.png');
-            background-size: cover;
-            background-position: center -220px; 
-            z-index: 2 !important; 
-            pointer-events: none !important; 
-            transition: opacity 0.5s ease;
-        }
-        
-        .movie-track-node {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background-color: #000;
-            display: none;
-            z-index: 4 !important;
-            pointer-events: none !important; 
-        }
-        
-        .camera-feed-stream {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 3 !important;
-            transform: scaleX(-1);
-            background-color: #000;
-            display: none;
-            pointer-events: none !important;
-        }
-        
-        /* THE BUTTON LAYER: Isolated outside visual elements on the highest plane */
-        .nav-menu-stack {
-            position: fixed !important; 
-            bottom: 12%; 
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999999 !important; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            gap: 16px; 
-            pointer-events: auto !important; 
-        }
-        
-        @media (min-width: 600px) and (max-width: 1023px) {
-            .wallpaper-bg {
-                background-position: center center;
-            }
-            .nav-menu-stack { bottom: 14%; }
-        }
-        
-        @media (min-width: 1024px) {
-            .wallpaper-bg {
-                background-position: center center;
-            }
-            .nav-menu-stack { 
-                bottom: 8% !important; 
-            } 
-            .nav-menu-stack .enter-link, 
-            .nav-menu-stack .download-btn {
-                font-size: 0.95rem !important; 
-            }
         }
 
-        .enter-link, .download-btn {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.1rem; 
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            animation: randomGlow 3.5s infinite ease-in-out;
-            cursor: pointer; 
-            font-weight: 300 !important; 
-            display: inline-block !important; 
-            padding: 8px 16px; 
-            background: none;
-            border: none;
-            outline: none;
-            pointer-events: auto !important;
+        /* 1. THE FIXED BACKGROUND LAYER */
+        /* This layer stays behind and lets all clicks pass through it */
+        .background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #34495e;
+            opacity: 0.1; /* Light overlay for visualization */
+            
+            /* CRITICAL FIXES FOR BACKGROUND */
+            z-index: 1 !important;         /* Keeps it on a low layer */
+            pointer-events: none !important; /* Clicks pass right through this */
         }
 
-        .mirror-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* 2. THE FIXED CONTENT CONTAINER */
+        /* This holds your active page content on a higher layer */
+        .content-layer {
             position: relative;
-            width: 100%; 
-            pointer-events: auto !important;
-            height: 48px; 
-        }
-        
-        .mirror-reflection {
-            transform: scaleY(-1);
-            opacity: 0.08; 
-            margin-top: -18px; 
-            filter: blur(3px); 
-            user-select: none;
-            pointer-events: none !important;
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            
+            /* CRITICAL FIXES FOR CONTENT CONTAINER */
+            z-index: 1000 !important;      /* Lifts content above background */
         }
 
-        @keyframes randomGlow {
-            0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
-            15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
-            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
-            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
-            50% { opacity: 0.15; text-shadow: none; }
-            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
-            85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
+        /* 3. THE FIXED BUTTON STYLES */
+        /* These settings force the buttons to accept clicks on the top layer */
+        .clickable-btn, button, a {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            
+            /* CRITICAL FIXES FOR BUTTONS */
+            position: relative !important; 
+            z-index: 9999 !important;      /* Puts buttons on the absolute top layer */
+            pointer-events: auto !important; /* Guarantees they register clicks */
+            cursor: pointer !important;      /* Forces the hand cursor to show */
+        }
+
+        /* Visual hover state to prove it is working */
+        .clickable-btn:hover, button:hover, a:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="appContainer">
-        <div class="media-vault">
-            <div class="wallpaper-bg" id="wallpaperBg"></div>
-            <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
-            <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
-        </div>
+    <!-- BACKGROUND ELEMENT (Will not block anything) -->
+    <div class="background-container"></div>
 
-        <div class="nav-menu-stack" id="navMenuStack">
-            <div class="mirror-block">
-                <button id="dropInTrigger" class="enter-link">drop in</button>
-                <span class="enter-link mirror-reflection">drop in</span>
-            </div>
-            
-            <div class="mirror-block">
-                <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
-                <span class="enter-link mirror-reflection">look in the mirror</span>
-            </div>
-            
-            <div class="mirror-block">
-                <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
-                <span class="download-btn mirror-reflection">reflect</span>
-            </div>
-        </div>
+    <!-- MAIN CONTENT LAYER (Contains your interactive elements) -->
+    <div class="content-layer">
+        <h1>Your Web Page Title</h1>
+        <p>The background can move or resize freely without blocking the items below.</p>
+        
+        <!-- BUTTON EXAMPLES USING THE NEW FIXED LAYER CLASSES -->
+        <button onclick="testClick('Standard Button')">Standard Button</button>
+        <a href="javascript:void(0);" class="clickable-btn" onclick="testClick('Link Button')">Text Link Button</a>
     </div>
 
+    <!-- JAVASCRIPT TEST ACTION -->
     <script>
-        function configureAdaptiveDownload() {
-            const downloadLink = document.getElementById('dynamicDownload');
-            if (!downloadLink) return;
-            const width = window.innerWidth;
-            let targetFile = 'reflexiunnewwallpaper.png'; 
-            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
-            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
-            downloadLink.href = targetFile;
+        function testClick(buttonName) {
+            alert(buttonName + " is working perfectly!");
         }
-        window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
-        window.addEventListener('resize', configureAdaptiveDownload);
+    </script>
 
-        const dropInTrigger = document.getElementById('dropInTrigger');
-        const mirrorTrigger = document.getElementById('mirrorTrigger');
-        const masterVideo = document.getElementById('masterVideoEngine');
-        const cameraVideo = document.getElementById('cameraStream');
-        const wallpaperBg = document.getElementById('wallpaperBg');
-        const navMenuStack = document.getElementById('navMenuStack');
-
-        let selectedPathwayRoute = "dropin";
-        let localCameraStream = null;
-
-        const localIntroUrl = "introvideo.mp4";
-        const localMatrixUrl = "phonecode.mp4";
-        const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "lookinthemirror.mp4";
-
-        function fireCinematicSystem(targetVideoUrl, routeName) {
-            selectedPathwayRoute = routeName;
-            
-            navMenuStack.style.opacity = '0';
-            navMenuStack.style.pointerEvents = 'none';
-            wallpaperBg.style.opacity = '0';
-            
-            masterVideo.style.zIndex = "9999999"; 
-            masterVideo.src = targetVideoUrl;
-            masterVideo.style.display = 'block';
-            masterVideo.muted = false; 
-            masterVideo.load();
-            
-            masterVideo.play().catch(err => {
-                masterVideo.muted = true;
-                masterVideo.play().catch(e => console.error(e));
-            });
-
-            // Trigger the camera permission handshake right at the launch point
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-                .then(stream => {
-                    localCameraStream = stream;
-                    cameraVideo.srcObject = localCameraStream;
-                    cameraVideo.load();
-                }).catch(err => {
-                    console.warn("Camera request declined or blocked by system parameters.", err);
-                    localCameraStream = null;
-                });
-            }
-        }
-        
-        dropInTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "mirror"); });
-
-        masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes(localIntroUrl)) {
-                masterVideo.style.display = 'none';
-
-                if (localCameraStream) {
-                    masterVideo.src = localMatrixUrl;
-                    masterVideo.style.mixBlendMode = 'screen';
-                    masterVideo.loop = true;
-                    masterVideo.muted = true; 
-                    masterVideo.load();
-                    
-                    cameraVideo.style.opacity = '1';
-                    cameraVideo.style.display = 'block';
-                    masterVideo.style.display = 'block';
-                    
-                    cameraVideo.play().catch(e => console.log(e));
+</body>
+</html>
