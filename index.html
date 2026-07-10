@@ -77,7 +77,7 @@
             transition: opacity 2s linear;
         }
         
-        /* Layer 999999: Floating Menu Stack perfectly lowered to clear logo boundaries */
+        /* Layer 999999: Floating Menu Stack tightened and pushed down half an inch */
         .nav-menu-stack {
             position: fixed; 
             top: 0;
@@ -91,8 +91,8 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            padding-top: 340px; /* Perfectly cleared phone logo space */
-            gap: 28px; 
+            padding-top: 390px; /* Shifted down an extra half inch on mobile phones */
+            gap: 16px; /* Audited: Pulled elements closer together */
             pointer-events: auto !important; 
             transition: opacity 0.5s ease;
         }
@@ -108,7 +108,7 @@
                 background-position: center center;
             }
             .nav-menu-stack { 
-                padding-top: 380px; /* Cleared tablet logo space */
+                padding-top: 430px; /* Shifted down on tablet viewports */
             }
         }
         @media (min-width: 1024px) {
@@ -118,7 +118,7 @@
                 background-position: center center;
             }
             .nav-menu-stack { 
-                padding-top: 480px; /* Cleared computer monitor logo space */
+                padding-top: 530px; /* Shifted down on computer monitors */
             } 
         }
 
@@ -132,7 +132,7 @@
             cursor: pointer; 
             font-weight: 400;
             display: inline-block !important; 
-            padding: 8px 16px;
+            padding: 4px 16px; /* Sleeker vertical height footprint */
             background: none;
             border: none;
             outline: none;
@@ -146,12 +146,12 @@
             position: relative;
             width: 100%; 
             pointer-events: auto !important;
-            height: 60px; 
+            height: 48px; /* Tightened row bounding heights */
         }
         .mirror-reflection {
             transform: scaleY(-1);
             opacity: 0.02; 
-            margin-top: -22px; 
+            margin-top: -24px; /* Perfectly tracked tight mirror overlap */
             filter: blur(3px); 
             user-select: none;
             pointer-events: none !important;
@@ -263,7 +263,3 @@
                         masterVideo.style.mixBlendMode = 'screen';
                         masterVideo.loop = true;
                         
-                        cameraVideo.style.opacity = '1';
-                        masterVideo.style.opacity = '1';
-                        cameraVideo.style.display = 'block';
-                        masterVideo.style.display = 'block';
