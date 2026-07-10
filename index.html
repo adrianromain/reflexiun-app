@@ -18,6 +18,7 @@
             overflow: hidden;
             font-family: sans-serif;
         }
+        
         .app-container {
             width: 100%;
             height: 100vh;
@@ -31,6 +32,8 @@
         .app-container.video-playing {
             animation: none !important;
         }
+        
+        /* --- 1. MOBILE PHONE BACKGROUND (DEFAULT) --- */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -47,6 +50,8 @@
         .wallpaper-bg.fade-out {
             opacity: 0;
         }
+
+        /* --- HARDWARE VIDEO TRACK LAYERS --- */
         .video-player-layer {
             position: absolute;
             top: 0;
@@ -58,6 +63,8 @@
             background-color: #000;
             display: none;
         }
+
+        /* --- HARDWARE LIVE CAMERA MIRROR LAYER --- */
         .camera-feed-stream {
             position: absolute;
             top: 0;
@@ -84,6 +91,7 @@
             pointer-events: none;
             transition: opacity 2s linear;
         }
+        
         .nav-menu-stack {
             position: relative;
             z-index: 9999; 
@@ -103,6 +111,8 @@
             opacity: 0;
             pointer-events: none;
         }
+        
+        /* --- 2. TABLET / IPAD OVERRIDES --- */
         @media (min-width: 600px) and (max-width: 1023px) {
             .wallpaper-bg {
                 background-image: url('reflexiuntablet.png'); 
@@ -113,6 +123,8 @@
                 padding-top: 250px; 
             }
         }
+        
+        /* --- 3. DESKTOP / LAPTOP MONITOR OVERRIDES --- */
         @media (min-width: 1024px) {
             .wallpaper-bg {
                 background-image: url('reflexiundesktop.png'); 
@@ -123,6 +135,7 @@
                 padding-top: 380px; 
             }
         }
+
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -138,6 +151,8 @@
             border: none;
             outline: none;
         }
+
+        /* --- THE MIRROR DESIGN EFFECT --- */
         .mirror-block {
             display: flex;
             flex-direction: column;
@@ -152,6 +167,7 @@
             user-select: none;
             pointer-events: none;
         }
+
         @keyframes screenGlitchShake {
             0%, 92%, 100% { transform: translate(0, 0); }
             93% { transform: translate(-3px, 2px); }
@@ -160,6 +176,7 @@
             96% { transform: translate(3px, -1px); }
             97% { transform: translate(0, 0); }
         }
+
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
@@ -172,29 +189,41 @@
     </style>
 </head>
 <body>
+
     <div class="app-container" id="appContainer">
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
         <video id="matrixFilter" class="matrix-filter-layer" autoplay playsinline muted loop></video>
         <video id="transitionVideo" class="video-player-layer" playsinline webkit-playsinline></video>
+        
         <div class="wallpaper-bg" id="wallpaperBg"></div>
+        
         <div class="nav-menu-stack" id="navMenuStack">
             <a href="#" id="dropInTrigger" class="enter-link">drop in</a>
+            
             <div class="mirror-block">
                 <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
                 <span class="download-btn mirror-reflection">reflect</span>
             </div>
         </div>
     </div>
+
     <script>
         function configureAdaptiveDownload() {
             const downloadLink = document.getElementById('dynamicDownload');
             if (!downloadLink) return;
+
             const width = window.innerWidth;
             let targetFile = 'reflexiunnewwallpaper.png'; 
-            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
-            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
+
+            if (width >= 1024) {
+                targetFile = 'reflexiundesktop.png'; 
+            } else if (width >= 600) {
+                targetFile = 'reflexiuntablet.png'; 
+            }
+
             downloadLink.href = targetFile;
         }
+
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
         window.addEventListener('resize', configureAdaptiveDownload);
 
@@ -205,25 +234,34 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
         const appContainer = document.getElementById('appContainer');
+        
         let localCameraStream = null;
 
         dropInTrigger.addEventListener('click', (event) => {
             if (event) event.preventDefault(); 
+
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user" }, audio: false
+                    video: { facingMode: "user" },
+                    audio: false
                 }).then(stream => {
                     localCameraStream = stream;
                     cameraVideo.srcObject = localCameraStream;
-                }).catch(cameraErr => { console.warn(cameraErr); });
+                }).catch(cameraErr => {
+                    console.warn("Camera pipeline bypass warning:", cameraErr);
+                });
             }
+
             transitionVideo.src = 'introvideo.mp4';
+            
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
+
             transitionVideo.style.display = 'block';
             transitionVideo.play().catch(err => {
-                transitionVideo.muted = true; transitionVideo.play();
+                transitionVideo.muted = true;
+                transitionVideo.play();
             });
         });
 
@@ -231,25 +269,19 @@
             if (transitionVideo.src.includes('introvideo.mp4')) {
                 transitionVideo.style.display = 'none';
                 transitionVideo.src = ""; 
+
                 if (localCameraStream) {
                     matrixFilter.src = 'phonecode.mp4';
                     matrixFilter.load();
+
                     cameraVideo.style.opacity = '1';
                     matrixFilter.style.opacity = '1';
+                    
                     cameraVideo.style.display = 'block';
                     matrixFilter.style.display = 'block';
+                    
                     cameraVideo.play().catch(e => console.log(e));
                     matrixFilter.play().catch(e => console.log(e));
+
                     setTimeout(() => {
                         cameraVideo.style.opacity = '0';
-                        matrixFilter.style.opacity = '0';
-                    }, 2000);
-                    setTimeout(() => {
-                        cameraVideo.style.display = 'none';
-                        matrixFilter.style.display = 'none';
-                        cameraVideo.pause(); matrixFilter.pause(); matrixFilter.src = ""; 
-                        localCameraStream.getTracks().forEach(track => track.stop());
-                        localCameraStream = null; cameraVideo.srcObject = null;
-                        playDropInSegment();
-                    }, 4000);
-                } else { playDropInSegment(); }
