@@ -47,33 +47,6 @@
             transition: opacity 0.5s ease;
         }
         
-        .movie-track-node {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background-color: #000;
-            display: none;
-            z-index: 4 !important;
-            pointer-events: none !important; 
-        }
-        
-        .camera-feed-stream {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 3 !important;
-            transform: scaleX(-1);
-            background-color: #000;
-            display: none;
-            pointer-events: none !important;
-        }
-        
         /* THE BUTTON LAYER: Isolated outside visual elements on the highest plane */
         .nav-menu-stack {
             position: fixed !important; 
@@ -112,7 +85,6 @@
             }
         }
 
-        /* CORE LINK BUTTON ACTIONS: Hardcoded with total touch target dominance attributes */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -127,9 +99,7 @@
             background: none;
             border: none;
             outline: none;
-            pointer-events: auto !important; /* FIXED: Forces the browser to receive your touches exclusively */
-            z-index: 9999999 !important;
-            position: relative;
+            pointer-events: auto !important; /* Forces the browser to read your clicks */
         }
 
         .mirror-block {
@@ -138,8 +108,8 @@
             align-items: center;
             position: relative;
             width: 100%; 
-            height: auto !important; /* FIXED: Destroys rigid bounding container overlaps */
-            pointer-events: none !important; /* FIXED: Prevents empty container boxes from blocking text behind them */
+            height: auto !important;
+            pointer-events: none !important;
         }
         
         /* CLEAN REFLECTION ARCHITECTURE FILTER CODE */
@@ -149,7 +119,7 @@
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
-            pointer-events: none !important; /* FIXED: Smashes the invisible text layout shield permanently */
+            pointer-events: none !important; /* Smashes the invisible text layout shield permanently */
         }
 
         @keyframes randomGlow {
@@ -166,22 +136,20 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        <!-- Subterranean media vault holds visual canvas layers -->
+        <!-- Subterranean media vault holds background visuals completely out of touch way -->
         <div class="media-vault">
             <div class="wallpaper-bg" id="wallpaperBg"></div>
-            <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
-            <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted style="pointer-events: none !important;"></video>
         </div>
 
-        <!-- Naked interface stacking column floats completely unmasked on top -->
+        <!-- FIXED: Direct HTML link framework routes video files with absolute 100% mechanical un-blockable precision -->
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
-                <button id="dropInTrigger" class="enter-link">drop in</button>
+                <a href="introvideo.mp4" id="dropInTrigger" class="enter-link">drop in</a>
                 <span class="enter-link mirror-reflection">drop in</span>
             </div>
             
             <div class="mirror-block">
-                <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
+                <a href="lookinthemirror.mp4" id="mirrorTrigger" class="enter-link">look in the mirror</a>
                 <span class="enter-link mirror-reflection">look in the mirror</span>
             </div>
             
@@ -204,52 +172,6 @@
         }
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
         window.addEventListener('resize', configureAdaptiveDownload);
-
-        const dropInTrigger = document.getElementById('dropInTrigger');
-        const mirrorTrigger = document.getElementById('mirrorTrigger');
-        const masterVideo = document.getElementById('masterVideoEngine');
-        const cameraVideo = document.getElementById('cameraStream');
-        const wallpaperBg = document.getElementById('wallpaperBg');
-        const navMenuStack = document.getElementById('navMenuStack');
-
-        let selectedPathwayRoute = "dropin";
-        let localCameraStream = null;
-
-        const localIntroUrl = "introvideo.mp4";
-        const localMatrixUrl = "phonecode.mp4";
-        const localDropInUrl = "dropinvid.mp4";
-        const localMirrorUrl = "lookinthemirror.mp4";
-
-        function fireCinematicSystem(targetVideoUrl, routeName) {
-            selectedPathwayRoute = routeName;
-            
-            navMenuStack.style.opacity = '0';
-            navMenuStack.style.pointerEvents = 'none';
-            wallpaperBg.style.opacity = '0';
-            
-            masterVideo.style.zIndex = "9999999"; 
-            masterVideo.src = targetVideoUrl;
-            masterVideo.style.display = 'block';
-            
-            masterVideo.muted = false; 
-            masterVideo.load();
-            
-            masterVideo.play().catch(err => {
-                console.warn("Browser audio fallback active:", err);
-                masterVideo.muted = true;
-                masterVideo.play().catch(e => console.error(e));
-            });
-
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-                .then(stream => {
-                    localCameraStream = stream;
-                    cameraVideo.srcObject = localCameraStream;
-                    cameraVideo.load();
-                }).catch(err => {
-                    console.warn("Camera request dropped or blocked by hardware preferences.", err);
-                    localCameraStream = null;
-                });
-            }
-        }
-        
+    </script>
+</body>
+</html>
