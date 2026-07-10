@@ -58,17 +58,17 @@
             /* Shrink text sizing exactly by half for phone displays */
             .enter-link, .download-btn {
                 font-size: 0.55rem !important;
-                padding: 2px 8px !important; /* Tighten internal space around text */
+                padding: 0px !important; /* Reset padding to keep calculation clean */
             }
 
-            /* Collapse the fixed block height so text can physically sit closer */
+            /* Give the box a specific height to leave clean room for the shadow reflection */
             .mirror-block {
-                height: auto !important;
+                height: 24px !important;
             }
 
-            /* Tighten up spacing gap between stack items specifically on mobile */
+            /* Set the gap between the blocks to hit a precise half-inch total distance */
             .nav-menu-stack {
-                gap: 4px !important;
+                gap: 12px !important;
             }
         }
 
