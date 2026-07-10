@@ -18,7 +18,6 @@
             overflow: hidden;
             font-family: sans-serif;
         }
-        
         .app-container {
             width: 100%;
             height: 100vh;
@@ -27,6 +26,10 @@
             align-items: center;
             position: relative;
             animation: screenGlitchShake 8s infinite linear;
+            transition: animation 0.3s ease;
+        }
+        .app-container.video-playing {
+            animation: none !important;
         }
         
         /* --- 1. MOBILE PHONE BACKGROUND (DEFAULT) --- */
@@ -36,11 +39,56 @@
             height: 100%;
             object-fit: cover;
             object-position: center -144px;
-            z-index: 1;
+            z-index: 5;
             pointer-events: none; 
             user-select: none;
             -webkit-user-drag: none;
             content: url('reflexiunnewwallpaper.png');
+            transition: opacity 0.5s ease;
+        }
+        .wallpaper-bg.fade-out {
+            opacity: 0;
+        }
+
+        /* --- HARDWARE VIDEO TRACK LAYERS --- */
+        .video-player-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 4; 
+            background-color: #000;
+            display: none;
+        }
+
+        /* --- HARDWARE LIVE CAMERA MIRROR LAYER --- */
+        .camera-feed-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            transform: scaleX(-1);
+            background-color: #000;
+            display: none;
+            transition: opacity 2s linear; /* Smooth 2-second fade driver */
+        }
+        .matrix-filter-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2;
+            display: none;
+            mix-blend-mode: screen; /* Drops black background, blends matrix onto user's face */
+            pointer-events: none;
+            transition: opacity 2s linear; /* Smooth 2-second fade driver */
         }
         
         .nav-menu-stack {
@@ -56,6 +104,11 @@
             padding-top: 210px;
             gap: 24px;
             pointer-events: auto;
+            transition: opacity 0.5s ease;
+        }
+        .nav-menu-stack.fade-out {
+            opacity: 0;
+            pointer-events: none;
         }
         
         /* --- 2. TABLET / IPAD DEVICE OVERRIDES --- */
@@ -113,7 +166,6 @@
             align-items: center;
             position: relative;
         }
-        /* Audited: Pulled closer, faded lighter, and blurred for a perfect glass look */
         .mirror-reflection {
             transform: scaleY(-1);
             opacity: 0.07; 
@@ -145,11 +197,21 @@
 </head>
 <body>
 
-    <div class="app-container">
-        <img class="wallpaper-bg" alt="Reflexiun Adaptive Framework">
+    <div class="app-container" id="appContainer">
+        <!-- Live Mirror Track -->
+        <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+
+        <!-- Matrix Matrix Code Overlay Filter -->
+        <video id="matrixFilter" class="matrix-filter-layer" autoplay playsinline muted loop></video>
+
+        <!-- Production Master Movie Layer -->
+        <video id="transitionVideo" class="video-player-layer" playsinline webkit-playsinline></video>
+
+        <!-- Static Artwork Layer -->
+        <img class="wallpaper-bg" id="wallpaperBg" alt="Reflexiun Adaptive Framework">
         
-        <div class="nav-menu-stack">
-            <a href="#content" class="enter-link">drop in</a>
+        <div class="nav-menu-stack" id="navMenuStack">
+            <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
             
             <div class="mirror-block">
                 <a href="#" id="dynamicDownload" class="download-btn" download>reflect</a>
@@ -159,6 +221,7 @@
     </div>
 
     <script>
+        // --- 1. DYNAMIC DEVICE DOWNLOAD ENGINE ---
         function configureAdaptiveDownload() {
             const downloadLink = document.getElementById('dynamicDownload');
             if (!downloadLink) return;
@@ -177,7 +240,43 @@
 
         window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
         window.addEventListener('resize', configureAdaptiveDownload);
-    </script>
 
-</body>
-</html>
+        // --- 2. MULTI-TIER AUTOMATED MOVIE SEQUENCER ---
+        const dropInTrigger = document.getElementById('dropInTrigger');
+        const transitionVideo = document.getElementById('transitionVideo');
+        const cameraVideo = document.getElementById('cameraStream');
+        const matrixFilter = document.getElementById('matrixFilter');
+        const wallpaperBg = document.getElementById('wallpaperBg');
+        const navMenuStack = document.getElementById('navMenuStack');
+        const appContainer = document.getElementById('appContainer');
+        
+        let localCameraStream = null;
+
+        dropInTrigger.addEventListener('click', async () => {
+            // Stage matrix resource code loop cleanly ahead of track handoff
+            matrixFilter.src = 'phonecode.mp4';
+            matrixFilter.load();
+
+            // Pre-warm and authorize live hardware channels silently
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    localCameraStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "user" },
+                        audio: false
+                    });
+                    cameraVideo.srcObject = localCameraStream;
+                } catch (cameraErr) {
+                    console.warn("Camera streaming pipeline unavailable or denied:", cameraErr);
+                }
+            }
+
+            // Set up original starting intro video track
+            transitionVideo.src = 'introvideo.mp4';
+            
+            // Dissolve interface container structures
+            navMenuStack.classList.add('fade-out');
+            wallpaperBg.classList.add('fade-out');
+            appContainer.classList.add('video-playing');
+
+            // Force visibility channels and execute master playback
+            transitionVideo.style.display = 'block';
