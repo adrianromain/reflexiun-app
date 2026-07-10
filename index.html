@@ -18,6 +18,7 @@
             overflow: hidden;
             font-family: sans-serif;
         }
+        
         .app-container {
             width: 100%;
             height: 100vh;
@@ -27,12 +28,13 @@
             position: relative;
             animation: screenGlitchShake 8s infinite linear;
             transition: animation 0.3s ease;
+            background-color: #000;
         }
         .app-container.video-playing {
             animation: none !important;
         }
         
-        /* Layer -100: Set to the absolute bottom floor to prevent click interference */
+        /* Layer 1: Background Graphic */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -40,7 +42,7 @@
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
             background-position: center -144px;
-            z-index: -100 !important; 
+            z-index: 1; 
             pointer-events: none !important; 
             user-select: none;
             -webkit-user-drag: none;
@@ -50,7 +52,7 @@
             opacity: 0;
         }
         
-        /* Layer 10: Master Native Video Layers */
+        /* Layer 2: Unified Master Video Media Engine */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -60,9 +62,8 @@
             object-fit: cover;
             background-color: #000;
             display: none;
+            z-index: 4;
         }
-        #introVideoNode { z-index: 40; }
-        #dropInVideoNode { z-index: 50; }
         
         .camera-feed-stream {
             position: absolute;
@@ -71,23 +72,17 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 20;
+            z-index: 2;
             transform: scaleX(-1);
             background-color: #000;
             display: none;
             transition: opacity 2s linear;
         }
-        #matrixFilterNode {
-            z-index: 30;
-            mix-blend-mode: screen; 
-            pointer-events: none;
-            transition: opacity 2s linear;
-        }
         
-        /* Layer 999999: Floating on the highest possible plane with zero graphics in its way */
+        /* Layer 3: Interactive Menus */
         .nav-menu-stack {
             position: relative;
-            z-index: 999999 !important; 
+            z-index: 10; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -104,15 +99,14 @@
             opacity: 0;
             pointer-events: none;
         }
+        
         @media (min-width: 600px) and (max-width: 1023px) {
             .wallpaper-bg {
                 background-image: url('reflexiuntablet.png'); 
                 background-size: contain;
                 background-position: center center;
             }
-            .nav-menu-stack {
-                padding-top: 250px; 
-            }
+            .nav-menu-stack { padding-top: 250px; }
         }
         @media (min-width: 1024px) {
             .wallpaper-bg {
@@ -120,9 +114,7 @@
                 background-size: contain;
                 background-position: center center;
             }
-            .nav-menu-stack {
-                padding-top: 380px; 
-            }
+            .nav-menu-stack { padding-top: 380px; }
         }
 
         .enter-link, .download-btn {
@@ -139,19 +131,13 @@
             background: none;
             border: none;
             outline: none;
-            position: relative;
-            z-index: 1000000 !important; /* Ultimate layer separation priority */
-            pointer-events: auto !important;
         }
 
-        /* --- THE DUAL MIRROR SETUP --- */
         .mirror-block {
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
-            z-index: 999999 !important;
-            pointer-events: auto !important;
         }
         .mirror-reflection {
             transform: scaleY(-1);
@@ -187,10 +173,8 @@
     <div class="app-container" id="appContainer">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
 
-        <!-- Stable hardware video channels -->
-        <video id="introVideoNode" class="movie-track-node" src="introvideo.mp4" playsinline webkit-playsinline preload="auto" muted></video>
-        <video id="matrixFilterNode" class="movie-track-node" src="phonecode.mp4" playsinline webkit-playsinline preload="auto" loop muted></video>
-        <video id="dropInVideoNode" class="movie-track-node" src="dropinvid.mp4" playsinline webkit-playsinline preload="auto" muted></video>
+        <!-- Single high-performance multi-swap media tracking layer -->
+        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto" muted></video>
         <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
         
         <div class="nav-menu-stack" id="navMenuStack">
@@ -220,41 +204,69 @@
         window.addEventListener('resize', configureAdaptiveDownload);
 
         const dropInTrigger = document.getElementById('dropInTrigger');
-        const introVideo = document.getElementById('introVideoNode');
-        const matrixFilter = document.getElementById('matrixFilterNode');
-        const dropInVideo = document.getElementById('dropInVideoNode');
+        const masterVideo = document.getElementById('masterVideoEngine');
         const cameraVideo = document.getElementById('cameraStream');
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
         const appContainer = document.getElementById('appContainer');
         let localCameraStream = null;
-        let flowExecuting = false; // Master shield variable to prevent double-strike overloading
 
-        function triggerCinematicPipeline(event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation(); // Stops ghost event echoes instantly
-            }
-            
-            // Abort instantly if processing is already running in current loop window
-            if (flowExecuting) return;
-            flowExecuting = true;
-            
+        function beginMasterSequence() {
             navMenuStack.classList.add('fade-out');
             wallpaperBg.classList.add('fade-out');
             appContainer.classList.add('video-playing');
             
-            introVideo.style.display = 'block';
-            introVideo.play().then(() => {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: "user" }, audio: false
-                    }).then(stream => {
-                        localCameraStream = stream;
-                        cameraVideo.srcObject = localCameraStream;
-                    }).catch(err => {
-                        console.warn("Camera fallback step initialized.", err);
-                        localCameraStream = null;
-                    });
-                }
-            }).catch(err => {
+            masterVideo.src = 'introvideo.mp4';
+            masterVideo.style.display = 'block';
+            masterVideo.play().catch(err => {
+                console.warn(err);
+                masterVideo.muted = true;
+                masterVideo.play();
+            });
+        }
+
+        dropInTrigger.addEventListener('click', (event) => {
+            if (event) event.preventDefault(); 
+
+            // Initialize camera instantly to bypass device privilege constraints
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" }, audio: false
+                }).then(stream => {
+                    localCameraStream = stream;
+                    cameraVideo.srcObject = localCameraStream;
+                    beginMasterSequence();
+                }).catch(err => {
+                    console.warn("Camera denied, running movie loops natively.", err);
+                    localCameraStream = null;
+                    beginMasterSequence();
+                });
+            } else {
+                beginMasterSequence();
+            }
+        });
+
+        masterVideo.addEventListener('ended', () => {
+            if (masterVideo.src.includes('introvideo.mp4')) {
+                // Intro ends -> Swap to Matrix Mirror phase
+                if (localCameraStream) {
+                    masterVideo.src = 'phonecode.mp4';
+                    masterVideo.style.mixBlendMode = 'screen';
+                    masterVideo.loop = true;
+                    
+                    cameraVideo.style.opacity = '1';
+                    masterVideo.style.opacity = '1';
+                    cameraVideo.style.display = 'block';
+                    
+                    cameraVideo.play().catch(e => console.log(e));
+                    masterVideo.play().catch(e => console.log(e));
+
+                    setTimeout(() => {
+                        cameraVideo.style.opacity = '0';
+                        masterVideo.style.opacity = '0';
+                    }, 2000);
+
+                    setTimeout(() => {
+                        cameraVideo.style.display = 'none';
+                        cameraVideo.pause();
+                        masterVideo.pause();
