@@ -32,7 +32,7 @@
             user-select: none;
         }
         
-        /* FIXED MOBILE BACKGROUND: Shifted up to center your logo on smartphone glass */
+        /* MOBILE VIEWPORT ARTWORK: Kept locked in the exact sweet spot you love */
         .wallpaper-bg {
             position: absolute;
             top: 0;
@@ -41,7 +41,7 @@
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center -220px; /* Pulls artwork up by a half-inch to center your logo */
+            background-position: center -220px; 
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
@@ -77,10 +77,10 @@
         /* THE BUTTON LAYER: Isolated outside visual elements on the highest plane */
         .nav-menu-stack {
             position: fixed !important; 
-            bottom: 12%; /* Mobile text placement left exactly where it belongs */
+            bottom: 12%; /* PROTECTED: Keeps text exactly where it sits in your screenshot */
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; /* Total dominance to block any hidden glass overlays */
+            z-index: 999999 !important; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -99,17 +99,16 @@
             .nav-menu-stack { bottom: 14%; }
         }
         
-        /* DESKTOP MONITOR BALANCE: Shrinks font size scale and lowers text height positioning */
         @media (min-width: 1024px) {
             .wallpaper-bg {
                 background-position: center center;
             }
             .nav-menu-stack { 
-                bottom: 8% !important; /* Drops text lower on computer screens to clear logo */
+                bottom: 8% !important; 
             } 
             .nav-menu-stack .enter-link, 
             .nav-menu-stack .download-btn {
-                font-size: 0.95rem !important; /* Makes typography sleeker on monitors */
+                font-size: 0.95rem !important; 
             }
         }
 
@@ -121,7 +120,7 @@
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
             cursor: pointer; 
-            font-weight: 300 !important; /* Locked premium thin typography styling */
+            font-weight: 300 !important; 
             display: inline-block !important; 
             padding: 8px 16px; 
             background: none;
@@ -142,7 +141,7 @@
         
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.08; /* Locked reflection visibility glow signature */
+            opacity: 0.08; 
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
@@ -163,14 +162,12 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        <!-- Subterranean media layout vault pushes graphics underneath active controls -->
         <div class="media-vault">
             <div class="wallpaper-bg" id="wallpaperBg"></div>
             <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
             <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
         </div>
 
-        <!-- Naked interface component stacking column -->
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
                 <button id="dropInTrigger" class="enter-link">drop in</button>
@@ -212,7 +209,6 @@
         let selectedPathwayRoute = "dropin";
         let localCameraStream = null;
 
-        // Clean local repository folder file mappings
         const localIntroUrl = "introvideo.mp4";
         const localMatrixUrl = "phonecode.mp4";
         const localDropInUrl = "dropinvid.mp4";
@@ -228,18 +224,15 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
-            
-            // Turn on audio channels explicitly under manual touch context
             masterVideo.muted = false; 
             masterVideo.load();
             
             masterVideo.play().catch(err => {
-                console.warn("Browser audio fallback active:", err);
+                console.warn("Autoplay handler engaged:", err);
                 masterVideo.muted = true;
                 masterVideo.play().catch(e => console.error(e));
             });
 
-            // Trigger the native hardware camera handshake immediately at button press
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
                 .then(stream => {
@@ -247,9 +240,25 @@
                     cameraVideo.srcObject = localCameraStream;
                     cameraVideo.load();
                 }).catch(err => {
-                    console.warn("Camera request dropped or blocked by hardware preferences.", err);
+                    console.warn("Camera hardware access denied.", err);
                     localCameraStream = null;
                 });
             }
         }
         
+        dropInTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "mirror"); });
+
+        masterVideo.addEventListener('ended', () => {
+            // FIXED: Standardized text search parameters to eliminate browser layout string crashes completely
+            if (masterVideo.src.includes(localIntroUrl)) {
+                masterVideo.style.display = 'none';
+
+                if (localCameraStream) {
+                    masterVideo.src = localMatrixUrl;
+                    masterVideo.style.mixBlendMode = 'screen';
+                    masterVideo.loop = true;
+                    masterVideo.muted = true; 
+                    masterVideo.load();
+                    
+                    cameraVideo.style.opacity = '1';
