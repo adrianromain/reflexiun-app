@@ -19,7 +19,6 @@
             font-family: sans-serif;
         }
         
-        /* Applied a randomized screen jitter animation to the container layout */
         .app-container {
             width: 100%;
             height: 100vh;
@@ -30,7 +29,7 @@
             animation: screenGlitchShake 8s infinite linear;
         }
         
-        /* --- PHONE SIZING (DEFAULT) --- */
+        /* --- 1. MOBILE PHONE BACKGROUND (DEFAULT) --- */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
@@ -41,7 +40,9 @@
             pointer-events: none; 
             user-select: none;
             -webkit-user-drag: none;
+            content: url('reflexiunnewwallpaper.png');
         }
+        
         .nav-menu-stack {
             position: relative;
             z-index: 10; 
@@ -53,27 +54,44 @@
             width: 100%;
             max-width: 400px;
             padding-top: 210px;
-            gap: 20px;
+            gap: 24px; /* Structured gap separation between menu targets */
             pointer-events: auto;
         }
         
-        /* --- COMPUTER / DESKTOP SIZING OVERRIDES --- */
+        /* --- 2. TABLET / IPAD DEVICE OVERRIDES --- */
+        @media (min-width: 600px) and (max-width: 1023px) {
+            .wallpaper-bg {
+                content: url('reflexiuntablet.png'); 
+                object-fit: contain;
+                width: 100%;
+                height: 100%;
+                object-position: center center;
+                margin-top: -30px; 
+            }
+            .nav-menu-stack {
+                padding-top: 250px; 
+            }
+        }
+        
+        /* --- 3. DESKTOP / LAPTOP MONITOR OVERRIDES --- */
         @media (min-width: 1024px) {
             .wallpaper-bg {
+                content: url('reflexiundesktop.png'); 
                 object-fit: contain;
                 width: 100%;
                 height: 100%;
                 max-width: 100vw;
                 max-height: 100vh;
                 object-position: center center;
-                transform: translateY(-40px);
+                margin-top: -40px; 
             }
             .nav-menu-stack {
-                padding-top: 310px;
+                padding-top: 310px; 
             }
         }
 
-        .enter-link {
+        /* Standardized Action Buttons Style Rules */
+        .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
             font-size: 1.5rem;
@@ -84,15 +102,34 @@
             font-weight: 400;
             display: inline-block;
             padding: 10px 20px;
+            background: none;
+            border: none;
+            outline: none;
         }
 
-        /* Pure CSS Randomized Screen Glitch Shake Animation Matrix */
+        /* --- THE MIRROR DESIGN EFFECT --- */
+        .mirror-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        /* Generates a ghosted, inverted reflection beneath the download text link */
+        .mirror-reflection {
+            transform: scaleY(-1);
+            opacity: 0.15;
+            margin-top: -8px;
+            filter: blur(1px);
+            user-select: none;
+            pointer-events: none;
+        }
+
         @keyframes screenGlitchShake {
             0%, 92%, 100% { transform: translate(0, 0); }
-            93% { transform: translate(-2px, 1px); }
-            94% { transform: translate(1px, -1px); }
-            95% { transform: translate(-1px, 2px); }
-            96% { transform: translate(2px, -2px); }
+            93% { transform: translate(-3px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            95% { transform: translate(-2px, 3px); }
+            96% { transform: translate(3px, -1px); }
             97% { transform: translate(0, 0); }
         }
 
@@ -110,12 +147,42 @@
 <body>
 
     <div class="app-container">
-        <img src="reflexiunbackground.png" alt="Reflexiun Background" class="wallpaper-bg">
+        <img class="wallpaper-bg" alt="Reflexiun Adaptive Framework">
         
         <div class="nav-menu-stack">
+            <!-- First Tier Route -->
             <a href="#content" class="enter-link">drop in</a>
+            
+            <!-- Second Tier Route: Auto-detecting Mirror Block Container -->
+            <div class="mirror-block">
+                <a href="#" id="dynamicDownload" class="download-btn" download>get asset</a>
+                <span class="download-btn mirror-reflection">get asset</span>
+            </div>
         </div>
     </div>
+
+    <!-- Intelligent client-side adaptive engine layout script -->
+    <script>
+        function configureAdaptiveDownload() {
+            const downloadLink = document.getElementById('dynamicDownload');
+            if (!downloadLink) return;
+
+            const width = window.innerWidth;
+            let targetFile = 'reflexiunnewwallpaper.png'; // Fallback Base Sizing Asset
+
+            if (width >= 1024) {
+                targetFile = 'reflexiundesktop.png'; // Desktop computer assets
+            } else if (width >= 600) {
+                targetFile = 'reflexiuntablet.png'; // Intermediate tablet assets
+            }
+
+            downloadLink.href = targetFile;
+        }
+
+        // Run detection loops instantly upon viewport initialization routines
+        window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
+        window.addEventListener('resize', configureAdaptiveDownload);
+    </script>
 
 </body>
 </html>
