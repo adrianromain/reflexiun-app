@@ -18,6 +18,8 @@
             overflow: hidden;
             font-family: sans-serif;
         }
+        
+        /* Applied a randomized screen jitter animation to the container layout */
         .app-container {
             width: 100%;
             height: 100vh;
@@ -25,6 +27,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            animation: screenGlitchShake 8s infinite linear;
         }
         
         /* --- PHONE SIZING (DEFAULT) --- */
@@ -33,7 +36,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center -144px; /* Locked mobile height positioning */
+            object-position: center -144px;
             z-index: 1;
             pointer-events: none; 
             user-select: none;
@@ -49,7 +52,7 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            padding-top: 210px; /* Locked mobile link positioning */
+            padding-top: 210px;
             gap: 20px;
             pointer-events: auto;
         }
@@ -61,12 +64,12 @@
                 width: 100%;
                 height: 100%;
                 max-width: 100vw;
-                max-height: 100vh; /* Restored back to full window footprint scaling */
+                max-height: 100vh;
                 object-position: center center;
-                transform: translateY(-40px); /* Direct vertical lift for laptop viewing layouts */
+                transform: translateY(-40px);
             }
             .nav-menu-stack {
-                padding-top: 310px; /* Recalibrated spacing height separation rules */
+                padding-top: 310px;
             }
         }
 
@@ -81,6 +84,16 @@
             font-weight: 400;
             display: inline-block;
             padding: 10px 20px;
+        }
+
+        /* Pure CSS Randomized Screen Glitch Shake Animation Matrix */
+        @keyframes screenGlitchShake {
+            0%, 92%, 100% { transform: translate(0, 0); }
+            93% { transform: translate(-2px, 1px); }
+            94% { transform: translate(1px, -1px); }
+            95% { transform: translate(-1px, 2px); }
+            96% { transform: translate(2px, -2px); }
+            97% { transform: translate(0, 0); }
         }
 
         @keyframes randomGlow {
