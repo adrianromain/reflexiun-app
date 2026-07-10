@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reflexiun</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         body, html {
             background-color: #000;
@@ -25,17 +26,22 @@
             align-items: center;
             position: relative;
         }
+        
+        /* --- PHONE SIZING (DEFAULT) --- */
         .wallpaper-bg {
             position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center -144px; 
+            object-position: center -144px; /* Your locked-in perfect mobile height */
             z-index: 1;
+            pointer-events: none; 
+            user-select: none;
+            -webkit-user-drag: none;
         }
         .nav-menu-stack {
             position: relative;
-            z-index: 2;
+            z-index: 10; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -43,13 +49,29 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            padding-top: 210px; 
-            gap: 20px; 
+            padding-top: 210px; /* Your locked-in perfect mobile text placement */
+            gap: 20px;
+            pointer-events: auto;
         }
+        
+        /* --- COMPUTER / DESKTOP SIZING OVERRIDES --- */
+        @media (min-width: 1024px) {
+            .wallpaper-bg {
+                object-fit: contain;
+                width: 100%;
+                max-width: 100vw; /* Scales exactly to the left and right edges of the screen */
+                max-height: 70vh; /* Reduces scale slightly so it isn't too huge vertically */
+                object-position: center center;
+                transform: translateY(-90px); /* Pushes the scaled logo higher towards the top */
+            }
+            .nav-menu-stack {
+                padding-top: 260px; /* Aligns text safely under the newly shifted layout */
+            }
+        }
+
         .enter-link {
             color: #fff;
             text-decoration: none;
-            /* Scaled text size up for maximum screen readability */
             font-size: 1.5rem;
             letter-spacing: 5px;
             text-transform: uppercase;
@@ -57,16 +79,10 @@
             cursor: pointer;
             font-weight: 400;
             display: inline-block;
-        }
-
-        @media (min-width: 1024px) {
-            .nav-menu-stack {
-                padding-top: 290px;
-            }
+            padding: 10px 20px;
         }
 
         @keyframes randomGlow {
-            /* Audited: Amplified the white neon bloom intensity across the timeline */
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
             22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
@@ -89,4 +105,3 @@
 
 </body>
 </html>
-
