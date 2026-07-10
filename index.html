@@ -19,7 +19,7 @@
             font-family: sans-serif;
         }
         
-        /* THE MEDIA LAYER: Forced deep into the background underneath the text buttons */
+        /* THE MEDIA LAYER: Visual media objects locked deep underneath active navigation controls */
         .media-vault {
             position: fixed;
             top: 0;
@@ -32,7 +32,7 @@
             user-select: none;
         }
         
-        /* MOBILE VIEWPORT ARTWORK: Kept locked in the exact sweet spot you love */
+        /* MOBILE VIEWPORT ARTWORK: Fixed to preserve your exact screenshot look */
         .wallpaper-bg {
             position: absolute;
             top: 0;
@@ -77,10 +77,10 @@
         /* THE BUTTON LAYER: Isolated outside visual elements on the highest plane */
         .nav-menu-stack {
             position: fixed !important; 
-            bottom: 12%; /* PROTECTED: Keeps text exactly where it sits in your screenshot */
+            bottom: 12%; /* LOCKED: Keeps buttons exactly down where you love them */
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; 
+            z-index: 999999 !important; /* Total dominance to block any hidden glass overlays */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -162,12 +162,15 @@
 <body>
 
     <div class="app-container" id="appContainer">
+        <!-- Subterranean media layout vault pushes graphics underneath active controls -->
         <div class="media-vault">
             <div class="wallpaper-bg" id="wallpaperBg"></div>
+            <!-- FIXED: Direct inline structural touch bypass rules locked into the media node layout -->
             <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
-            <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted></video>
+            <video id="cameraStream" class="camera-feed-stream" autoplay playsinline muted style="pointer-events: none !important;"></video>
         </div>
 
+        <!-- Naked interface component stacking column -->
         <div class="nav-menu-stack" id="navMenuStack">
             <div class="mirror-block">
                 <button id="dropInTrigger" class="enter-link">drop in</button>
@@ -209,6 +212,7 @@
         let selectedPathwayRoute = "dropin";
         let localCameraStream = null;
 
+        // Clean local repository folder file mappings
         const localIntroUrl = "introvideo.mp4";
         const localMatrixUrl = "phonecode.mp4";
         const localDropInUrl = "dropinvid.mp4";
@@ -224,11 +228,12 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
+            
             masterVideo.muted = false; 
             masterVideo.load();
             
             masterVideo.play().catch(err => {
-                console.warn("Autoplay handler engaged:", err);
+                console.warn("Browser audio fallback active:", err);
                 masterVideo.muted = true;
                 masterVideo.play().catch(e => console.error(e));
             });
@@ -240,7 +245,7 @@
                     cameraVideo.srcObject = localCameraStream;
                     cameraVideo.load();
                 }).catch(err => {
-                    console.warn("Camera hardware access denied.", err);
+                    console.warn("Camera request dropped or blocked by hardware preferences.", err);
                     localCameraStream = null;
                 });
             }
@@ -250,15 +255,6 @@
         mirrorTrigger.addEventListener('click', function() { fireCinematicSystem(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
-            // FIXED: Standardized text search parameters to eliminate browser layout string crashes completely
             if (masterVideo.src.includes(localIntroUrl)) {
                 masterVideo.style.display = 'none';
 
-                if (localCameraStream) {
-                    masterVideo.src = localMatrixUrl;
-                    masterVideo.style.mixBlendMode = 'screen';
-                    masterVideo.loop = true;
-                    masterVideo.muted = true; 
-                    masterVideo.load();
-                    
-                    cameraVideo.style.opacity = '1';
