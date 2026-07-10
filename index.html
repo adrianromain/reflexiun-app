@@ -32,7 +32,7 @@
             user-select: none;
         }
         
-        /* UNIFIED BACKGROUND PANEL: Percentage coordinate forces the background up past cover limits */
+        /* UNIFIED BACKGROUND PANEL: Re-anchored to 70% to force the logo graphic upward */
         .wallpaper-bg {
             position: absolute;
             top: 0;
@@ -41,7 +41,7 @@
             height: 100%;
             background-image: url('reflexiunnewwallpaper.png');
             background-size: cover;
-            background-position: center 30%; /* FIXED: Swapped to 30% to break past cover scaling constraints */
+            background-position: center 70%; /* FIXED: Set to center 70% to lift the image canvas */
             z-index: 2 !important; 
             pointer-events: none !important; 
             transition: opacity 0.5s ease;
