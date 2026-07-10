@@ -182,7 +182,7 @@
         <div class="tablet-bg" id="tabletBg"></div>
         <div class="desktop-bg" id="desktopBg"></div>
         
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
+        <video id="masterVideoEngine" class="movie-track-node" autoplay playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
@@ -224,10 +224,8 @@
         const desktopBg = document.getElementById('desktopBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
-        // State Tracking Variable
         let selectedPathwayRoute = "dropin";
 
-        // Hardcoded Native Folder File Directions
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "mirrorvid.mp4";
@@ -244,11 +242,16 @@
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
+            
+            // CRITICAL AUDIO BYPASS: Force video to unmute right inside the user click block
+            masterVideo.muted = false;
             masterVideo.load();
             
             const playPromise = masterVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
+                    // Fallback to muted only if a rare device security setting strictly demands it
+                    console.log("Audio block encountered, forcing fallback stream.");
                     masterVideo.muted = true;
                     masterVideo.play().catch(e => console.error(e));
                 });
@@ -259,19 +262,19 @@
         mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
 
         masterVideo.addEventListener('ended', () => {
-            // Convert current src string to lowercase to prevent server casing mismatch bugs
             const currentVideoSrc = masterVideo.src.toLowerCase();
             
-            // Check strictly for the core intro file text name anywhere in the URL
             if (currentVideoSrc.includes("introvideo.mp4")) {
-                // Route directly to the precise secondary file path requested
                 if (selectedPathwayRoute === "mirror") {
                     masterVideo.src = localMirrorUrl;
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
                 
+                // Maintain audio status across the dynamic handoff transition
+                masterVideo.muted = false;
                 masterVideo.load();
+                
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
@@ -280,7 +283,6 @@
                     });
                 }
             } else {
-                // Secondary file sequence completed -> Cleanly reset baseline display
                 masterVideo.style.zIndex = "3";
                 masterVideo.style.display = 'none';
                 masterVideo.src = "";
