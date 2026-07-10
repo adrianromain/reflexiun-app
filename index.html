@@ -47,7 +47,7 @@
             transition: opacity 0.5s ease;
         }
         
-        /* THE IMMERSIVE WEB PLAYER STAGE: Naked, full-viewport dynamic scaling layer */
+        /* THE IMMERSIVE WEB PLAYER STAGE: Naked viewport dynamic video engine */
         .movie-track-node {
             position: absolute;
             top: 0;
@@ -61,45 +61,49 @@
             pointer-events: none !important; 
         }
         
-        /* THE BUTTON LAYER: Isolated completely outside visual elements on the absolute highest plane */
-        .nav-menu-stack {
-            position: fixed !important; 
-            bottom: 12%; /* LOCKED: Text remains stationary down where you love it on your phone */
+        /* 
+           THE PEAK PLANE INDEPENDENT TRIGGER ENGINE
+           Every row anchors directly to screen coordinates. Zero shared column boxes. Zero masking.
+        */
+        .mirror-block {
+            position: fixed !important;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 999999 !important; /* Total dominance over screen coordinates */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            text-align: center;
-            width: 100%;
+            width: 100%; 
             max-width: 400px;
-            gap: 16px; 
-            pointer-events: auto !important; 
+            height: auto !important;
+            z-index: 999999 !important; /* Total dominance over screen layers */
+            pointer-events: none !important; /* Invisible wrapper frames cannot catch touch events */
         }
+        
+        /* INDEPENDENT POSITION TRACKING ARRAY: Mapped perfectly to preserve your 16px layout gaps */
+        #row-dropin { bottom: 22%; }
+        #row-mirror { bottom: 17%; }
+        #row-reflect { bottom: 12%; } /* LOCKED: Drops down exactly where it sits in your phone screenshot */
         
         @media (min-width: 600px) and (max-width: 1023px) {
-            .wallpaper-bg {
-                background-position: center center;
-            }
-            .nav-menu-stack { bottom: 14%; }
+            #row-dropin { bottom: 24%; }
+            #row-mirror { bottom: 19%; }
+            #row-reflect { bottom: 14%; }
         }
         
-        /* DESKTOP MONITOR BALANCE PANEL STYLES */
+        /* DESKTOP MONITOR POSITION ADJUSTMENT OVERRIDES */
         @media (min-width: 1024px) {
-            .wallpaper-bg {
-                background-position: center center;
-            }
-            .nav-menu-stack { 
-                bottom: 8% !important; /* Lowers link grid on large monitor displays */
-            } 
-            .nav-menu-stack .enter-link, 
-            .nav-menu-stack .download-btn {
-                font-size: 0.95rem !important; /* Shrinks typography sleeker on monitors */
+            .wallpaper-bg { background-position: center center; }
+            #row-dropin { bottom: 16% !important; }
+            #row-mirror { bottom: 12% !important; }
+            #row-reflect { bottom: 8% !important; } /* Lowers layout link rows on desktop monitors */
+            
+            .mirror-block .enter-link, 
+            .mirror-block .download-btn {
+                font-size: 0.95rem !important; /* Shrinks typography font scale sleeker on monitors */
             }
         }
 
+        /* CORE TEXT ACTIONS: Isolated absolute touch targets */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -114,29 +118,19 @@
             background: none;
             border: none;
             outline: none;
-            pointer-events: auto !important;
+            pointer-events: auto !important; /* Forces the browser engine to receive your clicks exclusively */
             z-index: 9999999 !important;
             position: relative;
         }
-
-        .mirror-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            width: 100%; 
-            height: auto !important; /* Shrink-wraps links to delete container collisions */
-            pointer-events: none !important; /* Ghost rows ensure zero touch masking */
-        }
         
-        /* CLEAN REFLECTION GLOW LIGHT SIGNATURE CODE */
+        /* CLEAN REFLECTION SIGNATURE ARCHITECTURE */
         .mirror-reflection {
             transform: scaleY(-1);
-            opacity: 0.08; /* Your exact reflection intensity signature match */
+            opacity: 0.08; /* Exact reflection intensity signature match */
             margin-top: -18px; 
             filter: blur(3px); 
             user-select: none;
-            pointer-events: none !important; /* Completely transparent to finger and mouse clicks */
+            pointer-events: none !important; /* Mirror shadows are completely transparent to mouse trackpads */
         }
 
         @keyframes randomGlow {
@@ -153,29 +147,32 @@
 <body>
 
     <div class="app-container" id="appContainer">
-        <!-- Subterranean media vault holds visual canvas layers completely out of the interface way -->
+        <!-- Subterranean media layout vault pushes graphic layers underneath active controls -->
         <div class="media-vault">
             <div class="wallpaper-bg" id="wallpaperBg"></div>
-            <!-- Immersive container player tag stripped completely free of browser controls -->
             <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline crossorigin="anonymous" preload="auto" style="pointer-events: none !important;"></video>
         </div>
 
-        <!-- High-priority button grid floats completely unmasked on top of the world -->
-        <div class="nav-menu-stack" id="navMenuStack">
-            <div class="mirror-block">
-                <button id="dropInTrigger" class="enter-link">drop in</button>
-                <span class="enter-link mirror-reflection">drop in</span>
-            </div>
-            
-            <div class="mirror-block">
-                <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
-                <span class="enter-link mirror-reflection">look in the mirror</span>
-            </div>
-            
-            <div class="mirror-block">
-                <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
-                <span class="download-btn mirror-reflection">reflect</span>
-            </div>
+        /* 
+           UNIFIED INDEPENDENT INTERACTION MATRIX 
+           Each button floats completely standalone to eliminate box enclosure crashes entirely 
+        */
+        <!-- 1. Drop In Active Target Link -->
+        <div class="mirror-block" id="row-dropin">
+            <a href="javascript:void(0);" id="dropInTrigger" class="enter-link">drop in</a>
+            <span class="enter-link mirror-reflection">drop in</span>
+        </div>
+        
+        <!-- 2. Look In The Mirror Active Target Link -->
+        <div class="mirror-block" id="row-mirror">
+            <a href="javascript:void(0);" id="mirrorTrigger" class="enter-link">look in the mirror</a>
+            <span class="enter-link mirror-reflection">look in the mirror</span>
+        </div>
+        
+        <!-- 3. Reflect Download Target Link -->
+        <div class="mirror-block" id="row-reflect">
+            <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
+            <span class="download-btn mirror-reflection">reflect</span>
         </div>
     </div>
 
@@ -196,22 +193,29 @@
         const mirrorTrigger = document.getElementById('mirrorTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
         const wallpaperBg = document.getElementById('wallpaperBg');
-        const navMenuStack = document.getElementById('navMenuStack');
 
-        // FIXED: Rebuilt script layout to listen strictly to native button tag variables to eliminate script memory shutdowns
         let activeFilePlaylist = [];
         let currentPlaylistIndex = 0;
+
+        // Relative paths clear nested folder hosted tracks on GitHub Pages servers natively
+        const localIntroUrl = "./introvideo.mp4";
+        const localDropInUrl = "./dropinvid.mp4";
+        const localMirrorUrl = "./lookinthemirror.mp4";
 
         function launchVideoChain(playlistArray) {
             activeFilePlaylist = playlistArray;
             currentPlaylistIndex = 0;
             
-            // Clear landing interface assets out of view instantly
-            navMenuStack.style.opacity = '0';
-            navMenuStack.style.pointerEvents = 'none';
+            // Instantly clear background artwork elements out of view
+            dropInTrigger.style.opacity = '0';
+            dropInTrigger.style.pointerEvents = 'none';
+            mirrorTrigger.style.opacity = '0';
+            mirrorTrigger.style.pointerEvents = 'none';
+            document.getElementById('dynamicDownload').style.opacity = '0';
+            document.getElementById('dynamicDownload').style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
             
-            // Pop unblocked native player canvas right to the highest layout plane
+            // Bring player canvas forward out of the vault layer setup
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.style.display = 'block';
             
@@ -221,25 +225,15 @@
         function executePlaylistTrack() {
             if (currentPlaylistIndex < activeFilePlaylist.length) {
                 masterVideo.src = activeFilePlaylist[currentPlaylistIndex];
-                
-                // Track 1 (Intro) triggers soundtrack audio channels, subsequent loops mute safely
-                if (currentPlaylistIndex === 0) {
-                    masterVideo.muted = false;
-                } else {
-                    masterVideo.muted = false;
-                }
-                
+                masterVideo.muted = false;
                 masterVideo.load();
                 
                 const playPromise = masterVideo.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(err => {
-                        console.warn("Autoplay audio restriction active: engaged backup tracking sequence", err);
+                        console.warn("Autoplay handler engaged safety muted loop:", err);
                         masterVideo.muted = true;
                         masterVideo.play().catch(e => console.error(e));
                     });
                 }
             } else {
-                // Entire track loop completed cleanly -> Drop player depth and restore original home layout screen
-                masterVideo.style.zIndex = "3";
-                masterVideo.style.display = 'none';
