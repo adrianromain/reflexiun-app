@@ -17,8 +17,8 @@
         
         .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
         
-        /* Camera style - mirrored */
-        #cameraStreamNode { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); z-index: 4 !important; opacity: 0; transition: opacity 0.3s ease; }
+        /* Camera style - Mirrored for both paths */
+        #cameraStreamNode { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; opacity: 0; transition: opacity 0.3s ease; }
         
         .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 16px; pointer-events: auto !important; }
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
@@ -86,7 +86,7 @@
         const navMenuStack = document.getElementById('navMenuStack');
 
         let selectedPathwayRoute = "dropin";
-        let flowState = "intro"; // states: intro, camera, final
+        let flowState = "intro"; 
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
