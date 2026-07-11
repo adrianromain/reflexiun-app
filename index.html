@@ -5,89 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reflexiun</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body, html {
-            background-color: #000;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
         
-        .media-vault {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background-color: #000;
-            z-index: 1 !important;
-            pointer-events: none !important;
-            user-select: none;
-        }
+        .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; user-select: none; }
+        .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('reflexiunnewwallpaper.png'); background-size: cover; background-position: center center; z-index: 2 !important; pointer-events: none !important; transition: opacity 0.5s ease; }
+        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; display: none; z-index: 3 !important; pointer-events: none !important; transition: opacity 2s ease; }
         
-        .wallpaper-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('reflexiunnewwallpaper.png');
-            background-size: cover;
-            background-position: center center;
-            z-index: 2 !important; 
-            pointer-events: none !important; 
-            transition: opacity 0.5s ease;
-        }
+        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; gap: 16px; pointer-events: auto !important; transition: opacity 0.5s ease; }
         
-        .movie-track-node {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background-color: #000;
-            display: none;
-            z-index: 3 !important;
-            pointer-events: none !important; 
-            transition: opacity 2s ease; /* Added for your fade-to-black */
-        }
-        
-        .nav-menu-stack {
-            position: fixed !important; 
-            bottom: 12%; 
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999999 !important;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            gap: 16px; 
-            pointer-events: auto !important;
-            transition: opacity 0.5s ease;
-        }
-        
-        @media (min-width: 600px) and (max-width: 1023px) {
-            .nav-menu-stack { bottom: 14%; }
-        }
-        @media (min-width: 1024px) {
-            .nav-menu-stack { bottom: 16%; } 
-        }
-
+        /* TEXT SIZE HALVED HERE */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
-            font-size: 1.1rem; 
+            font-size: 0.55rem; /* Exactly half of 1.1rem */
             letter-spacing: 5px;
             text-transform: uppercase;
             animation: randomGlow 3.5s infinite ease-in-out;
@@ -101,38 +32,19 @@
             pointer-events: auto !important;
         }
 
-        .mirror-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            width: 100%; 
-            pointer-events: auto !important;
-            height: 48px; 
-        }
-        
-        .mirror-reflection {
-            transform: scaleY(-1);
-            opacity: 0.08; 
-            margin-top: -18px; 
-            filter: blur(3px); 
-            user-select: none;
-            pointer-events: none !important;
-        }
+        .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px; }
+        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); user-select: none; pointer-events: none !important; }
 
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
-            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
             45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
             50% { opacity: 0.15; text-shadow: none; }
-            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
             85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
         }
     </style>
 </head>
 <body>
-
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
@@ -159,14 +71,12 @@
         const navMenuStack = document.getElementById('navMenuStack');
         let selectedPathwayRoute = "dropin";
 
-        // Logic for your path
         async function startStreamingVideo(route) {
             selectedPathwayRoute = route;
             navMenuStack.style.opacity = '0';
             wallpaperBg.style.opacity = '0';
             masterVideo.style.display = 'block';
 
-            // 1. Start with the Camera/Filter
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 masterVideo.srcObject = stream;
@@ -174,11 +84,9 @@
                 masterVideo.play();
             } catch(e) { console.log(e); }
 
-            // 2. Hold for 2 seconds, then fade to black (2 seconds)
             setTimeout(() => {
-                masterVideo.style.opacity = '0'; // Starts the 2s CSS transition
+                masterVideo.style.opacity = '0';
                 setTimeout(() => {
-                    // 3. Once fully black, switch to the final video
                     masterVideo.style.opacity = '1'; 
                     masterVideo.srcObject = null;
                     masterVideo.src = (selectedPathwayRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
