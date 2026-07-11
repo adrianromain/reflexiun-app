@@ -5,74 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reflexiun</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: sans-serif; }
         .vault { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         .bg { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: url('reflexiunnewwallpaper.png') center/cover no-repeat;
             z-index: 2;
         }
-        .vid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 5; }
+        .vid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 5; pointer-events: none; }
         #cam { z-index: 10; transform: scaleX(-1); }
         #filter { z-index: 15; mix-blend-mode: screen; }
-        .nav { 
-            position: fixed; bottom: 10%; width: 100%; z-index: 20; 
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
+
+        /* Restoring your exact original text design */
+        .nav-menu-stack { 
+            position: fixed; bottom: 12%; left: 50%; transform: translateX(-50%);
+            z-index: 99; display: flex; flex-direction: column; align-items: center; gap: 16px;
+            pointer-events: auto;
         }
-        button { color: #fff; background: none; border: 1px solid #fff; padding: 10px 20px; cursor: pointer; text-transform: uppercase; }
+        .enter-link { 
+            color: #fff; text-decoration: none; font-size: 1.1rem; letter-spacing: 5px; 
+            text-transform: uppercase; cursor: pointer; font-weight: 300;
+        }
     </style>
 </head>
 <body>
 
     <div class="vault">
-        <div id="bg" class="bg"></div>
-        <video id="intro" class="vid" src="introvideo.mp4" playsinline></video>
-        <video id="drop" class="vid" src="dropinvid.mp4" playsinline></video>
-        <video id="mirror" class="vid" src="lookinthemirror.mp4" playsinline></video>
+        <div class="bg"></div>
+        <video id="intro" class="vid" src="introvideo.mp4" playsinline preload="metadata"></video>
+        <video id="drop" class="vid" src="dropinvid.mp4" playsinline preload="metadata"></video>
+        <video id="mirror" class="vid" src="lookinthemirror.mp4" playsinline preload="metadata"></video>
         <video id="cam" class="vid" autoplay playsinline muted></video>
         <video id="filter" class="vid" src="phonecode.mp4" loop playsinline muted></video>
     </div>
 
-    <div class="nav" id="nav">
-        <button onclick="start('drop')">drop in</button>
-        <button onclick="start('mirror')">look in the mirror</button>
+    <div class="nav-menu-stack">
+        <div class="enter-link" onclick="start('drop')">drop in</div>
+        <div class="enter-link" onclick="start('mirror')">look in the mirror</div>
     </div>
 
     <script>
-        const nav = document.getElementById('nav');
         const intro = document.getElementById('intro');
         const cam = document.getElementById('cam');
         const filter = document.getElementById('filter');
         const drop = document.getElementById('drop');
         const mirror = document.getElementById('mirror');
-        let choice = "";
+        const nav = document.querySelector('.nav-menu-stack');
 
         async function start(type) {
-            choice = type;
             nav.style.display = 'none';
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 cam.srcObject = stream;
-            } catch(e) { console.error(e); }
+            } catch(e) { console.log(e); }
+            
             intro.style.display = 'block';
             intro.play();
-        }
 
-        intro.onended = () => {
-            intro.style.display = 'none';
-            cam.style.display = 'block';
-            filter.style.display = 'block';
-            filter.play();
-            setTimeout(() => {
-                cam.style.display = 'none';
-                filter.style.display = 'none';
-                if(cam.srcObject) cam.srcObject.getTracks().forEach(t => t.stop());
-                const active = (choice === 'mirror') ? mirror : drop;
-                active.style.display = 'block';
-                active.play();
-                active.onended = () => { active.style.display = 'none'; nav.style.display = 'flex'; };
-            }, 4000);
-        };
+            intro.onended = () => {
+                intro.style.display = 'none';
+                cam.style.display = 'block';
+                filter.style.display = 'block';
+                filter.play();
+                
+                setTimeout(() => {
+                    cam.style.display = 'none';
+                    filter.style.display = 'none';
+                    const active = (type === 'mirror') ? mirror : drop;
+                    active.style.display = 'block';
+                    active.play();
+                    active.onended = () => { 
+                        active.style.display = 'none'; 
+                        nav.style.display = 'flex'; 
+                    };
+                }, 4000);
+            };
+        }
     </script>
 </body>
 </html>
