@@ -23,15 +23,15 @@
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
         @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(16% + 32px); gap: 48px; } }
 
-        /* TIGHTER GLOW SETTINGS */
+        /* TIGHTER GLOW - REMOVED BLUR */
         .enter-link, .download-btn { 
             color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; 
             cursor: pointer; font-weight: 300 !important; display: inline-block !important; 
             padding: 8px 16px; background: none; border: none; outline: none; 
             pointer-events: auto !important; white-space: nowrap;
-            /* Applying tighter glow directly to the base state */
-            text-shadow: 0 0 2px rgba(255,255,255,0.8);
-            animation: randomGlow 3.5s infinite ease-in-out; 
+            /* Using a tiny 0px blur shadow to stay sharp on the text */
+            text-shadow: 0 0 0px #fff; 
+            animation: tightGlow 3.5s infinite ease-in-out; 
         }
         @media (max-width: 599px) { .enter-link, .download-btn { font-size: 0.55rem; } }
         @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn { font-size: 1.1rem; } }
@@ -40,11 +40,10 @@
         .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px; }
         .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(1px); user-select: none; pointer-events: none !important; }
 
-        @keyframes randomGlow {
-            0%, 100% { opacity: 0.8; text-shadow: 0 0 1px rgba(255,255,255,1); }
-            15% { opacity: 1; text-shadow: 0 0 2px rgba(255,255,255,1), 0 0 4px rgba(255,255,255,0.8); }
-            50% { opacity: 0.6; text-shadow: 0 0 1px rgba(255,255,255,0.9); }
-            85% { opacity: 1; text-shadow: 0 0 2px rgba(255,255,255,1); }
+        /* Keyframes now just change color intensity, not spread */
+        @keyframes tightGlow {
+            0%, 100% { color: rgba(255,255,255,0.4); }
+            50% { color: rgba(255,255,255,1); }
         }
     </style>
 </head>
