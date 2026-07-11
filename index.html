@@ -5,55 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reflexiun</title>
     <style>
-        * {
-            margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;
-        }
-        body, html {
-            background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
         
-        .media-vault {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; user-select: none;
-        }
+        .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; user-select: none; }
         
-        .wallpaper-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; z-index: 2 !important; pointer-events: none !important; transition: opacity 0.5s ease;
-        }
+        .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; z-index: 2 !important; pointer-events: none !important; transition: opacity 0.5s ease; }
         @media (max-width: 599px) { .wallpaper-bg { background-image: url('reflexiunphone.png'); } }
         @media (min-width: 600px) and (max-width: 1023px) { .wallpaper-bg { background-image: url('reflexiuntablet.png'); } }
         @media (min-width: 1024px) { .wallpaper-bg { background-image: url('reflexiundesktop.png'); } }
         
-        .movie-track-node {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease;
-        }
+        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
         
-        .nav-menu-stack {
-            position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 16px; pointer-events: auto !important;
-        }
+        /* Camera style - mirrored */
+        #cameraStreamNode { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); z-index: 4 !important; opacity: 0; transition: opacity 0.3s ease; }
         
+        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 16px; pointer-events: auto !important; }
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
-        @media (min-width: 1024px) { 
-            .nav-menu-stack { 
-                bottom: calc(16% + 32px); 
-                gap: 48px; 
-            } 
-        }
+        @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(16% + 32px); gap: 48px; } }
 
-        /* Independent Device Controls */
-        .enter-link, .download-btn {
-            color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important; white-space: nowrap;
-        }
+        .enter-link, .download-btn { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important; white-space: nowrap; }
         @media (max-width: 599px) { .enter-link, .download-btn { font-size: 0.55rem; } }
         @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn { font-size: 1.1rem; } }
         @media (min-width: 1024px) { .enter-link, .download-btn { font-size: 1.1rem; } }
 
-        .mirror-block {
-            display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px;
-        }
-        
-        .mirror-reflection {
-            transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); user-select: none; pointer-events: none !important;
-        }
+        .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px; }
+        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); user-select: none; pointer-events: none !important; }
 
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
@@ -67,10 +44,10 @@
     </style>
 </head>
 <body>
-
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
+        <video id="cameraStreamNode" autoplay muted playsinline></video>
+        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
@@ -104,44 +81,48 @@
         const dropInTrigger = document.getElementById('dropInTrigger');
         const mirrorTrigger = document.getElementById('mirrorTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
+        const cam = document.getElementById('cameraStreamNode');
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
         let selectedPathwayRoute = "dropin";
+        let flowState = "intro"; // states: intro, camera, final
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
 
-        function startStreamingVideo(targetVideoUrl, routeName) {
+        function startStreamingVideo(routeName) {
             selectedPathwayRoute = routeName;
+            flowState = "intro";
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
-            masterVideo.style.zIndex = "9999999"; 
-            masterVideo.src = targetVideoUrl;
-            masterVideo.muted = false; // Changed to allow sound
+            masterVideo.src = localIntroUrl;
             masterVideo.style.opacity = '1'; 
-            masterVideo.load();
-            masterVideo.play().catch(e => console.error("Playback failed:", e));
+            masterVideo.play();
         }
         
-        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
+        dropInTrigger.addEventListener('click', () => startStreamingVideo("dropin"));
+        mirrorTrigger.addEventListener('click', () => startStreamingVideo("mirror"));
 
         masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes(localIntroUrl)) {
-                if (selectedPathwayRoute === "mirror") {
-                    masterVideo.src = localMirrorUrl;
-                } else {
-                    masterVideo.src = localDropInUrl;
-                }
-                masterVideo.muted = false; // Changed to allow sound on the next clip
-                masterVideo.load();
-                masterVideo.play().catch(e => console.error("Playback failed:", e));
-            } else {
-                masterVideo.style.zIndex = "3";
-                masterVideo.style.opacity = '0'; 
-                masterVideo.src = "";
+            if (flowState === "intro") {
+                flowState = "camera";
+                masterVideo.style.opacity = '0';
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    cam.srcObject = stream;
+                    cam.style.opacity = '1';
+                    setTimeout(() => {
+                        stream.getTracks().forEach(t => t.stop());
+                        cam.style.opacity = '0';
+                        flowState = "final";
+                        masterVideo.src = (selectedPathwayRoute === "mirror") ? localMirrorUrl : localDropInUrl;
+                        masterVideo.style.opacity = '1';
+                        masterVideo.play();
+                    }, 4000);
+                });
+            } else if (flowState === "final") {
+                masterVideo.style.opacity = '0';
                 navMenuStack.style.opacity = '1';
                 navMenuStack.style.pointerEvents = 'auto';
                 wallpaperBg.style.opacity = '1';
