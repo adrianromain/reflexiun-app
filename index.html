@@ -21,4 +21,132 @@
         }
         @media (max-width: 599px) { .wallpaper-bg { background-image: url('reflexiunphone.png'); } }
         @media (min-width: 600px) and (max-width: 1023px) { .wallpaper-bg { background-image: url('reflexiuntablet.png'); } }
-        @media (min-width
+        @media (min-width: 1024px) { .wallpaper-bg { background-image: url('reflexiundesktop.png'); } }
+        
+        .movie-track-node {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease;
+        }
+        
+        .nav-menu-stack {
+            position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 16px; pointer-events: auto !important;
+        }
+        
+        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
+        @media (min-width: 1024px) { 
+            .nav-menu-stack { 
+                bottom: calc(16% + 32px); 
+                gap: 48px; 
+            } 
+        }
+
+        /* Independent Device Controls */
+        .enter-link, .download-btn {
+            color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important; white-space: nowrap;
+        }
+        @media (max-width: 599px) { .enter-link, .download-btn { font-size: 0.55rem; } }
+        @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn { font-size: 1.1rem; } }
+        @media (min-width: 1024px) { .enter-link, .download-btn { font-size: 1.1rem; } }
+
+        .mirror-block {
+            display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px;
+        }
+        
+        .mirror-reflection {
+            transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); user-select: none; pointer-events: none !important;
+        }
+
+        @keyframes randomGlow {
+            0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
+            15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
+            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
+            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
+            50% { opacity: 0.15; text-shadow: none; }
+            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
+            85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="media-vault">
+        <div class="wallpaper-bg" id="wallpaperBg"></div>
+        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
+    </div>
+
+    <div class="nav-menu-stack" id="navMenuStack">
+        <div class="mirror-block">
+            <button id="dropInTrigger" class="enter-link">drop in</button>
+            <span class="enter-link mirror-reflection">drop in</span>
+        </div>
+        <div class="mirror-block">
+            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
+            <span class="enter-link mirror-reflection">look in the mirror</span>
+        </div>
+        <div class="mirror-block">
+            <a href="reflexiunphone.png" id="dynamicDownload" class="download-btn" download>reflect</a>
+            <span class="download-btn mirror-reflection">reflect</span>
+        </div>
+    </div>
+
+    <script>
+        function configureAdaptiveDownload() {
+            const downloadLink = document.getElementById('dynamicDownload');
+            if (!downloadLink) return;
+            const width = window.innerWidth;
+            let targetFile = 'reflexiunphone.png'; 
+            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
+            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
+            downloadLink.href = targetFile;
+        }
+        window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
+        window.addEventListener('resize', configureAdaptiveDownload);
+
+        const dropInTrigger = document.getElementById('dropInTrigger');
+        const mirrorTrigger = document.getElementById('mirrorTrigger');
+        const masterVideo = document.getElementById('masterVideoEngine');
+        const wallpaperBg = document.getElementById('wallpaperBg');
+        const navMenuStack = document.getElementById('navMenuStack');
+
+        let selectedPathwayRoute = "dropin";
+        const localIntroUrl = "introvideo.mp4";
+        const localDropInUrl = "dropinvid.mp4";
+        const localMirrorUrl = "lookinthemirror.mp4";
+
+        function startStreamingVideo(targetVideoUrl, routeName) {
+            selectedPathwayRoute = routeName;
+            navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
+            wallpaperBg.style.opacity = '0';
+            masterVideo.style.zIndex = "9999999"; 
+            masterVideo.src = targetVideoUrl;
+            masterVideo.muted = true; 
+            masterVideo.style.opacity = '1'; 
+            masterVideo.load();
+            masterVideo.play().catch(e => console.error("Playback failed:", e));
+        }
+        
+        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
+
+        masterVideo.addEventListener('ended', () => {
+            if (masterVideo.src.includes(localIntroUrl)) {
+                if (selectedPathwayRoute === "mirror") {
+                    masterVideo.src = localMirrorUrl;
+                } else {
+                    masterVideo.src = localDropInUrl;
+                }
+                masterVideo.muted = true; 
+                masterVideo.load();
+                masterVideo.play().catch(e => console.error("Playback failed:", e));
+            } else {
+                masterVideo.style.zIndex = "3";
+                masterVideo.style.opacity = '0'; 
+                masterVideo.src = "";
+                navMenuStack.style.opacity = '1';
+                navMenuStack.style.pointerEvents = 'auto';
+                wallpaperBg.style.opacity = '1';
+            }
+        });
+    </script>
+</body>
+</html>
