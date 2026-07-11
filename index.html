@@ -9,36 +9,23 @@
         body, html { background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
         
         .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; user-select: none; }
-        .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('reflexiunnewwallpaper.png'); background-size: cover; background-position: center center; z-index: 2 !important; pointer-events: none !important; transition: opacity 0.5s ease; }
-        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; display: none; z-index: 3 !important; pointer-events: none !important; transition: opacity 2s ease; }
+        .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('reflexiunnewwallpaper.png'); background-size: cover; background-position: center center; z-index: 2 !important; transition: opacity 0.5s ease; }
         
-        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; gap: 16px; pointer-events: auto !important; transition: opacity 0.5s ease; }
+        /* The camera/filter container */
+        #cameraLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 4; transition: opacity 2s ease; }
         
-        /* TEXT SIZE HALVED HERE */
-        .enter-link, .download-btn {
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.55rem; /* Exactly half of 1.1rem */
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            animation: randomGlow 3.5s infinite ease-in-out;
-            cursor: pointer; 
-            font-weight: 300 !important; 
-            display: inline-block !important; 
-            padding: 8px 16px; 
-            background: none;
-            border: none;
-            outline: none;
-            pointer-events: auto !important;
-        }
-
-        .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px; }
-        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); user-select: none; pointer-events: none !important; }
+        /* The final video container */
+        #masterVideoEngine { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 3 !important; }
+        
+        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; width: 100%; gap: 16px; pointer-events: auto !important; transition: opacity 0.5s ease; }
+        
+        .enter-link { color: #fff; text-decoration: none; font-size: 0.55rem; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; padding: 8px 16px; background: none; border: none; outline: none; }
+        .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; height: 30px; }
+        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); pointer-events: none !important; }
 
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
-            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
             50% { opacity: 0.15; text-shadow: none; }
             85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
         }
@@ -47,66 +34,58 @@
 <body>
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
+        <video id="cameraLayer" autoplay playsinline muted></video>
+        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline></video>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
-        <div class="mirror-block">
-            <button id="dropInTrigger" class="enter-link">drop in</button>
+        <div class="mirror-block" onclick="start('drop')">
+            <button class="enter-link">drop in</button>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
-        <div class="mirror-block">
-            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
+        <div class="mirror-block" onclick="start('mirror')">
+            <button class="enter-link">look in the mirror</button>
             <span class="enter-link mirror-reflection">look in the mirror</span>
-        </div>
-        <div class="mirror-block">
-            <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
-            <span class="download-btn mirror-reflection">reflect</span>
         </div>
     </div>
 
     <script>
-        const masterVideo = document.getElementById('masterVideoEngine');
-        const wallpaperBg = document.getElementById('wallpaperBg');
-        const navMenuStack = document.getElementById('navMenuStack');
-        let selectedPathwayRoute = "dropin";
+        const cam = document.getElementById('cameraLayer');
+        const master = document.getElementById('masterVideoEngine');
+        const bg = document.getElementById('wallpaperBg');
+        const nav = document.getElementById('navMenuStack');
 
-        async function startStreamingVideo(route) {
-            selectedPathwayRoute = route;
-            navMenuStack.style.opacity = '0';
-            wallpaperBg.style.opacity = '0';
-            masterVideo.style.display = 'block';
+        async function start(type) {
+            nav.style.opacity = '0';
+            bg.style.opacity = '0';
+            cam.style.display = 'block';
+            cam.style.opacity = '1';
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                masterVideo.srcObject = stream;
-                masterVideo.muted = true;
-                masterVideo.play();
+                cam.srcObject = stream;
             } catch(e) { console.log(e); }
 
+            // Phase 1: Hold for 2 seconds
             setTimeout(() => {
-                masterVideo.style.opacity = '0';
+                // Phase 2: Fade to black (2 seconds)
+                cam.style.opacity = '0';
                 setTimeout(() => {
-                    masterVideo.style.opacity = '1'; 
-                    masterVideo.srcObject = null;
-                    masterVideo.src = (selectedPathwayRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
-                    masterVideo.load();
-                    masterVideo.play();
+                    cam.style.display = 'none';
+                    // Phase 3: Play final video
+                    master.style.display = 'block';
+                    master.src = (type === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
+                    master.play();
                 }, 2000);
             }, 2000);
         }
 
-        document.getElementById('dropInTrigger').addEventListener('click', () => startStreamingVideo("dropin"));
-        document.getElementById('mirrorTrigger').addEventListener('click', () => startStreamingVideo("mirror"));
-
-        masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes("mp4")) {
-                masterVideo.style.display = 'none';
-                navMenuStack.style.opacity = '1';
-                wallpaperBg.style.opacity = '1';
-                masterVideo.src = "";
-            }
-        });
+        master.onended = () => {
+            master.style.display = 'none';
+            nav.style.opacity = '1';
+            bg.style.opacity = '1';
+            master.src = "";
+        };
     </script>
 </body>
 </html>
