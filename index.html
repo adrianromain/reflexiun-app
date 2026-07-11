@@ -34,10 +34,13 @@
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
         @media (min-width: 1024px) { .nav-menu-stack { bottom: 16%; } }
 
-        /* Font size halved to 0.55rem */
+        /* Independent Device Controls */
         .enter-link, .download-btn {
-            color: #fff; text-decoration: none; font-size: 0.55rem; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important; white-space: nowrap;
+            color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important; white-space: nowrap;
         }
+        @media (max-width: 599px) { .enter-link, .download-btn { font-size: 0.55rem; } }
+        @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn { font-size: 1.1rem; } }
+        @media (min-width: 1024px) { .enter-link, .download-btn { font-size: 1.1rem; } }
 
         .mirror-block {
             display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px;
@@ -75,7 +78,7 @@
             <span class="enter-link mirror-reflection">look in the mirror</span>
         </div>
         <div class="mirror-block">
-            <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
+            <a href="reflexiunphone.png" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="download-btn mirror-reflection">reflect</span>
         </div>
     </div>
