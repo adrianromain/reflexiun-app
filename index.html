@@ -16,7 +16,6 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; user-select: none;
         }
         
-        /* Updated Wallpaper Logic */
         .wallpaper-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; z-index: 2 !important; pointer-events: none !important; transition: opacity 0.5s ease;
         }
@@ -29,22 +28,23 @@
         }
         
         .nav-menu-stack {
-            position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; gap: 16px; pointer-events: auto !important;
+            position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 16px; pointer-events: auto !important;
         }
         
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
         @media (min-width: 1024px) { .nav-menu-stack { bottom: 16%; } }
 
+        /* Font size halved to 0.55rem */
         .enter-link, .download-btn {
-            color: #fff; text-decoration: none; font-size: 1.1rem; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important;
+            color: #fff; text-decoration: none; font-size: 0.55rem; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important; white-space: nowrap;
         }
 
         .mirror-block {
-            display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 48px;
+            display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px;
         }
         
         .mirror-reflection {
-            transform: scaleY(-1); opacity: 0.08; margin-top: -18px; filter: blur(3px); user-select: none; pointer-events: none !important;
+            transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); user-select: none; pointer-events: none !important;
         }
 
         @keyframes randomGlow {
