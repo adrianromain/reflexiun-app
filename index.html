@@ -16,23 +16,25 @@
         @media (min-width: 1024px) { .wallpaper-bg { background-image: url('reflexiundesktop.png'); } }
         
         .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
+        /* True Mirror Effect */
         #cameraStreamNode { transform: scaleX(-1); -webkit-transform: scaleX(-1); }
         
         .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 600px; transition: opacity 0.5s ease; pointer-events: auto !important; }
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
         @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(16% + 32px); gap: 48px; } }
 
-        /* Font size reduced by half and fixed for single line */
         .enter-link, .download-btn { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 4px 8px; background: none; border: none; font-size: 0.55rem; white-space: nowrap; }
         
         .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; height: 15px; pointer-events: auto !important; }
         .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -5px; filter: blur(3px); pointer-events: none !important; }
 
+        /* The Reflexiun Chamber */
         #voidJournal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
-        .chamber-title { color: #fff; letter-spacing: 8px; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 40px; opacity: 0.5; }
-        #voidInput { background: transparent; border: none; color: #fff; width: 80%; max-width: 500px; font-size: 1.5rem; text-align: center; outline: none; letter-spacing: 2px; opacity: 0.7; }
-        .reflection-prompt { color: #555; margin-bottom: 20px; letter-spacing: 4px; text-transform: uppercase; font-size: 0.8rem; pointer-events: none; }
-
+        .chamber-title { color: #fff; letter-spacing: 8px; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 10px; opacity: 0.5; }
+        .chamber-instruction { color: #fff; letter-spacing: 2px; text-transform: lowercase; font-size: 0.6rem; margin-bottom: 40px; opacity: 0.3; }
+        #voidInput { background: transparent; border: none; color: #fff; width: 80%; max-width: 500px; font-size: 1.5rem; text-align: center; outline: none; letter-spacing: 2px; opacity: 0.7; animation: pulse 2s infinite ease-in-out; }
+        
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
         @keyframes randomGlow { 0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); } 50% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1); } }
     </style>
 </head>
@@ -42,16 +44,19 @@
         <video id="cameraStreamNode" class="movie-track-node" autoplay muted playsinline></video>
         <video id="masterVideoEngine" class="movie-track-node" playsinline preload="auto"></video>
     </div>
+    
     <div id="voidJournal">
         <div class="chamber-title">The Reflexiun Chamber</div>
-        <div class="reflection-prompt">release your reflection</div>
+        <div class="chamber-instruction">state what you are releasing</div>
         <textarea id="voidInput" placeholder="..."></textarea>
     </div>
+
     <div class="nav-menu-stack" id="navMenuStack">
         <div class="mirror-block"><button id="dropInTrigger" class="enter-link">drop in</button><span class="enter-link mirror-reflection">drop in</span></div>
         <div class="mirror-block"><button id="mirrorTrigger" class="enter-link">look in the mirror</button><span class="enter-link mirror-reflection">look in the mirror</span></div>
         <div class="mirror-block"><a href="reflexiunphone.png" id="dynamicDownload" class="download-btn" download>reflect</a><span class="download-btn mirror-reflection">reflect</span></div>
     </div>
+
     <script>
         const cameraNode = document.getElementById('cameraStreamNode');
         const masterVideo = document.getElementById('masterVideoEngine');
@@ -99,22 +104,23 @@
         });
 
         voidInput.addEventListener('input', (e) => {
-            if (e.target.value.length > 0) {
+            // Extended release time
+            clearTimeout(window.releaseTimer);
+            window.releaseTimer = setTimeout(() => {
+                voidInput.style.transition = "opacity 3s ease";
+                voidInput.style.opacity = "0";
                 setTimeout(() => {
-                    voidInput.style.opacity = "0";
+                    e.target.value = "";
+                    voidInput.style.opacity = "0.7";
+                    voidJournal.style.opacity = '0';
                     setTimeout(() => {
-                        e.target.value = "";
-                        voidInput.style.opacity = "0.7";
-                        voidJournal.style.opacity = '0';
-                        setTimeout(() => {
-                            voidJournal.style.display = 'none';
-                            navMenuStack.style.opacity = '1';
-                            navMenuStack.style.pointerEvents = 'auto';
-                            wallpaperBg.style.opacity = '1';
-                        }, 1000);
-                    }, 2000);
-                }, 6000);
-            }
+                        voidJournal.style.display = 'none';
+                        navMenuStack.style.opacity = '1';
+                        navMenuStack.style.pointerEvents = 'auto';
+                        wallpaperBg.style.opacity = '1';
+                    }, 1000);
+                }, 3000);
+            }, 12000);
         });
 
         document.getElementById('dropInTrigger').addEventListener('click', () => startFlow("dropin"));
