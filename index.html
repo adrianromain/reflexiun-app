@@ -2,30 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reflexiun</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
-        .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1; pointer-events: none; }
-        .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; z-index: 2; }
-        @media (max-width: 599px) { .wallpaper-bg { background-image: url('reflexiunphone.png'); } }
-        .movie-track { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3; transition: opacity 0.3s ease; }
-        #cameraStream { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); z-index: 4; opacity: 0; }
-        .nav-menu { position: fixed; bottom: 20%; left: 50%; transform: translateX(-50%); z-index: 999; display: flex; flex-direction: column; align-items: center; gap: 24px; pointer-events: auto; }
-        .nav-link { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; cursor: pointer; padding: 4px 8px; font-size: 0.55rem; white-space: nowrap; background: none; border: none; }
+        body, html { margin: 0; padding: 0; background-color: #000; width: 100%; height: 100%; overflow: hidden; }
+        .full-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* The Background */
+        .wallpaper-bg { background-image: url('reflexiunphone.png'); background-size: cover; background-position: center; z-index: 1; }
+        
+        /* Videos: 'contain' ensures no zooming/cropping */
+        .vid-layer { z-index: 2; object-fit: contain; background: #000; opacity: 0; }
+        #cameraStream { z-index: 3; transform: scaleX(-1); object-fit: contain; }
+        
+        .nav-menu { position: fixed; bottom: 20%; width: 100%; text-align: center; z-index: 10; }
+        .nav-link { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; display: block; margin: 20px 0; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
-    <div class="media-vault">
-        <div class="wallpaper-bg"></div>
-        <video id="cameraStream" autoplay muted playsinline></video>
-        <video id="masterVideo" class="movie-track" playsinline preload="auto"></video>
-    </div>
+    <div class="full-screen wallpaper-bg"></div>
+    <video id="cameraStream" class="full-screen vid-layer" autoplay muted playsinline></video>
+    <video id="masterVideo" class="full-screen vid-layer" playsinline></video>
     
     <div class="nav-menu" id="navMenu">
-        <button id="dropInTrigger" class="nav-link">drop in</button>
-        <button id="mirrorTrigger" class="nav-link">look in the mirror</button>
+        <div id="dropIn" class="nav-link">drop in</div>
+        <div id="mirror" class="nav-link">look in the mirror</div>
         <a href="reflexiunphone.png" class="nav-link" download>reflect</a>
     </div>
 
@@ -35,39 +36,41 @@
         const nav = document.getElementById('navMenu');
         let activeRoute = "";
 
-        vid.addEventListener('ended', () => {
+        function showNav(show) { nav.style.display = show ? 'block' : 'none'; }
+
+        vid.onended = () => {
             if (vid.src.includes("introvideo.mp4")) {
                 vid.src = (activeRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
                 vid.play();
             } else {
                 vid.style.opacity = '0';
-                nav.style.opacity = '1';
+                showNav(true);
             }
-        });
+        };
 
-        document.getElementById('dropInTrigger').addEventListener('click', () => {
+        document.getElementById('dropIn').onclick = () => {
             activeRoute = "dropin";
-            nav.style.opacity = '0';
+            showNav(false);
             vid.src = "introvideo.mp4";
             vid.style.opacity = '1';
             vid.play();
-        });
+        };
 
-        document.getElementById('mirrorTrigger').addEventListener('click', () => {
+        document.getElementById('mirror').onclick = () => {
             activeRoute = "mirror";
-            nav.style.opacity = '0';
-            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                cam.srcObject = stream;
+            showNav(false);
+            navigator.mediaDevices.getUserMedia({video: true}).then(s => {
+                cam.srcObject = s;
                 cam.style.opacity = '1';
                 setTimeout(() => {
-                    stream.getTracks().forEach(t => t.stop());
+                    s.getTracks().forEach(t => t.stop());
                     cam.style.opacity = '0';
                     vid.src = "introvideo.mp4";
                     vid.style.opacity = '1';
                     vid.play();
                 }, 4000);
             });
-        });
+        };
     </script>
 </body>
 </html>
