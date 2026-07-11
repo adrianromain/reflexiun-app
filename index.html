@@ -15,50 +15,43 @@
         @media (min-width: 600px) and (max-width: 1023px) { .wallpaper-bg { background-image: url('reflexiuntablet.png'); } }
         @media (min-width: 1024px) { .wallpaper-bg { background-image: url('reflexiundesktop.png'); } }
         
-        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; transition: opacity 0.3s ease; }
+        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
         #cameraStreamNode { transform: scaleX(-1); -webkit-transform: scaleX(-1); }
         
-        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 600px; transition: opacity 0.5s ease; }
+        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 600px; transition: opacity 0.5s ease; pointer-events: auto !important; }
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
         @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(16% + 32px); gap: 48px; } }
 
-        .enter-link, .download-btn { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; font-size: 1.1rem; white-space: nowrap; }
+        /* Font size reduced by half and fixed for single line */
+        .enter-link, .download-btn { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 4px 8px; background: none; border: none; font-size: 0.55rem; white-space: nowrap; }
         
-        .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; height: 30px; }
-        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); pointer-events: none !important; }
+        .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; height: 15px; pointer-events: auto !important; }
+        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -5px; filter: blur(3px); pointer-events: none !important; }
 
-        /* The Reflexiun Chamber */
         #voidJournal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
         .chamber-title { color: #fff; letter-spacing: 8px; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 40px; opacity: 0.5; }
         #voidInput { background: transparent; border: none; color: #fff; width: 80%; max-width: 500px; font-size: 1.5rem; text-align: center; outline: none; letter-spacing: 2px; opacity: 0.7; }
         .reflection-prompt { color: #555; margin-bottom: 20px; letter-spacing: 4px; text-transform: uppercase; font-size: 0.8rem; pointer-events: none; }
 
-        @keyframes randomGlow {
-            0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
-            50% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1); }
-        }
+        @keyframes randomGlow { 0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); } 50% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1); } }
     </style>
 </head>
 <body>
-
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         <video id="cameraStreamNode" class="movie-track-node" autoplay muted playsinline></video>
-        <video id="masterVideoEngine" class="movie-track-node" autoplay playsinline preload="auto"></video>
+        <video id="masterVideoEngine" class="movie-track-node" playsinline preload="auto"></video>
     </div>
-
     <div id="voidJournal">
         <div class="chamber-title">The Reflexiun Chamber</div>
         <div class="reflection-prompt">release your reflection</div>
         <textarea id="voidInput" placeholder="..."></textarea>
     </div>
-
     <div class="nav-menu-stack" id="navMenuStack">
         <div class="mirror-block"><button id="dropInTrigger" class="enter-link">drop in</button><span class="enter-link mirror-reflection">drop in</span></div>
         <div class="mirror-block"><button id="mirrorTrigger" class="enter-link">look in the mirror</button><span class="enter-link mirror-reflection">look in the mirror</span></div>
         <div class="mirror-block"><a href="reflexiunphone.png" id="dynamicDownload" class="download-btn" download>reflect</a><span class="download-btn mirror-reflection">reflect</span></div>
     </div>
-
     <script>
         const cameraNode = document.getElementById('cameraStreamNode');
         const masterVideo = document.getElementById('masterVideoEngine');
@@ -66,39 +59,48 @@
         const wallpaperBg = document.getElementById('wallpaperBg');
         const voidJournal = document.getElementById('voidJournal');
         const voidInput = document.getElementById('voidInput');
+        let currentRoute = "";
 
-        function initiateCameraSequence(routeName) {
+        function startFlow(routeName) {
+            currentRoute = routeName;
             navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
-            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                cameraNode.srcObject = stream;
-                cameraNode.style.zIndex = "9999999";
-                cameraNode.style.opacity = '1';
-                setTimeout(() => {
-                    stream.getTracks().forEach(t => t.stop());
-                    cameraNode.style.opacity = '0';
-                    startStreamingVideo(routeName);
-                }, 4000);
-            }).catch(() => startStreamingVideo(routeName));
-        }
-
-        function startStreamingVideo(routeName) {
-            masterVideo.src = (routeName === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
+            masterVideo.src = "introvideo.mp4";
             masterVideo.style.opacity = '1';
             masterVideo.play();
         }
 
         masterVideo.addEventListener('ended', () => {
-            masterVideo.style.opacity = '0';
-            voidJournal.style.display = 'flex';
-            setTimeout(() => voidJournal.style.opacity = '1', 100);
-            voidInput.focus();
+            if (masterVideo.src.includes("introvideo.mp4")) {
+                masterVideo.style.opacity = '0';
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    cameraNode.srcObject = stream;
+                    cameraNode.style.zIndex = "9999999";
+                    cameraNode.style.opacity = '1';
+                    setTimeout(() => {
+                        stream.getTracks().forEach(t => t.stop());
+                        cameraNode.style.opacity = '0';
+                        masterVideo.src = (currentRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
+                        masterVideo.style.opacity = '1';
+                        masterVideo.play();
+                    }, 4000);
+                }).catch(() => {
+                    masterVideo.src = (currentRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
+                    masterVideo.style.opacity = '1';
+                    masterVideo.play();
+                });
+            } else {
+                masterVideo.style.opacity = '0';
+                voidJournal.style.display = 'flex';
+                setTimeout(() => voidJournal.style.opacity = '1', 100);
+                voidInput.focus();
+            }
         });
 
         voidInput.addEventListener('input', (e) => {
             if (e.target.value.length > 0) {
                 setTimeout(() => {
-                    voidInput.style.transition = "opacity 2s ease";
                     voidInput.style.opacity = "0";
                     setTimeout(() => {
                         e.target.value = "";
@@ -107,6 +109,7 @@
                         setTimeout(() => {
                             voidJournal.style.display = 'none';
                             navMenuStack.style.opacity = '1';
+                            navMenuStack.style.pointerEvents = 'auto';
                             wallpaperBg.style.opacity = '1';
                         }, 1000);
                     }, 2000);
@@ -114,8 +117,8 @@
             }
         });
 
-        document.getElementById('dropInTrigger').addEventListener('click', () => initiateCameraSequence("dropin"));
-        document.getElementById('mirrorTrigger').addEventListener('click', () => initiateCameraSequence("mirror"));
+        document.getElementById('dropInTrigger').addEventListener('click', () => startFlow("dropin"));
+        document.getElementById('mirrorTrigger').addEventListener('click', () => startFlow("mirror"));
     </script>
 </body>
 </html>
