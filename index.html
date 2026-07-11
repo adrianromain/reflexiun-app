@@ -56,6 +56,7 @@
             display: none;
             z-index: 3 !important;
             pointer-events: none !important; 
+            transition: opacity 2s ease; /* Added for your fade-to-black */
         }
         
         .nav-menu-stack {
@@ -67,12 +68,22 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            justify-content: flex-start;
+            text-align: center;
             width: 100%;
+            max-width: 400px;
+            gap: 16px; 
             pointer-events: auto !important;
+            transition: opacity 0.5s ease;
+        }
+        
+        @media (min-width: 600px) and (max-width: 1023px) {
+            .nav-menu-stack { bottom: 14%; }
+        }
+        @media (min-width: 1024px) {
+            .nav-menu-stack { bottom: 16%; } 
         }
 
-        /* EXACT ORIGINAL TEXT STYLING RESTORED */
         .enter-link, .download-btn {
             color: #fff;
             text-decoration: none;
@@ -87,13 +98,14 @@
             background: none;
             border: none;
             outline: none;
-            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5); /* Shadow added back */
+            pointer-events: auto !important;
         }
 
         .mirror-block {
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
             width: 100%; 
             pointer-events: auto !important;
             height: 48px; 
@@ -111,7 +123,11 @@
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
-            50% { opacity: 0.15; }
+            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
+            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
+            50% { opacity: 0.15; text-shadow: none; }
+            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
+            85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
         }
     </style>
 </head>
@@ -119,7 +135,7 @@
 
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto"></video>
+        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline preload="auto"></video>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
@@ -143,29 +159,44 @@
         const navMenuStack = document.getElementById('navMenuStack');
         let selectedPathwayRoute = "dropin";
 
-        function startStreamingVideo(targetVideoUrl, routeName) {
-            selectedPathwayRoute = routeName;
+        // Logic for your path
+        async function startStreamingVideo(route) {
+            selectedPathwayRoute = route;
             navMenuStack.style.opacity = '0';
-            navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
-            masterVideo.src = targetVideoUrl;
             masterVideo.style.display = 'block';
-            masterVideo.play();
+
+            // 1. Start with the Camera/Filter
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                masterVideo.srcObject = stream;
+                masterVideo.muted = true;
+                masterVideo.play();
+            } catch(e) { console.log(e); }
+
+            // 2. Hold for 2 seconds, then fade to black (2 seconds)
+            setTimeout(() => {
+                masterVideo.style.opacity = '0'; // Starts the 2s CSS transition
+                setTimeout(() => {
+                    // 3. Once fully black, switch to the final video
+                    masterVideo.style.opacity = '1'; 
+                    masterVideo.srcObject = null;
+                    masterVideo.src = (selectedPathwayRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
+                    masterVideo.load();
+                    masterVideo.play();
+                }, 2000);
+            }, 2000);
         }
 
-        document.getElementById('dropInTrigger').addEventListener('click', () => startStreamingVideo("introvideo.mp4", "dropin"));
-        document.getElementById('mirrorTrigger').addEventListener('click', () => startStreamingVideo("introvideo.mp4", "mirror"));
+        document.getElementById('dropInTrigger').addEventListener('click', () => startStreamingVideo("dropin"));
+        document.getElementById('mirrorTrigger').addEventListener('click', () => startStreamingVideo("mirror"));
 
         masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes("introvideo.mp4")) {
-                masterVideo.src = (selectedPathwayRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
-                masterVideo.play();
-            } else {
+            if (masterVideo.src.includes("mp4")) {
                 masterVideo.style.display = 'none';
-                masterVideo.src = "";
                 navMenuStack.style.opacity = '1';
-                navMenuStack.style.pointerEvents = 'auto';
                 wallpaperBg.style.opacity = '1';
+                masterVideo.src = "";
             }
         });
     </script>
