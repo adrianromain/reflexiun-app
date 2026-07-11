@@ -5,87 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reflexiun</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
+        * {
+            margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;
+        }
+        body, html {
+            background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif;
+        }
         
-        .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; user-select: none; }
-        .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('reflexiunnewwallpaper.png'); background-size: cover; background-position: center center; z-index: 2 !important; transition: opacity 0.5s ease; }
+        .media-vault {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; user-select: none;
+        }
         
-        /* The camera/filter container */
-        #cameraLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 4; transition: opacity 2s ease; }
+        .wallpaper-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('reflexiunnewwallpaper.png'); background-size: cover; background-position: center center; z-index: 2 !important; pointer-events: none !important; transition: opacity 0.5s ease;
+        }
         
-        /* The final video container */
-        #masterVideoEngine { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 3 !important; }
+        .movie-track-node {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; display: none; z-index: 3 !important; pointer-events: none !important;
+        }
         
-        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; width: 100%; gap: 16px; pointer-events: auto !important; transition: opacity 0.5s ease; }
+        .nav-menu-stack {
+            position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 400px; gap: 16px; pointer-events: auto !important;
+        }
         
-        .enter-link { color: #fff; text-decoration: none; font-size: 0.55rem; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; padding: 8px 16px; background: none; border: none; outline: none; }
-        .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; height: 30px; }
-        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); pointer-events: none !important; }
+        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
+        @media (min-width: 1024px) { .nav-menu-stack { bottom: 16%; } }
+
+        .enter-link, .download-btn {
+            color: #fff; text-decoration: none; font-size: 1.1rem; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important;
+        }
+
+        .mirror-block {
+            display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 48px;
+        }
+        
+        .mirror-reflection {
+            transform: scaleY(-1); opacity: 0.08; margin-top: -18px; filter: blur(3px); user-select: none; pointer-events: none !important;
+        }
 
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 0 4px rgba(255,255,255,0.3); }
             15% { opacity: 1; text-shadow: 0 0 16px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9); }
+            22% { opacity: 0.35; text-shadow: 0 0 6px rgba(255,255,255,0.4); }
+            45% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 35px rgba(255,255,255,0.8); }
             50% { opacity: 0.15; text-shadow: none; }
+            70% { opacity: 0.75; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
             85% { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,1); }
         }
     </style>
 </head>
 <body>
+
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="cameraLayer" autoplay playsinline muted></video>
-        <video id="masterVideoEngine" class="movie-track-node" playsinline webkit-playsinline></video>
+        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
-        <div class="mirror-block" onclick="start('drop')">
-            <button class="enter-link">drop in</button>
+        <div class="mirror-block">
+            <button id="dropInTrigger" class="enter-link">drop in</button>
             <span class="enter-link mirror-reflection">drop in</span>
         </div>
-        <div class="mirror-block" onclick="start('mirror')">
-            <button class="enter-link">look in the mirror</button>
+        <div class="mirror-block">
+            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
             <span class="enter-link mirror-reflection">look in the mirror</span>
+        </div>
+        <div class="mirror-block">
+            <a href="reflexiunnewwallpaper.png" id="dynamicDownload" class="download-btn" download>reflect</a>
+            <span class="download-btn mirror-reflection">reflect</span>
         </div>
     </div>
 
     <script>
-        const cam = document.getElementById('cameraLayer');
-        const master = document.getElementById('masterVideoEngine');
-        const bg = document.getElementById('wallpaperBg');
-        const nav = document.getElementById('navMenuStack');
-
-        async function start(type) {
-            nav.style.opacity = '0';
-            bg.style.opacity = '0';
-            cam.style.display = 'block';
-            cam.style.opacity = '1';
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                cam.srcObject = stream;
-            } catch(e) { console.log(e); }
-
-            // Phase 1: Hold for 2 seconds
-            setTimeout(() => {
-                // Phase 2: Fade to black (2 seconds)
-                cam.style.opacity = '0';
-                setTimeout(() => {
-                    cam.style.display = 'none';
-                    // Phase 3: Play final video
-                    master.style.display = 'block';
-                    master.src = (type === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
-                    master.play();
-                }, 2000);
-            }, 2000);
+        function configureAdaptiveDownload() {
+            const downloadLink = document.getElementById('dynamicDownload');
+            if (!downloadLink) return;
+            const width = window.innerWidth;
+            let targetFile = 'reflexiunnewwallpaper.png'; 
+            if (width >= 1024) { targetFile = 'reflexiundesktop.png'; } 
+            else if (width >= 600) { targetFile = 'reflexiuntablet.png'; }
+            downloadLink.href = targetFile;
         }
+        window.addEventListener('DOMContentLoaded', configureAdaptiveDownload);
+        window.addEventListener('resize', configureAdaptiveDownload);
 
-        master.onended = () => {
-            master.style.display = 'none';
-            nav.style.opacity = '1';
-            bg.style.opacity = '1';
-            master.src = "";
-        };
+        const dropInTrigger = document.getElementById('dropInTrigger');
+        const mirrorTrigger = document.getElementById('mirrorTrigger');
+        const masterVideo = document.getElementById('masterVideoEngine');
+        const wallpaperBg = document.getElementById('wallpaperBg');
+        const navMenuStack = document.getElementById('navMenuStack');
+
+        let selectedPathwayRoute = "dropin";
+        const localIntroUrl = "introvideo.mp4";
+        const localDropInUrl = "dropinvid.mp4";
+        const localMirrorUrl = "lookinthemirror.mp4";
+
+        function startStreamingVideo(targetVideoUrl, routeName) {
+            selectedPathwayRoute = routeName;
+            navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
+            wallpaperBg.style.opacity = '0';
+            masterVideo.style.zIndex = "9999999"; 
+            masterVideo.src = targetVideoUrl;
+            masterVideo.style.display = 'block';
+            masterVideo.load();
+            const playPromise = masterVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    masterVideo.muted = true;
+                    masterVideo.play().catch(e => console.error(e));
+                });
+            }
+        }
+        
+        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
+        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
+
+        masterVideo.addEventListener('ended', () => {
+            if (masterVideo.src.includes(localIntroUrl)) {
+                if (selectedPathwayRoute === "mirror") {
+                    masterVideo.src = localMirrorUrl;
+                } else {
+                    masterVideo.src = localDropInUrl;
+                }
+                masterVideo.load();
+                const playPromise = masterVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        masterVideo.muted = true;
+                        masterVideo.play().catch(e => console.error(e));
+                    });
+                }
+            } else {
+                masterVideo.style.zIndex = "3";
+                masterVideo.style.display = 'none';
+                masterVideo.src = "";
+                navMenuStack.style.opacity = '1';
+                navMenuStack.style.pointerEvents = 'auto';
+                wallpaperBg.style.opacity = '1';
+            }
+        });
     </script>
 </body>
 </html>
