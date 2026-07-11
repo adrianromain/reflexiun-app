@@ -2,74 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reflexiun</title>
     <style>
-        body, html { margin: 0; padding: 0; background-color: #000; width: 100%; height: 100%; overflow: hidden; }
-        .full-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+        body { margin: 0; background: #000; font-family: sans-serif; }
+        .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('reflexiunphone.png') center/cover no-repeat; }
         
-        /* The Background */
-        .wallpaper-bg { background-image: url('reflexiunphone.png'); background-size: cover; background-position: center; z-index: 1; }
+        /* Video layers */
+        video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; background: #000; }
         
-        /* Videos: 'contain' ensures no zooming/cropping */
-        .vid-layer { z-index: 2; object-fit: contain; background: #000; opacity: 0; }
-        #cameraStream { z-index: 3; transform: scaleX(-1); object-fit: contain; }
+        /* Mirroring effect ONLY on camera */
+        #cam { transform: scaleX(-1); }
         
-        .nav-menu { position: fixed; bottom: 20%; width: 100%; text-align: center; z-index: 10; }
-        .nav-link { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; display: block; margin: 20px 0; cursor: pointer; font-size: 1rem; }
+        #nav { position: fixed; bottom: 100px; width: 100%; text-align: center; }
+        .link { color: white; cursor: pointer; display: block; margin: 30px 0; font-size: 16px; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <div class="full-screen wallpaper-bg"></div>
-    <video id="cameraStream" class="full-screen vid-layer" autoplay muted playsinline></video>
-    <video id="masterVideo" class="full-screen vid-layer" playsinline></video>
+    <div class="bg"></div>
+    <video id="cam" playsinline muted></video>
+    <video id="vid" playsinline></video>
     
-    <div class="nav-menu" id="navMenu">
-        <div id="dropIn" class="nav-link">drop in</div>
-        <div id="mirror" class="nav-link">look in the mirror</div>
-        <a href="reflexiunphone.png" class="nav-link" download>reflect</a>
+    <div id="nav">
+        <div class="link" onclick="start('drop')">drop in</div>
+        <div class="link" onclick="start('mirror')">look in the mirror</div>
+        <a class="link" href="reflexiunphone.png" download>reflect</a>
     </div>
 
     <script>
-        const cam = document.getElementById('cameraStream');
-        const vid = document.getElementById('masterVideo');
-        const nav = document.getElementById('navMenu');
-        let activeRoute = "";
+        const cam = document.getElementById('cam');
+        const vid = document.getElementById('vid');
+        const nav = document.getElementById('nav');
+        let mode = "";
 
-        function showNav(show) { nav.style.display = show ? 'block' : 'none'; }
+        function start(type) {
+            mode = type;
+            nav.style.display = 'none';
+            // Start with the Intro
+            vid.src = 'introvideo.mp4';
+            vid.style.display = 'block';
+            vid.play();
+        }
 
         vid.onended = () => {
-            if (vid.src.includes("introvideo.mp4")) {
-                vid.src = (activeRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
-                vid.play();
-            } else {
-                vid.style.opacity = '0';
-                showNav(true);
-            }
-        };
-
-        document.getElementById('dropIn').onclick = () => {
-            activeRoute = "dropin";
-            showNav(false);
-            vid.src = "introvideo.mp4";
-            vid.style.opacity = '1';
-            vid.play();
-        };
-
-        document.getElementById('mirror').onclick = () => {
-            activeRoute = "mirror";
-            showNav(false);
-            navigator.mediaDevices.getUserMedia({video: true}).then(s => {
-                cam.srcObject = s;
-                cam.style.opacity = '1';
-                setTimeout(() => {
-                    s.getTracks().forEach(t => t.stop());
-                    cam.style.opacity = '0';
-                    vid.src = "introvideo.mp4";
-                    vid.style.opacity = '1';
+            // After intro, decide what to do
+            if (vid.src.includes('introvideo.mp4')) {
+                if (mode === 'mirror') {
+                    // Start Camera
+                    vid.style.display = 'none';
+                    navigator.mediaDevices.getUserMedia({video: true}).then(s => {
+                        cam.srcObject = s;
+                        cam.style.display = 'block';
+                        setTimeout(() => {
+                            s.getTracks().forEach(t => t.stop());
+                            cam.style.display = 'none';
+                            // Play final mirror video
+                            vid.src = 'lookinthemirror.mp4';
+                            vid.style.display = 'block';
+                            vid.play();
+                        }, 4000);
+                    });
+                } else {
+                    // Drop in flow
+                    vid.src = 'dropinvid.mp4';
                     vid.play();
-                }, 4000);
-            });
+                }
+            } else {
+                // Final video finished
+                vid.style.display = 'none';
+                nav.style.display = 'block';
+            }
         };
     </script>
 </body>
