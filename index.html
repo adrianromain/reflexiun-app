@@ -7,16 +7,11 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
-        
         .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1; pointer-events: none; }
         .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; z-index: 2; }
         @media (max-width: 599px) { .wallpaper-bg { background-image: url('reflexiunphone.png'); } }
-        
         .movie-track { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3; transition: opacity 0.3s ease; }
-        
-        /* Camera setup */
         #cameraStream { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); z-index: 4; opacity: 0; }
-        
         .nav-menu { position: fixed; bottom: 20%; left: 50%; transform: translateX(-50%); z-index: 999; display: flex; flex-direction: column; align-items: center; gap: 24px; pointer-events: auto; }
         .nav-link { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; cursor: pointer; padding: 4px 8px; font-size: 0.55rem; white-space: nowrap; background: none; border: none; }
     </style>
@@ -38,23 +33,24 @@
         const cam = document.getElementById('cameraStream');
         const vid = document.getElementById('masterVideo');
         const nav = document.getElementById('navMenu');
-        
         let activeRoute = "";
 
-        function playVideo(source) {
-            nav.style.opacity = '0';
-            vid.src = source;
-            vid.style.opacity = '1';
-            vid.play();
-        }
-
         vid.addEventListener('ended', () => {
-            vid.style.opacity = '0';
-            nav.style.opacity = '1';
+            if (vid.src.includes("introvideo.mp4")) {
+                vid.src = (activeRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
+                vid.play();
+            } else {
+                vid.style.opacity = '0';
+                nav.style.opacity = '1';
+            }
         });
 
         document.getElementById('dropInTrigger').addEventListener('click', () => {
-            playVideo("dropinvid.mp4");
+            activeRoute = "dropin";
+            nav.style.opacity = '0';
+            vid.src = "introvideo.mp4";
+            vid.style.opacity = '1';
+            vid.play();
         });
 
         document.getElementById('mirrorTrigger').addEventListener('click', () => {
@@ -66,7 +62,9 @@
                 setTimeout(() => {
                     stream.getTracks().forEach(t => t.stop());
                     cam.style.opacity = '0';
-                    playVideo("lookinthemirror.mp4");
+                    vid.src = "introvideo.mp4";
+                    vid.style.opacity = '1';
+                    vid.play();
                 }, 4000);
             });
         });
