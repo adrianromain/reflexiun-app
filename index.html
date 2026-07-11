@@ -23,13 +23,18 @@
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
         @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(16% + 32px); gap: 48px; } }
 
-        .enter-link, .download-btn { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; animation: randomGlow 3.5s infinite ease-in-out; cursor: pointer; font-weight: 300 !important; display: inline-block !important; padding: 8px 16px; background: none; border: none; outline: none; pointer-events: auto !important; white-space: nowrap; }
+        .enter-link, .download-btn { 
+            color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; 
+            cursor: pointer; font-weight: 300 !important; display: inline-block !important; 
+            padding: 8px 16px; background: none; border: none; outline: none; 
+            pointer-events: auto !important; white-space: nowrap;
+            animation: randomGlow 3.5s infinite ease-in-out; 
+        }
         @media (max-width: 599px) { .enter-link, .download-btn { font-size: 0.55rem; } }
         @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn { font-size: 1.1rem; } }
         @media (min-width: 1024px) { .enter-link, .download-btn { font-size: 1.1rem; } }
 
         .mirror-block { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; pointer-events: auto !important; height: 30px; }
-        .mirror-reflection { transform: scaleY(-1); opacity: 0.08; margin-top: -10px; filter: blur(3px); user-select: none; pointer-events: none !important; }
 
         @keyframes randomGlow {
             0%, 100% { opacity: 0.25; text-shadow: 0 4px 1px #fff; }
@@ -50,18 +55,9 @@
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
-        <div class="mirror-block">
-            <button id="dropInTrigger" class="enter-link">drop in</button>
-            <span class="enter-link mirror-reflection">drop in</span>
-        </div>
-        <div class="mirror-block">
-            <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
-            <span class="enter-link mirror-reflection">look in the mirror</span>
-        </div>
-        <div class="mirror-block">
-            <a href="reflexiunphone.png" id="dynamicDownload" class="download-btn" download>reflect</a>
-            <span class="download-btn mirror-reflection">reflect</span>
-        </div>
+        <button id="dropInTrigger" class="enter-link">drop in</button>
+        <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
+        <a href="reflexiunphone.png" id="dynamicDownload" class="download-btn" download>reflect</a>
     </div>
 
     <script>
