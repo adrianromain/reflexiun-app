@@ -10,9 +10,8 @@
         .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; }
         .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; z-index: 2 !important; transition: opacity 0.5s ease; }
         @media (max-width: 599px) { .wallpaper-bg { background-image: url('reflexiunphone.png'); } }
-        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
-        #cameraStreamNode { transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; position: absolute; }
-        #rainOverlay { z-index: 5 !important; mix-blend-mode: screen; opacity: 0.3; position: absolute; }
+        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background-color: #000; opacity: 0; z-index: 3 !important; transition: opacity 0.3s ease; }
+        #cameraStreamNode { transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; position: absolute; object-fit: cover; }
         .nav-menu-stack { position: fixed !important; bottom: 20%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; transition: opacity 0.5s ease; pointer-events: auto !important; }
         .enter-link, .reflect-btn { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; cursor: pointer; padding: 4px 8px; font-size: 0.55rem; white-space: nowrap; background: none; border: none; }
         #voidJournal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
@@ -24,7 +23,6 @@
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
         <video id="cameraStreamNode" autoplay muted playsinline></video>
-        <video id="rainOverlay" loop muted playsinline src="phonecode.mp4"></video>
         <video id="masterVideoEngine" playsinline preload="auto"></video>
     </div>
     <div id="voidJournal">
@@ -38,7 +36,6 @@
     </div>
     <script>
         const cameraNode = document.getElementById('cameraStreamNode');
-        const rainOverlay = document.getElementById('rainOverlay');
         const masterVideo = document.getElementById('masterVideoEngine');
         const navMenuStack = document.getElementById('navMenuStack');
         const wallpaperBg = document.getElementById('wallpaperBg');
@@ -59,13 +56,9 @@
                 navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
                     cameraNode.srcObject = stream;
                     cameraNode.style.opacity = '1';
-                    rainOverlay.style.opacity = '0.3';
-                    rainOverlay.play();
                     setTimeout(() => {
                         stream.getTracks().forEach(t => t.stop());
                         cameraNode.style.opacity = '0';
-                        rainOverlay.style.opacity = '0';
-                        rainOverlay.pause();
                         masterVideo.src = (currentRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
                         masterVideo.style.opacity = '1';
                         masterVideo.play();
