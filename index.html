@@ -34,14 +34,15 @@
         @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn { font-size: 1.1rem; } }
         @media (min-width: 1024px) { .enter-link, .download-btn { font-size: 1.1rem; } }
 
+        /* Glow shifted down to the base of the letters */
         @keyframes randomGlow {
-            0%, 100% { opacity: 0.25; text-shadow: 0 -2px 1px #fff; }
-            15% { opacity: 1; text-shadow: 0 -2px 1px #fff, 0 -3px 2px #fff; }
-            22% { opacity: 0.35; text-shadow: 0 -2px 1px #fff; }
-            45% { opacity: 0.9; text-shadow: 0 -3px 2px #fff, 0 -4px 3px #fff; }
+            0%, 100% { opacity: 0.25; text-shadow: 0 6px 1px #fff; }
+            15% { opacity: 1; text-shadow: 0 6px 2px #fff, 0 8px 4px #fff; }
+            22% { opacity: 0.35; text-shadow: 0 6px 1px #fff; }
+            45% { opacity: 0.9; text-shadow: 0 7px 3px #fff, 0 9px 5px #fff; }
             50% { opacity: 0.15; text-shadow: none; }
-            70% { opacity: 0.75; text-shadow: 0 -2px 1px #fff; }
-            85% { opacity: 1; text-shadow: 0 -2px 1px #fff; }
+            70% { opacity: 0.75; text-shadow: 0 6px 2px #fff; }
+            85% { opacity: 1; text-shadow: 0 6px 2px #fff; }
         }
     </style>
 </head>
