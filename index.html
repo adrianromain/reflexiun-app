@@ -119,7 +119,7 @@
             wallpaperBg.style.opacity = '0';
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
-            masterVideo.muted = true; 
+            masterVideo.muted = false; // Changed to allow sound
             masterVideo.style.opacity = '1'; 
             masterVideo.load();
             masterVideo.play().catch(e => console.error("Playback failed:", e));
@@ -135,7 +135,7 @@
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
-                masterVideo.muted = true; 
+                masterVideo.muted = false; // Changed to allow sound on the next clip
                 masterVideo.load();
                 masterVideo.play().catch(e => console.error("Playback failed:", e));
             } else {
