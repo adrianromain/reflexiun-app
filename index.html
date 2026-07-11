@@ -28,21 +28,22 @@
             cursor: pointer; font-weight: 300 !important; display: inline-block !important; 
             padding: 8px 16px; background: none; border: none; outline: none; 
             pointer-events: auto !important; white-space: nowrap;
-            animation: randomGlow 3.5s infinite ease-in-out; 
+            /* Using a mirrored shadow effect: transform is not supported in text-shadow, 
+               so we use a combination of offset and multiple layers to simulate the reflection */
+            animation: mirrorReflection 3.5s infinite ease-in-out; 
         }
         @media (max-width: 599px) { .enter-link, .download-btn { font-size: 0.55rem; } }
         @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn { font-size: 1.1rem; } }
         @media (min-width: 1024px) { .enter-link, .download-btn { font-size: 1.1rem; } }
 
-        /* Glow shifted down to the base of the letters */
-        @keyframes randomGlow {
-            0%, 100% { opacity: 0.25; text-shadow: 0 6px 1px #fff; }
-            15% { opacity: 1; text-shadow: 0 6px 2px #fff, 0 8px 4px #fff; }
-            22% { opacity: 0.35; text-shadow: 0 6px 1px #fff; }
-            45% { opacity: 0.9; text-shadow: 0 7px 3px #fff, 0 9px 5px #fff; }
+        @keyframes mirrorReflection {
+            0%, 100% { opacity: 0.25; text-shadow: 0 1px 0 #fff, 0 3px 2px rgba(255,255,255,0.4); }
+            15% { opacity: 1; text-shadow: 0 1px 0 #fff, 0 5px 3px rgba(255,255,255,0.6); }
+            22% { opacity: 0.35; text-shadow: 0 1px 0 #fff, 0 3px 2px rgba(255,255,255,0.4); }
+            45% { opacity: 0.9; text-shadow: 0 1px 0 #fff, 0 7px 4px rgba(255,255,255,0.5); }
             50% { opacity: 0.15; text-shadow: none; }
-            70% { opacity: 0.75; text-shadow: 0 6px 2px #fff; }
-            85% { opacity: 1; text-shadow: 0 6px 2px #fff; }
+            70% { opacity: 0.75; text-shadow: 0 1px 0 #fff, 0 4px 2px rgba(255,255,255,0.4); }
+            85% { opacity: 1; text-shadow: 0 1px 0 #fff, 0 4px 2px rgba(255,255,255,0.4); }
         }
     </style>
 </head>
