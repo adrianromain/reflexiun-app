@@ -26,6 +26,12 @@
         .movie-track-node {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease;
         }
+
+        /* Specific style to make the camera act like a mirror */
+        #cameraStreamNode {
+            transform: scaleX(-1);
+            -webkit-transform: scaleX(-1);
+        }
         
         .nav-menu-stack {
             position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 16px; pointer-events: auto !important;
@@ -70,7 +76,8 @@
 
     <div class="media-vault">
         <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto" style="pointer-events: none !important;"></video>
+        <video id="cameraStreamNode" class="movie-track-node" autoplay muted playsinline webkit-playsinline></video>
+        <video id="masterVideoEngine" class="movie-track-node" autoplay muted playsinline webkit-playsinline preload="auto"></video>
     </div>
 
     <div class="nav-menu-stack" id="navMenuStack">
@@ -104,6 +111,7 @@
         const dropInTrigger = document.getElementById('dropInTrigger');
         const mirrorTrigger = document.getElementById('mirrorTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
+        const cameraNode = document.getElementById('cameraStreamNode');
         const wallpaperBg = document.getElementById('wallpaperBg');
         const navMenuStack = document.getElementById('navMenuStack');
 
@@ -112,21 +120,60 @@
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
 
-        function startStreamingVideo(targetVideoUrl, routeName) {
+        function initiateCameraSequence(routeName) {
             selectedPathwayRoute = routeName;
+            
+            // Fade out UI immediately to prepare for the sequence
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
+
+            // Request Camera Access
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(function(stream) {
+                    // Connect stream and display camera
+                    cameraNode.srcObject = stream;
+                    cameraNode.style.zIndex = "9999999";
+                    cameraNode.style.opacity = '1';
+
+                    // Run the mirror for exactly 4 seconds
+                    setTimeout(function() {
+                        // Kill the camera feed entirely
+                        stream.getTracks().forEach(track => track.stop());
+                        cameraNode.style.opacity = '0';
+                        cameraNode.style.zIndex = "3";
+                        cameraNode.srcObject = null;
+
+                        // Seamlessly start the standard video sequence
+                        startStreamingVideo(localIntroUrl, routeName);
+                    }, 4000);
+                })
+                .catch(function(err) {
+                    console.error("Camera access denied or failed. Proceeding directly to video.", err);
+                    // Fallback: If no camera or permission denied, just play the video immediately.
+                    startStreamingVideo(localIntroUrl, routeName);
+                });
+        }
+
+        function startStreamingVideo(targetVideoUrl, routeName) {
+            selectedPathwayRoute = routeName;
+            
+            // Ensure UI is hidden (redundant safeguard)
+            navMenuStack.style.opacity = '0';
+            navMenuStack.style.pointerEvents = 'none';
+            wallpaperBg.style.opacity = '0';
+            
             masterVideo.style.zIndex = "9999999"; 
             masterVideo.src = targetVideoUrl;
-            masterVideo.muted = false; // Changed to allow sound
+            masterVideo.muted = false; // Allows sound to play
             masterVideo.style.opacity = '1'; 
             masterVideo.load();
             masterVideo.play().catch(e => console.error("Playback failed:", e));
         }
         
-        dropInTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "dropin"); });
-        mirrorTrigger.addEventListener('click', function() { startStreamingVideo(localIntroUrl, "mirror"); });
+        // Triggers updated to point to the new camera sequence function
+        dropInTrigger.addEventListener('click', function() { initiateCameraSequence("dropin"); });
+        mirrorTrigger.addEventListener('click', function() { initiateCameraSequence("mirror"); });
 
         masterVideo.addEventListener('ended', () => {
             if (masterVideo.src.includes(localIntroUrl)) {
@@ -135,7 +182,7 @@
                 } else {
                     masterVideo.src = localDropInUrl;
                 }
-                masterVideo.muted = false; // Changed to allow sound on the next clip
+                masterVideo.muted = false; // Allows sound on the second clip
                 masterVideo.load();
                 masterVideo.play().catch(e => console.error("Playback failed:", e));
             } else {
