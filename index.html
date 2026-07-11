@@ -1,123 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reflexiun</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { background-color: #000; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; transition: transform 20s ease-in-out; }
-        .drift-active { transform: perspective(1000px) rotateY(1deg) rotateX(0.5deg); }
-        
-        .media-vault { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1 !important; pointer-events: none !important; }
-        .wallpaper-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; z-index: 2 !important; transition: opacity 0.5s ease; }
-        @media (max-width: 599px) { .wallpaper-bg { background-image: url('reflexiunphone.png'); } }
-        
-        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
-        #cameraStreamNode { transform: scaleX(-1) !important; -webkit-transform: scaleX(-1) !important; position: absolute; z-index: 9999999 !important; }
-        
-        @keyframes hardcoreGlitch {
-            0%, 100% { filter: invert(0) saturate(1); transform: scaleX(-1) translateX(0); }
-            15% { filter: invert(0.5) saturate(5); transform: scaleX(-1) translateX(-10px); }
-            30% { filter: invert(0.8) contrast(200%); transform: scaleX(-1) translateX(10px); }
-            50% { filter: grayscale(1) blur(2px); transform: scaleX(-1) translateX(-5px); }
-        }
-        .glitch-active { animation: hardcoreGlitch 0.15s infinite linear; mask-image: radial-gradient(circle, black 40%, transparent 80%); }
-        
-        /* Menu Stack: Refined positioning */
-        .nav-menu-stack { position: fixed !important; bottom: 20%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; transition: opacity 0.5s ease; pointer-events: auto !important; }
-        .enter-link, .reflect-btn { color: #fff; text-decoration: none; letter-spacing: 5px; text-transform: uppercase; cursor: pointer; padding: 4px 8px; font-size: 0.55rem; white-space: nowrap; background: none; border: none; }
-        
-        #voidJournal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
-        .chamber-title { color: #fff; letter-spacing: 10px; text-transform: uppercase; font-size: 0.4rem; position: fixed; top: 5%; width: 100%; text-align: center; white-space: nowrap; opacity: 0.6; }
-        #voidInput { background: transparent; border: none; color: #fff; width: 90%; font-size: 1.5rem; text-align: center; outline: none; letter-spacing: 2px; opacity: 0.7; transition: transform 0.1s ease; }
-    </style>
-</head>
-<body>
-    <div class="media-vault">
-        <div class="wallpaper-bg" id="wallpaperBg"></div>
-        <video id="cameraStreamNode" autoplay muted playsinline></video>
-        <video id="masterVideoEngine" playsinline preload="auto"></video>
-    </div>
-    
-    <div id="voidJournal">
-        <div class="chamber-title">THE REFLEXIUN CHAMBER</div>
-        <textarea id="voidInput" placeholder="..."></textarea>
-    </div>
-
-    <div class="nav-menu-stack" id="navMenuStack">
-        <button id="dropInTrigger" class="enter-link">drop in</button>
-        <button id="mirrorTrigger" class="enter-link">look in the mirror</button>
-        <a href="reflexiunphone.png" class="reflect-btn" download>reflect</a>
-    </div>
-
-    <script>
-        const cameraNode = document.getElementById('cameraStreamNode');
-        const masterVideo = document.getElementById('masterVideoEngine');
-        const navMenuStack = document.getElementById('navMenuStack');
-        const wallpaperBg = document.getElementById('wallpaperBg');
-        const voidJournal = document.getElementById('voidJournal');
-        const voidInput = document.getElementById('voidInput');
-        
-        let currentRoute = "";
-        let forcedPhrase = "YOU HAVE TO WAKE UP.";
-        let charIndex = 0;
-
-        function triggerSubliminalFlash() {
-            const flash = document.createElement('div');
-            flash.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999999; opacity:0; pointer-events:none;";
-            document.body.appendChild(flash);
-            flash.style.transition = "opacity 0.05s";
-            setTimeout(() => { flash.style.opacity = "0.2"; }, 1500);
-            setTimeout(() => { flash.style.opacity = "0"; }, 1550);
-            setTimeout(() => { flash.remove(); }, 1600);
-        }
-
-        function startFlow(routeName) {
-            currentRoute = routeName;
-            document.body.classList.add('drift-active');
-            navMenuStack.style.opacity = '0';
-            wallpaperBg.style.opacity = '0';
-            masterVideo.src = "introvideo.mp4";
-            masterVideo.style.opacity = '1';
-            masterVideo.play();
-        }
-
-        masterVideo.addEventListener('ended', () => {
-            if (masterVideo.src.includes("introvideo.mp4")) {
-                masterVideo.style.opacity = '0';
-                triggerSubliminalFlash();
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    cameraNode.srcObject = stream;
-                    cameraNode.classList.add('glitch-active');
-                    cameraNode.style.opacity = '1';
-                    setTimeout(() => {
-                        stream.getTracks().forEach(t => t.stop());
-                        cameraNode.style.opacity = '0';
-                        cameraNode.classList.remove('glitch-active');
-                        masterVideo.src = (currentRoute === "mirror") ? "lookinthemirror.mp4" : "dropinvid.mp4";
-                        masterVideo.style.opacity = '1';
-                        masterVideo.play();
-                    }, 4000);
-                });
-            } else {
-                masterVideo.style.opacity = '0';
-                voidJournal.style.display = 'flex';
-                setTimeout(() => voidJournal.style.opacity = '1', 100);
-                voidInput.focus();
-            }
-        });
-
+// Clean, crisp forced typing
         voidInput.addEventListener('keydown', (e) => {
             e.preventDefault();
-            voidInput.style.transform = "scale(0.95)";
-            setTimeout(() => { voidInput.style.transform = "scale(1)"; }, 100);
+            
+            // Only add characters if we haven't finished the phrase
             if (charIndex < forcedPhrase.length) {
-                setTimeout(() => {
-                    voidInput.value += forcedPhrase[charIndex];
-                    charIndex++;
-                }, 150);
+                voidInput.value += forcedPhrase[charIndex];
+                charIndex++;
             }
+            
+            // Auto-advance if they reach the end
             if (charIndex >= forcedPhrase.length) {
                 setTimeout(() => {
                     voidJournal.style.opacity = '0';
@@ -125,15 +16,10 @@
                         voidJournal.style.display = 'none';
                         navMenuStack.style.opacity = '1';
                         wallpaperBg.style.opacity = '1';
+                        // Reset for next time
                         voidInput.value = "";
                         charIndex = 0;
                     }, 1000);
-                }, 3000);
+                }, 1500); // Shorter pause before closing
             }
         });
-
-        document.getElementById('dropInTrigger').addEventListener('click', () => startFlow("dropin"));
-        document.getElementById('mirrorTrigger').addEventListener('click', () => startFlow("mirror"));
-    </script>
-</body>
-</html>
