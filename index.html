@@ -17,14 +17,14 @@
         
         .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
         
+        /* Black and White Sunken Place Filter */
         #cameraStreamNode { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; 
             transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; opacity: 0; 
             transition: opacity 0.8s ease; 
-            filter: brightness(0.7) contrast(1.5) saturate(0.5) blur(2px) invert(0.1);
+            filter: grayscale(1) contrast(1.4) brightness(0.8) blur(1.5px);
         }
         
-        /* Adjusted menu stack further up */
         .nav-menu-stack { position: fixed !important; bottom: 18%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 32px; pointer-events: auto !important; }
         @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 20%; } }
         @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(22% + 32px); gap: 64px; } }
@@ -44,7 +44,8 @@
             filter: blur(0.4px);
         }
 
-        @media (max-width: 599px) { .enter-link, .download-btn, .mirror-reflection { font-size: 0.75rem; } }
+        /* Reverted to original sizes */
+        @media (max-width: 599px) { .enter-link, .download-btn, .mirror-reflection { font-size: 0.55rem; } }
         @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn, .mirror-reflection { font-size: 1.1rem; } }
         @media (min-width: 1024px) { .enter-link, .download-btn, .mirror-reflection { font-size: 1.1rem; } }
 
