@@ -20,8 +20,11 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             object-fit: cover; background-color: #000; opacity: 0; z-index: 4 !important; 
             pointer-events: none !important; transition: opacity 0.3s ease; 
-            /* Ghosting/Filter effect */
+            
+            /* Slight scale to reveal logo, darker filter for mood */
+            transform: scale(0.95);
             mix-blend-mode: screen; 
+            filter: brightness(0.6) contrast(1.2);
         }
         
         /* Camera set to Z-index 3 to sit behind the video filter */
