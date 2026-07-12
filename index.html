@@ -15,13 +15,15 @@
         @media (min-width: 600px) and (max-width: 1023px) { .wallpaper-bg { background-image: url('reflexiuntablet.png'); } }
         @media (min-width: 1024px) { .wallpaper-bg { background-image: url('reflexiundesktop.png'); } }
         
-        /* Video set to Z-index 4 to overlay the camera */
+        /* Base video styles */
         .movie-track-node { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             object-fit: cover; background-color: #000; opacity: 0; z-index: 4 !important; 
             pointer-events: none !important; transition: opacity 0.3s ease; 
-            
-            /* Slight scale to reveal logo, darker filter for mood */
+        }
+
+        /* The filter applied ONLY to the practice video */
+        .practice-filter {
             transform: scale(0.95);
             mix-blend-mode: screen; 
             filter: brightness(0.6) contrast(1.2);
@@ -123,6 +125,7 @@
         function startStreamingVideo(routeName) {
             selectedPathwayRoute = routeName;
             flowState = "intro";
+            masterVideo.classList.remove('practice-filter'); // Ensure filter is OFF for intro
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
@@ -139,6 +142,8 @@
             if (flowState === "intro") {
                 if (selectedPathwayRoute === "practice") {
                     flowState = "camera_active";
+                    // Apply filter ONLY when practice video starts
+                    masterVideo.classList.add('practice-filter');
                     navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
                         cam.srcObject = stream;
                         cam.style.opacity = '1';
@@ -161,6 +166,7 @@
                 }
                 cam.style.opacity = '0';
                 masterVideo.style.opacity = '0';
+                masterVideo.classList.remove('practice-filter'); // Reset filter
                 navMenuStack.style.opacity = '1';
                 navMenuStack.style.pointerEvents = 'auto';
                 wallpaperBg.style.opacity = '1';
