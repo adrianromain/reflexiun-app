@@ -22,9 +22,10 @@
             pointer-events: none !important; transition: opacity 0.3s ease; 
         }
 
-        /* The filter applied ONLY to the practice video */
+        /* The filter: Using contain and scale to keep the full video visible */
         .practice-filter {
-            transform: scale(0.95);
+            object-fit: contain !important;
+            transform: scale(0.9);
             mix-blend-mode: screen; 
             filter: brightness(0.6) contrast(1.2);
         }
@@ -125,7 +126,7 @@
         function startStreamingVideo(routeName) {
             selectedPathwayRoute = routeName;
             flowState = "intro";
-            masterVideo.classList.remove('practice-filter'); // Ensure filter is OFF for intro
+            masterVideo.classList.remove('practice-filter'); 
             navMenuStack.style.opacity = '0';
             navMenuStack.style.pointerEvents = 'none';
             wallpaperBg.style.opacity = '0';
@@ -142,7 +143,6 @@
             if (flowState === "intro") {
                 if (selectedPathwayRoute === "practice") {
                     flowState = "camera_active";
-                    // Apply filter ONLY when practice video starts
                     masterVideo.classList.add('practice-filter');
                     navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
                         cam.srcObject = stream;
@@ -166,7 +166,7 @@
                 }
                 cam.style.opacity = '0';
                 masterVideo.style.opacity = '0';
-                masterVideo.classList.remove('practice-filter'); // Reset filter
+                masterVideo.classList.remove('practice-filter'); 
                 navMenuStack.style.opacity = '1';
                 navMenuStack.style.pointerEvents = 'auto';
                 wallpaperBg.style.opacity = '1';
