@@ -107,7 +107,7 @@
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
-        const localPracticeUrl = "practicevid.mp4";
+        const localPracticeUrl = "thepractice.mp4";
 
         function startStreamingVideo(routeName) {
             selectedPathwayRoute = routeName;
@@ -126,30 +126,34 @@
 
         masterVideo.addEventListener('ended', () => {
             if (flowState === "intro") {
-                flowState = "camera";
-                masterVideo.style.opacity = '0';
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    cam.srcObject = stream;
-                    cam.style.opacity = '1';
-                    setTimeout(() => {
-                        stream.getTracks().forEach(t => t.stop());
-                        cam.style.opacity = '0';
-                        flowState = "final";
-                        const videoMap = {
-                            "mirror": localMirrorUrl,
-                            "practice": localPracticeUrl,
-                            "dropin": localDropInUrl
-                        };
-                        masterVideo.src = videoMap[selectedPathwayRoute] || localDropInUrl;
-                        masterVideo.style.opacity = '1';
+                if (selectedPathwayRoute === "practice") {
+                    flowState = "camera_active";
+                    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                        cam.srcObject = stream;
+                        cam.style.opacity = '1';
+                        masterVideo.src = localPracticeUrl;
                         masterVideo.play();
-                    }, 4000);
-                });
-            } else if (flowState === "final") {
+                    });
+                } else {
+                    flowState = "final";
+                    const videoMap = {
+                        "mirror": localMirrorUrl,
+                        "dropin": localDropInUrl
+                    };
+                    masterVideo.src = videoMap[selectedPathwayRoute] || localDropInUrl;
+                    masterVideo.play();
+                }
+            } else if (flowState === "camera_active" || flowState === "final") {
+                if (cam.srcObject) {
+                    cam.srcObject.getTracks().forEach(t => t.stop());
+                    cam.srcObject = null;
+                }
+                cam.style.opacity = '0';
                 masterVideo.style.opacity = '0';
                 navMenuStack.style.opacity = '1';
                 navMenuStack.style.pointerEvents = 'auto';
                 wallpaperBg.style.opacity = '1';
+                flowState = "intro";
             }
         });
     </script>
