@@ -17,11 +17,17 @@
         
         .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
         
-        #cameraStreamNode { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; opacity: 0; transition: opacity 0.3s ease; }
+        #cameraStreamNode { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; 
+            transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; opacity: 0; 
+            transition: opacity 0.8s ease; 
+            filter: brightness(0.7) contrast(1.5) saturate(0.5) blur(2px) invert(0.1);
+        }
         
-        .nav-menu-stack { position: fixed !important; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 32px; pointer-events: auto !important; }
-        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 14%; } }
-        @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(16% + 32px); gap: 64px; } }
+        /* Adjusted menu stack further up */
+        .nav-menu-stack { position: fixed !important; bottom: 18%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 32px; pointer-events: auto !important; }
+        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 20%; } }
+        @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(22% + 32px); gap: 64px; } }
 
         .btn-container { display: flex; flex-direction: column; align-items: center; pointer-events: auto !important; }
         
@@ -32,7 +38,6 @@
             white-space: nowrap; animation: pulseOpacity 3.5s infinite ease-in-out; 
         }
 
-        /* Reflection: Moved up closer and lowered opacity for a subtler, married look */
         .mirror-reflection { 
             color: #fff; letter-spacing: 5px; text-transform: uppercase; font-weight: 300 !important;
             transform: scaleY(-1); opacity: 0.25; margin-top: -6px; user-select: none; pointer-events: none !important;
