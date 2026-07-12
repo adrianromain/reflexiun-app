@@ -24,9 +24,9 @@
             filter: grayscale(1) contrast(1.4) brightness(0.8) blur(1.5px);
         }
         
-        .nav-menu-stack { position: fixed !important; bottom: 18%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 32px; pointer-events: auto !important; }
-        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 20%; } }
-        @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(22% + 32px); gap: 64px; } }
+        .nav-menu-stack { position: fixed !important; bottom: 18%; left: 50%; transform: translateX(-50%); z-index: 999999 !important; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; width: 100%; max-width: 600px; gap: 24px; pointer-events: auto !important; }
+        @media (min-width: 600px) and (max-width: 1023px) { .nav-menu-stack { bottom: 20%; gap: 32px; } }
+        @media (min-width: 1024px) { .nav-menu-stack { bottom: calc(22% + 32px); gap: 48px; } }
 
         .btn-container { display: flex; flex-direction: column; align-items: center; pointer-events: auto !important; }
         
@@ -37,7 +37,6 @@
             white-space: nowrap; animation: pulseOpacity 3.5s infinite ease-in-out; 
         }
 
-        /* Reflection: Increased opacity and added glow for more presence */
         .mirror-reflection { 
             color: #fff; letter-spacing: 5px; text-transform: uppercase; font-weight: 300 !important;
             transform: scaleY(-1); opacity: 0.45; margin-top: -6px; user-select: none; pointer-events: none !important;
@@ -73,6 +72,10 @@
             <span class="mirror-reflection">look in the mirror</span>
         </div>
         <div class="btn-container">
+            <button id="practiceTrigger" class="enter-link">the practice</button>
+            <span class="mirror-reflection">the practice</span>
+        </div>
+        <div class="btn-container">
             <a href="reflexiunphone.png" id="dynamicDownload" class="download-btn" download>reflect</a>
             <span class="mirror-reflection">reflect</span>
         </div>
@@ -93,6 +96,7 @@
 
         const dropInTrigger = document.getElementById('dropInTrigger');
         const mirrorTrigger = document.getElementById('mirrorTrigger');
+        const practiceTrigger = document.getElementById('practiceTrigger');
         const masterVideo = document.getElementById('masterVideoEngine');
         const cam = document.getElementById('cameraStreamNode');
         const wallpaperBg = document.getElementById('wallpaperBg');
@@ -103,6 +107,7 @@
         const localIntroUrl = "introvideo.mp4";
         const localDropInUrl = "dropinvid.mp4";
         const localMirrorUrl = "lookinthemirror.mp4";
+        const localPracticeUrl = "practicevid.mp4";
 
         function startStreamingVideo(routeName) {
             selectedPathwayRoute = routeName;
@@ -117,6 +122,7 @@
         
         dropInTrigger.addEventListener('click', () => startStreamingVideo("dropin"));
         mirrorTrigger.addEventListener('click', () => startStreamingVideo("mirror"));
+        practiceTrigger.addEventListener('click', () => startStreamingVideo("practice"));
 
         masterVideo.addEventListener('ended', () => {
             if (flowState === "intro") {
@@ -129,7 +135,12 @@
                         stream.getTracks().forEach(t => t.stop());
                         cam.style.opacity = '0';
                         flowState = "final";
-                        masterVideo.src = (selectedPathwayRoute === "mirror") ? localMirrorUrl : localDropInUrl;
+                        const videoMap = {
+                            "mirror": localMirrorUrl,
+                            "practice": localPracticeUrl,
+                            "dropin": localDropInUrl
+                        };
+                        masterVideo.src = videoMap[selectedPathwayRoute] || localDropInUrl;
                         masterVideo.style.opacity = '1';
                         masterVideo.play();
                     }, 4000);
