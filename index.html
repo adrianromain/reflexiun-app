@@ -17,7 +17,6 @@
         
         .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
         
-        /* Black and White Sunken Place Filter */
         #cameraStreamNode { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; 
             transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; opacity: 0; 
@@ -38,13 +37,13 @@
             white-space: nowrap; animation: pulseOpacity 3.5s infinite ease-in-out; 
         }
 
+        /* Reflection: Increased opacity and added glow for more presence */
         .mirror-reflection { 
             color: #fff; letter-spacing: 5px; text-transform: uppercase; font-weight: 300 !important;
-            transform: scaleY(-1); opacity: 0.25; margin-top: -6px; user-select: none; pointer-events: none !important;
-            filter: blur(0.4px);
+            transform: scaleY(-1); opacity: 0.45; margin-top: -6px; user-select: none; pointer-events: none !important;
+            filter: blur(0.4px); text-shadow: 0 0 8px rgba(255,255,255,0.8);
         }
 
-        /* Reverted to original sizes */
         @media (max-width: 599px) { .enter-link, .download-btn, .mirror-reflection { font-size: 0.55rem; } }
         @media (min-width: 600px) and (max-width: 1023px) { .enter-link, .download-btn, .mirror-reflection { font-size: 1.1rem; } }
         @media (min-width: 1024px) { .enter-link, .download-btn, .mirror-reflection { font-size: 1.1rem; } }
