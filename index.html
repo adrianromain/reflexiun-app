@@ -28,6 +28,7 @@
             transform: scale(0.9);
             mix-blend-mode: screen; 
             filter: brightness(0.6) contrast(1.2);
+            transition: filter 1s ease, opacity 1s ease;
         }
         
         /* Camera set to Z-index 3 to sit behind the video filter */
@@ -139,11 +140,19 @@
         mirrorTrigger.addEventListener('click', () => startStreamingVideo("mirror"));
         practiceTrigger.addEventListener('click', () => startStreamingVideo("practice"));
 
+        // Monitor video time for fade-out effect
+        masterVideo.addEventListener('timeupdate', () => {
+            if (flowState === "camera_active" && masterVideo.duration - masterVideo.currentTime <= 5) {
+                masterVideo.style.opacity = '0.3'; // Gently fade the video filter
+            }
+        });
+
         masterVideo.addEventListener('ended', () => {
             if (flowState === "intro") {
                 if (selectedPathwayRoute === "practice") {
                     flowState = "camera_active";
                     masterVideo.classList.add('practice-filter');
+                    masterVideo.style.opacity = '1'; // Reset opacity
                     navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
                         cam.srcObject = stream;
                         cam.style.opacity = '1';
