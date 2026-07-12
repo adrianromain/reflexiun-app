@@ -15,11 +15,19 @@
         @media (min-width: 600px) and (max-width: 1023px) { .wallpaper-bg { background-image: url('reflexiuntablet.png'); } }
         @media (min-width: 1024px) { .wallpaper-bg { background-image: url('reflexiundesktop.png'); } }
         
-        .movie-track-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background-color: #000; opacity: 0; z-index: 3 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
+        /* Video set to Z-index 4 to overlay the camera */
+        .movie-track-node { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: cover; background-color: #000; opacity: 0; z-index: 4 !important; 
+            pointer-events: none !important; transition: opacity 0.3s ease; 
+            /* Ghosting/Filter effect */
+            mix-blend-mode: screen; 
+        }
         
+        /* Camera set to Z-index 3 to sit behind the video filter */
         #cameraStreamNode { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; 
-            transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 4 !important; opacity: 0; 
+            transform: scaleX(-1); -webkit-transform: scaleX(-1); z-index: 3 !important; opacity: 0; 
             transition: opacity 0.8s ease; 
             filter: grayscale(1) contrast(1.4) brightness(0.8) blur(1.5px);
         }
